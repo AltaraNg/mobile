@@ -22,12 +22,22 @@ import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../typ
 import LinkingConfiguration from './LinkingConfiguration';
 import { Intro } from '../screens/Intro';
 import Login from '../screens/Login';
+import Otp from '../screens/Otp';
 
+
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    backgroundColor: 'rgb(255, 45, 85)',
+  },
+};
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
-      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+     >
       <RootNavigator />
     </NavigationContainer>
   );
@@ -44,6 +54,8 @@ function RootNavigator() {
     <Stack.Navigator>
       <Stack.Screen name="Intro" component={Intro} options={{ headerShown: false }}/>
       <Stack.Screen name="Root" component={Login} options={{ headerShown: false }} />
+      <Stack.Screen name="OTP" component={Otp} options={{ headerShown: false }} />
+
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />

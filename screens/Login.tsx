@@ -1,11 +1,44 @@
 import { Pressable, StyleSheet, TextInput } from 'react-native';
 
-import {LinearGradient} from 'expo-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header';
-import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
+import React, { useState, createRef } from 'react';
+import {post} from '../utilities/api';
 
-export default function Login({ navigation }: RootTabScreenProps<'TabOne'>) {
+import { Text, View } from '../components/Themed';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types';
+type OtpNavigationProps = StackNavigationProp<RootStackParamList, 'OTP'>;
+
+interface OtpProps {
+	navigation: OtpNavigationProps;
+}
+
+
+export default function Login({ navigation }: OtpProps) {
+	const [userPhone, setUserPhone] = useState('');
+	const [loading, setLoading] = useState(false);
+	const [errorText, setErrorText] = useState('');
+	let url = 'otp/send'
+
+	 const handleLogin = async () => {
+		setErrorText('');
+		if (!userPhone) {
+			alert('Please fill phone');
+			return;
+		}
+		setLoading(true);
+		let data = {
+			phone_number : userPhone
+		}
+		post(url, data).then(res => {
+			navigation.navigate('OTP');
+		}).catch(err => {
+			console.log(err, userPhone);
+		}).finally(() => {
+			navigation.navigate('OTP');
+		})
+	};
 	return (
 		<View style={styles.container}>
 			<Header></Header>
@@ -17,7 +50,11 @@ export default function Login({ navigation }: RootTabScreenProps<'TabOne'>) {
 
 			<View style={styles.inputContainer}>
 				<Text style={styles.label}>Phone Number</Text>
-				<TextInput style={styles.input} />
+				<TextInput
+					keyboardType="phone-pad"
+					onChangeText={(userPhone) => setUserPhone(userPhone)}
+					style={styles.input}
+				/>
 			</View>
 			<LinearGradient
 				colors={['#074A74', '#089CA4']}
@@ -25,7 +62,7 @@ export default function Login({ navigation }: RootTabScreenProps<'TabOne'>) {
 				start={{ x: 1, y: 0.5 }}
 				end={{ x: 0, y: 0.5 }}
 			>
-				<Pressable style={[styles.button]}>
+				<Pressable style={[styles.button]} onPress={handleLogin}>
 					<Text style={styles.buttonText}>Next</Text>
 				</Pressable>
 			</LinearGradient>

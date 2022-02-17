@@ -1,6 +1,9 @@
 {
   "expo": {
     "name": "mobile",
+    "extra": {
+      "URL": "https://altara-customer-play-api.herokuapp.com/api/v1/"
+    },
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -29,6 +32,8 @@
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
-    }
-  }
+    },
+    "sdkVersion": "44.0.0"
+  },
+  "name": "mobile"
 }
