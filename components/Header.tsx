@@ -19,13 +19,5 @@ const styles = StyleSheet.create({
         paddingLeft: 30
 		
 	},
-	title: {
-		fontSize: 20,
-		fontWeight: 'bold',
-	},
-	separator: {
-		marginVertical: 30,
-		height: 1,
-		width: '80%',
-	},
+	
 });

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, TextInput } from 'react-native';
+import { Pressable, StyleSheet, TextInput, ActivityIndicator } from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header';
@@ -17,8 +17,8 @@ interface OtpProps {
 
 export default function Login({ navigation }: OtpProps) {
 	const [userPhone, setUserPhone] = useState('');
-	const [loading, setLoading] = useState(false);
-	const [errorText, setErrorText] = useState('');
+	const [isLoading, setLoading] = useState(false);
+	let [errorText, setErrorText] = useState('');
 	let url = 'otp/send'
 
 	 const handleLogin = async () => {
@@ -32,15 +32,22 @@ export default function Login({ navigation }: OtpProps) {
 			phone_number : userPhone
 		}
 		post(url, data).then(res => {
-			navigation.navigate('OTP');
+			navigation.navigate('OTP', {phone_number: userPhone});
 		}).catch(err => {
-			console.log(err, userPhone);
+			let message = err?.response?.data?.data?.errors?.phone_number[0];
+			setErrorText(message);
 		}).finally(() => {
-			navigation.navigate('OTP');
+			setLoading(false);
+			navigation.navigate('OTP', {phone_number: userPhone});
+			
+
 		})
 	};
 	return (
+		
 		<View style={styles.container}>
+			{isLoading ? <ActivityIndicator size={'large'} /> : (<View>
+			
 			<Header></Header>
 
 			<Text style={styles.title}>Enter phone number</Text>
@@ -55,6 +62,11 @@ export default function Login({ navigation }: OtpProps) {
 					onChangeText={(userPhone) => setUserPhone(userPhone)}
 					style={styles.input}
 				/>
+				{errorText != '' ? (
+              <Text style={styles.errorText}>
+                {errorText}
+              </Text>
+            ) : null}
 			</View>
 			<LinearGradient
 				colors={['#074A74', '#089CA4']}
@@ -66,6 +78,8 @@ export default function Login({ navigation }: OtpProps) {
 					<Text style={styles.buttonText}>Next</Text>
 				</Pressable>
 			</LinearGradient>
+			</View>)}
+			
 		</View>
 	);
 }
@@ -100,6 +114,10 @@ const styles = StyleSheet.create({
 	inputContainer: {
 		marginHorizontal: 40,
 		marginTop: 45,
+	},
+	errorText: {
+		color: 'red',
+		fontSize: 15
 	},
 	label: {
 		fontSize: 16,

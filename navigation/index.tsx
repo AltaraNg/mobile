@@ -16,13 +16,12 @@ import ModalScreen from '../screens/ModalScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 
 import NotFoundScreen from '../screens/NotFoundScreen';
-import TabOneScreen from '../screens/TabOneScreen';
-import TabTwoScreen from '../screens/TabTwoScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import { Intro } from '../screens/Intro';
 import Login from '../screens/Login';
 import Otp from '../screens/Otp';
+import Dashboard from '../screens/Dashboard';
 
 
 const MyTheme = {
@@ -55,6 +54,8 @@ function RootNavigator() {
       <Stack.Screen name="Intro" component={Intro} options={{ headerShown: false }}/>
       <Stack.Screen name="Root" component={Login} options={{ headerShown: false }} />
       <Stack.Screen name="OTP" component={Otp} options={{ headerShown: false }} />
+      <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
+
 
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
@@ -101,14 +102,7 @@ function BottomTabNavigator() {
           ),
         })}
       />
-      <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
-        options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      />
+     
     </BottomTab.Navigator>
   );
 }

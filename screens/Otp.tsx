@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, TextInput } from 'react-native';
+import * as Device from 'expo-device';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header';
@@ -9,8 +10,14 @@ import CustomTextInput from '../lib/CustomTextInput';
 import { GenericStyles } from '../styles/GenericStyles';
 import { AntDesign } from '@expo/vector-icons';
 import colors from '../common/colors';
+import { post } from '../utilities/api';
 
-export default function Otp() {
+export default function Otp({ navigation, route }) {
+	let [errorText, setErrorText] = useState('');
+	const [isLoading, setLoading] = useState(false);
+	const phone = route.params;
+
+	let url = 'auth/login';
 	const [otpArray, setOtpArray] = useState(['', '', '', '']);
 
 	const refCallback = (textInputRef) => (node) => {
@@ -30,6 +37,29 @@ export default function Otp() {
 			const otpArrayCopy = otpArray.concat();
 			otpArrayCopy[index] = value;
 			setOtpArray(otpArrayCopy);
+			if (index === 3) {
+				const data = {
+					otp: otpArrayCopy.join(''),
+					phone_number: phone?.phone_number,
+					device_name: Device.deviceName
+				};
+				post(url, data)
+					.then((res) => {
+						let loginInfo = res.data.data;
+						navigation.navigate('Dashboard', {phone_number: loginInfo});
+
+					})
+					.catch((err) => {
+						console.log(err?.response?.data?.data, data);
+						let message = err?.response?.data?.data?.errors;
+						setErrorText(message);
+					})
+					.finally(() => {
+						setLoading(false);
+						return
+					});
+			}
+			
 
 			// auto focus to next InputText if value is not blank
 			if (value !== '') {
@@ -77,8 +107,7 @@ export default function Otp() {
 			<Text style={styles.simple}>
 				We sent a pin to your phone number to confirm
 			</Text>
-
-			<AntDesign name="lock" size={72}  />
+			<AntDesign name="lock" size={72} style={styles.svg} />
 
 			<View style={[GenericStyles.row, GenericStyles.mt12]}>
 				{[
@@ -134,6 +163,10 @@ const styles = StyleSheet.create({
 
 		color: '#074A74',
 	},
+	svg: {
+		textAlign: 'center',
+		marginVertical: 20,
+	},
 	inputContainer: {
 		marginVertical: 10,
 		justifyContent: 'center',
@@ -172,6 +205,6 @@ const styles = StyleSheet.create({
 
 	lock: {
 		flex: 1,
-		justifyContent: 'center'
-	}
+		justifyContent: 'center',
+	},
 });
