@@ -13,7 +13,6 @@ import { ColorSchemeName, Pressable } from 'react-native';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../screens/ModalScreen';
-import WelcomeScreen from '../screens/WelcomeScreen';
 
 import NotFoundScreen from '../screens/NotFoundScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
@@ -28,7 +27,7 @@ const MyTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    backgroundColor: 'rgb(255, 45, 85)',
+    backgroundColor: '#EFF5F9',
   },
 };
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {

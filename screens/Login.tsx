@@ -46,7 +46,7 @@ export default function Login({ navigation }: OtpProps) {
 	return (
 		
 		<View style={styles.container}>
-			{isLoading ? <ActivityIndicator size={'large'} /> : (<View>
+			{/* {isLoading ? <ActivityIndicator size={'large'} /> : (<View> */}
 			
 			<Header></Header>
 
@@ -78,7 +78,7 @@ export default function Login({ navigation }: OtpProps) {
 					<Text style={styles.buttonText}>Next</Text>
 				</Pressable>
 			</LinearGradient>
-			</View>)}
+			{/* </View>)} */}
 			
 		</View>
 	);
@@ -87,6 +87,7 @@ export default function Login({ navigation }: OtpProps) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		backgroundColor: '#EFF5F9',
 	},
 	title: {
 		marginTop: 70,
@@ -107,13 +108,15 @@ const styles = StyleSheet.create({
 		borderColor: '#074A74',
 		borderRadius: 5,
 		height: 50,
-		fontSize: 32,
+		fontSize: 20,
 		paddingHorizontal: 10,
 		color: '#074A74',
 	},
 	inputContainer: {
 		marginHorizontal: 40,
 		marginTop: 45,
+		backgroundColor: '#EFF5F9'
+		
 	},
 	errorText: {
 		color: 'red',
@@ -122,6 +125,8 @@ const styles = StyleSheet.create({
 	label: {
 		fontSize: 16,
 		marginBottom: 8,
+		color: '#72788D',
+		fontFamily: 'Montserrat_700Bold',
 	},
 	buttonContainer: {
 		flexDirection: 'row',
