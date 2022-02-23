@@ -11,6 +11,7 @@ import { GenericStyles } from '../styles/GenericStyles';
 import { AntDesign } from '@expo/vector-icons';
 import colors from '../common/colors';
 import { post } from '../utilities/api';
+import Lock from '../assets/svgs/lock.svg'
 
 export default function Otp({ navigation, route }) {
 	let [errorText, setErrorText] = useState('');
@@ -107,9 +108,10 @@ export default function Otp({ navigation, route }) {
 			<Text style={styles.simple}>
 				We sent a pin to your phone number to confirm
 			</Text>
-			<AntDesign name="lock" size={72} style={styles.svg} />
-
-			<View style={[GenericStyles.row, GenericStyles.mt12]}>
+			<View style={styles.svg}>
+				<Lock size={72} />
+			</View>
+			<View style={[GenericStyles.row, GenericStyles.mt12, styles.otp,]}>
 				{[
 					firstTextInputRef,
 					secondTextInputRef,
@@ -137,6 +139,8 @@ export default function Otp({ navigation, route }) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		backgroundColor: '#EFF5F9',
+		flexDirection: 'column',
 	},
 	title: {
 		marginTop: 70,
@@ -164,8 +168,10 @@ const styles = StyleSheet.create({
 		color: '#074A74',
 	},
 	svg: {
-		textAlign: 'center',
+		justifyContent: 'center',
 		marginVertical: 20,
+		flexDirection: 'row',
+		backgroundColor: '#EFF5F9',
 	},
 	inputContainer: {
 		marginVertical: 10,
@@ -201,10 +207,14 @@ const styles = StyleSheet.create({
 		color: '#074A74',
 		fontSize: 18,
 		width: '100%',
+		
 	},
 
 	lock: {
 		flex: 1,
 		justifyContent: 'center',
 	},
+	otp:{
+		backgroundColor: '#EFF5F9'
+	}
 });

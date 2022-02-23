@@ -63,8 +63,9 @@ const styles = StyleSheet.create({
 	text: {
 		color: '#5E5C5C',
 		textAlign: 'center',
-		marginHorizontal: 72,
+		marginHorizontal: 62,
         marginVertical: 5,
+		fontFamily: 'Montserrat_400Regular',
 
 	},
 	title: {
@@ -74,6 +75,7 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: '#074A74',
 		textAlign: 'center',
+		paddingTop:28
 	},
 	paginationContainer: {
 		position: 'absolute',
@@ -100,14 +102,15 @@ const styles = StyleSheet.create({
 	},
 	buttonContainer: {
 		flexDirection: 'row',
-		marginHorizontal: 36,
+		marginHorizontal: 30,
         borderColor: '#074A74',
         borderWidth: 1,
         borderRadius: 10,
+		
 	},
 	button: {
 		flex: 1,
-		paddingVertical: 20,
+		paddingVertical: 14,
 		marginHorizontal: 8,
 		borderRadius: 24,
 		backgroundColor: '#1cb278',
@@ -118,17 +121,19 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
         fontSize: 18,
 	},
+
 });
 const renderItem = ({ item }: { item: Item }) => (
 	<View
 		style={[
 			styles.slide,
 			{
-				backgroundColor: 'white',
+				backgroundColor: '#EFF5F9',
+				
 			},
 		]}
 	>
-		<SvgXml xml={item.img} width={200} height={250}/>
+		<SvgXml  xml={item.img} width={258} height={164}/>
 		<Text style={styles.title}>{item.title}</Text>
 		<Text style={styles.text}>{item.text}</Text>
 	</View>
@@ -153,7 +158,7 @@ const RenderPagination = ({
 								style={[
 									styles.dot,
 									i === activeIndex
-										? { backgroundColor: 'white' }
+										? { backgroundColor: '#EFF5F9' }
 										: { backgroundColor: '#074A74' },
 								]}
 								onPress={() => slider?.goToSlide(i, true)}
@@ -164,7 +169,7 @@ const RenderPagination = ({
 					<View style={styles.buttonContainer}>
 						<Pressable
 							onPress={handleIntroCompleted}
-							style={[styles.button, { backgroundColor: 'white' }]}
+							style={[styles.button, { backgroundColor: '#EFF5F9' }]}
 						>
 							<Text style={styles.buttonText}>Log in</Text>
 						</Pressable>
