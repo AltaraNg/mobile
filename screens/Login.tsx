@@ -52,7 +52,6 @@ export default function Login({ navigation }: OtpProps) {
 	return (
 		<View style={styles.container}>
 			{/* {isLoading ? <ActivityIndicator size={'large'} /> : (<View> */}
-
 			<Header></Header>
 
 			<Text style={styles.title}>Enter phone number</Text>
