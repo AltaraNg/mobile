@@ -54,7 +54,6 @@ export default function Otp({ navigation, route }) {
 
 					})
 					.catch((err) => {
-						console.log(err?.response?.data?.message);
 						let message = err?.response?.data?.message;
 						setErrorText(message);
 					})
