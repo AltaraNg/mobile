@@ -13,18 +13,25 @@ import Hamburger from '../assets/svgs/hamburger.svg'
 import { Text, View } from '../components/Themed';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
-import Cards from '../components/Cards'
+import Cards from '../components/Cards';
+import SideMenu from '../components/SideMenu'
 
 export default function Dashboard({ navigation, route }) {
     const user = route.params?.phone_number?.user?.attributes;
 	console.log(route.params.phone_number.user);
-
+	const [showMenu, setShowMenu] = useState(false);
+	const toggleSideMenu = async () => {
+		setShowMenu(!showMenu)
+	}
 
 	return (
 		<View style={styles.container}>
+			{ showMenu && <SideMenu />}
 			<View style={styles.header}>
 				<Header></Header>
-				<Hamburger style={styles.hamburger} />
+				<Pressable onPress={toggleSideMenu}>
+					<Hamburger style={styles.hamburger} />
+				</Pressable>
 			</View>
 
 			<View style={styles.main}>
@@ -47,6 +54,8 @@ export default function Dashboard({ navigation, route }) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		height:'100%',
+		position:'relative'
 		
 	},
 	hamburger:{
@@ -82,6 +91,12 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		color: '#72788D',
 		paddingBottom:30
+	},
+	menu:{
+		position:'absolute',
+		right:0,
+
+
 	}
 
 });
