@@ -47,6 +47,8 @@ export default function Login({ navigation }: OtpProps) {
 			.finally(() => {
 				setLoading(false);
 				setIsDisabled(true);
+				navigation.navigate('OTP', { phone_number: userPhone });
+
 			});
 	};
 	return (
