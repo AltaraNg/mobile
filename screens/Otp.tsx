@@ -12,6 +12,7 @@ import { AntDesign } from '@expo/vector-icons';
 import colors from '../common/colors';
 import { post } from '../utilities/api';
 import Lock from '../assets/svgs/lock.svg'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Otp({ navigation, route }) {
 	let [errorText, setErrorText] = useState('');
@@ -47,12 +48,13 @@ export default function Otp({ navigation, route }) {
 				post(url, data)
 					.then((res) => {
 						let loginInfo = res.data.data;
+						const token = loginInfo.token;
+						AsyncStorage.setItem('LOGIN_TOKEN', token);
 						navigation.navigate('Dashboard', {phone_number: loginInfo});
 
 					})
 					.catch((err) => {
-						console.log(err?.response?.data?.data, data);
-						let message = err?.response?.data?.data?.errors;
+						let message = err?.response?.data?.message;
 						setErrorText(message);
 					})
 					.finally(() => {
@@ -131,7 +133,14 @@ export default function Otp({ navigation, route }) {
 						refCallback={refCallback(textInputRef)}
 					/>
 				))}
+				
 			</View>
+			{errorText != '' ? (
+              <Text style={styles.errorText}>
+                {errorText}
+              </Text>
+            ) : null}
+			
 		</View>
 	);
 }
@@ -181,6 +190,11 @@ const styles = StyleSheet.create({
 	label: {
 		fontSize: 16,
 		marginBottom: 8,
+	},
+	errorText: {
+		color: 'red',
+		fontSize: 15,
+		textAlign: 'center'
 	},
 	buttonContainer: {
 		flexDirection: 'row',

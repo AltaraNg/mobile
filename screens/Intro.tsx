@@ -6,6 +6,7 @@ import { illustration } from '../assets/svgs/illustration.js';
 import { hands } from '../assets/svgs/hands.js';
 import { image3 } from '../assets/svgs/image3.js';
 
+
 import {
 	View,
 	SafeAreaView,
@@ -183,6 +184,7 @@ export const Intro = ({ navigation }: IntroProps) => {
 	const sliderEl = useRef(null);
 	const keyExtractor = (item: Item) => item.title;
 	const onIntroCompleted = () => {
+	
 		navigation.navigate('Root');
 	};
 	return (
