@@ -1,9 +1,14 @@
-import { Pressable, StyleSheet, TextInput, ActivityIndicator } from 'react-native';
+import {
+	Pressable,
+	StyleSheet,
+	TextInput,
+	ActivityIndicator,
+} from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header';
 import React, { useState, createRef } from 'react';
-import {post} from '../utilities/api';
+import { post } from '../utilities/api';
 
 import { Text, View } from '../components/Themed';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -14,14 +19,14 @@ interface OtpProps {
 	navigation: OtpNavigationProps;
 }
 
-
 export default function Login({ navigation }: OtpProps) {
 	const [userPhone, setUserPhone] = useState('');
-	const [isLoading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [isDisabled, setIsDisabled] = useState(true);
 	let [errorText, setErrorText] = useState('');
-	let url = 'otp/send'
+	let url = 'otp/send';
 
-	 const handleLogin = async () => {
+	const handleLogin = async () => {
 		setErrorText('');
 		if (!userPhone) {
 			alert('Please fill phone');
@@ -29,25 +34,26 @@ export default function Login({ navigation }: OtpProps) {
 		}
 		setLoading(true);
 		let data = {
-			phone_number : userPhone
-		}
-		post(url, data).then(res => {
-			navigation.navigate('OTP', {phone_number: userPhone});
-		}).catch(err => {
-			let message = err?.response?.data?.data?.errors?.phone_number[0];
-			setErrorText(message);
-		}).finally(() => {
-			setLoading(false);
-			navigation.navigate('OTP', {phone_number: userPhone});
-			
+			phone_number: userPhone,
+		};
+		post(url, data)
+			.then((res) => {
+				navigation.navigate('OTP', { phone_number: userPhone });
+			})
+			.catch((err) => {
+				let message = err?.response?.data?.message;
+				setErrorText(message);
+			})
+			.finally(() => {
+				setLoading(false);
+				setIsDisabled(true);
+				navigation.navigate('OTP', { phone_number: userPhone });
 
-		})
+			});
 	};
 	return (
-		
 		<View style={styles.container}>
 			{/* {isLoading ? <ActivityIndicator size={'large'} /> : (<View> */}
-			
 			<Header></Header>
 
 			<Text style={styles.title}>Enter phone number</Text>
@@ -59,27 +65,44 @@ export default function Login({ navigation }: OtpProps) {
 				<Text style={styles.label}>Phone Number</Text>
 				<TextInput
 					keyboardType="phone-pad"
-					onChangeText={(userPhone) => setUserPhone(userPhone)}
+					onChangeText={(userPhone) => {
+						setUserPhone(userPhone);
+						if (userPhone.length === 11) {
+							setIsDisabled(false);
+						}else{
+							setIsDisabled(true);
+						}
+					}}
 					style={styles.input}
 				/>
 				{errorText != '' ? (
-              <Text style={styles.errorText}>
-                {errorText}
-              </Text>
-            ) : null}
+					<Text style={styles.errorText}>{errorText}</Text>
+				) : null}
 			</View>
 			<LinearGradient
-				colors={['#074A74', '#089CA4']}
-				style={styles.buttonContainer}
+				colors={ ['#074A74', '#089CA4']}
+				style={isDisabled ? styles.disabled : styles.buttonContainer}
 				start={{ x: 1, y: 0.5 }}
 				end={{ x: 0, y: 0.5 }}
 			>
-				<Pressable style={[styles.button]} onPress={handleLogin}>
-					<Text style={styles.buttonText}>Next</Text>
+				<Pressable
+					style={[styles.button]}
+					onPress={handleLogin}
+					disabled={isDisabled}
+					
+				>
+					{loading ? (
+						<ActivityIndicator
+						visible={loading}
+						textContent={'please wait'}
+						textStyle={styles.spinnerTextStyle}
+						 />
+					) : (
+						<Text style={styles.buttonText}>Next</Text>
+					)}
 				</Pressable>
 			</LinearGradient>
 			{/* </View>)} */}
-			
 		</View>
 	);
 }
@@ -115,13 +138,15 @@ const styles = StyleSheet.create({
 	inputContainer: {
 		marginHorizontal: 40,
 		marginTop: 45,
-		backgroundColor: '#EFF5F9'
-		
+		backgroundColor: '#EFF5F9',
 	},
 	errorText: {
 		color: 'red',
-		fontSize: 15
+		fontSize: 15,
 	},
+	spinnerTextStyle: {
+		color: '#FFF',
+	  },
 	label: {
 		fontSize: 16,
 		marginBottom: 8,
@@ -135,6 +160,16 @@ const styles = StyleSheet.create({
 		borderColor: '#074A74',
 		borderWidth: 1,
 		borderRadius: 10,
+	},
+
+	disabled: {
+		flexDirection: 'row',
+		marginHorizontal: 40,
+		marginTop: 50,
+		borderColor: '#074A74',
+		borderWidth: 1,
+		borderRadius: 10,
+		opacity: 0.1
 	},
 	button: {
 		flex: 1,

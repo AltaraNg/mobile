@@ -5,7 +5,11 @@
  */
 import { FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import {
+	NavigationContainer,
+	DefaultTheme,
+	DarkTheme,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { ColorSchemeName, Pressable } from 'react-native';
@@ -15,30 +19,38 @@ import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../screens/ModalScreen';
 
 import NotFoundScreen from '../screens/NotFoundScreen';
-import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
+import {
+	RootStackParamList,
+	RootTabParamList,
+	RootTabScreenProps,
+} from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import { Intro } from '../screens/Intro';
 import Login from '../screens/Login';
 import Otp from '../screens/Otp';
 import Dashboard from '../screens/Dashboard';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MyTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    backgroundColor: '#EFF5F9',
-  },
+	...DefaultTheme,
+	colors: {
+		...DefaultTheme.colors,
+		backgroundColor: '#EFF5F9',
+	},
 };
-export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
-  return (
-    <NavigationContainer
-      linking={LinkingConfiguration}
-      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-     >
-      <RootNavigator />
-    </NavigationContainer>
-  );
+export default function Navigation({
+	colorScheme,
+}: {
+	colorScheme: ColorSchemeName;
+}) {
+	return (
+		<NavigationContainer
+			linking={LinkingConfiguration}
+			theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+		>
+			<RootNavigator />
+		</NavigationContainer>
+	);
 }
 
 /**
@@ -47,21 +59,48 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
  */
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+const apiKey = AsyncStorage.getItem('LOGIN_TOKEN');
+
 function RootNavigator() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="Intro" component={Intro} options={{ headerShown: false }}/>
-      <Stack.Screen name="Root" component={Login} options={{ headerShown: false }} />
-      <Stack.Screen name="OTP" component={Otp} options={{ headerShown: false }} />
-      <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
+	return (
+		<Stack.Navigator
+			initialRouteName="Intro"
+			screenOptions={{
+				headerTintColor: 'green',
+				headerStyle: { backgroundColor: 'tomato' },
+			}}
+		>
+			<Stack.Screen
+				name="Intro"
+				component={Intro}
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="Root"
+				component={Login}
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="OTP"
+				component={Otp}
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="Dashboard"
+				component={Dashboard}
+				options={{ headerShown: false }}
+			/>
 
-
-      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-      <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
-      </Stack.Group>
-    </Stack.Navigator>
-  );
+			<Stack.Screen
+				name="NotFound"
+				component={NotFoundScreen}
+				options={{ title: 'Oops!' }}
+			/>
+			<Stack.Group screenOptions={{ presentation: 'modal' }}>
+				<Stack.Screen name="Modal" component={ModalScreen} />
+			</Stack.Group>
+		</Stack.Navigator>
+	);
 }
 
 /**
@@ -71,47 +110,48 @@ function RootNavigator() {
 const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
 function BottomTabNavigator() {
-  const colorScheme = useColorScheme();
+	const colorScheme = useColorScheme();
 
-  return (
-    <BottomTab.Navigator
-      initialRouteName="TabOne"
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
-      }}>
-      <BottomTab.Screen
-        name="TabOne"
-        component={WelcomeScreen}
-        options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate('Modal')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}>
-              <FontAwesome
-                name="info-circle"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
-          ),
-        })}
-      />
-     
-    </BottomTab.Navigator>
-  );
+	return (
+		<BottomTab.Navigator
+			initialRouteName="TabOne"
+			screenOptions={{
+				tabBarActiveTintColor: Colors[colorScheme].tint,
+			}}
+		>
+			<BottomTab.Screen
+				name="TabOne"
+				component={WelcomeScreen}
+				options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
+					title: 'Tab One',
+					tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+					headerRight: () => (
+						<Pressable
+							onPress={() => navigation.navigate('Modal')}
+							style={({ pressed }) => ({
+								opacity: pressed ? 0.5 : 1,
+							})}
+						>
+							<FontAwesome
+								name="info-circle"
+								size={25}
+								color={Colors[colorScheme].text}
+								style={{ marginRight: 15 }}
+							/>
+						</Pressable>
+					),
+				})}
+			/>
+		</BottomTab.Navigator>
+	);
 }
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
  */
 function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
+	name: React.ComponentProps<typeof FontAwesome>['name'];
+	color: string;
 }) {
-  return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
+	return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
 }
