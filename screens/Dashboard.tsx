@@ -18,6 +18,7 @@ import { RootStackParamList } from '../types';
 import Cards from '../components/Cards';
 import SideMenu from '../components/SideMenu'
 
+
 export default function Dashboard({ navigation, route }) {
 
 	const [exitApp, setExitApp] = useState(1);
