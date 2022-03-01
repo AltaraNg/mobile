@@ -10,16 +10,15 @@ import {
 
 import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header';
-import React, { useState, createRef, useEffect } from 'react';
+import React, { useState, createRef, useEffect, useContext } from 'react';
 import Hamburger from '../assets/svgs/hamburger.svg'
 import { Text, View } from '../components/Themed';
-
+import { Context as AuthContext } from '../context/AuthContext';
 import Cards from '../components/Cards'
 
 export default function Dashboard({ navigation, route }) {
-
+	const {state} = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
-    const user = route.params?.phone_number?.user?.attributes;
 	const backAction = () => {
 		if (Platform.OS === "ios") return;
 		setTimeout(() => {
@@ -28,7 +27,6 @@ export default function Dashboard({ navigation, route }) {
 
 		if(exitApp === 0){
 			setExitApp(exitApp + 1);
-			console.log(exitApp);
 
 			ToastAndroid.showWithGravity(
 				'press back button again to exit app',
@@ -58,7 +56,7 @@ export default function Dashboard({ navigation, route }) {
 
 			<View style={styles.main}>
                 <Text style={styles.name}>
-                    {user.first_name},
+                    {state.user.attributes.first_name},
                 </Text>
                 <Text style={styles.message}>
                 Welcome to your altara dashboard
