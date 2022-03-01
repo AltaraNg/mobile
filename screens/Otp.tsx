@@ -217,7 +217,6 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 	},
 	otpText: {
-		fontWeight: 'bold',
 		color: '#074A74',
 		fontSize: 18,
 		width: '100%',

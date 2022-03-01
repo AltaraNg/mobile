@@ -6,6 +6,7 @@ import {
 	ToastAndroid,
 	BackHandler,
 	Platform,
+	TouchableOpacity
 } from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
@@ -58,30 +59,27 @@ export default function Dashboard({ navigation, route }) {
 
 
 	return (
-		<View style={styles.container}>
-			{ showMenu && <SideMenu />}
-			<View style={styles.header}>
-				<Header></Header>
-				<Pressable onPress={toggleSideMenu}>
-					<Hamburger style={styles.hamburger} />
-				</Pressable>
-			</View>
+    <View style={styles.container}>
+      {showMenu && <SideMenu />}
+      <View style={styles.header}>
+        <Header></Header>
+        <TouchableOpacity>
+          <Pressable onPress={toggleSideMenu}>
+            <Hamburger style={styles.hamburger} />
+          </Pressable>
+        </TouchableOpacity>
+      </View>
 
-			<View style={styles.main}>
-                <Text style={styles.name}>
-                    {user.first_name},
-                </Text>
-                <Text style={styles.message}>
-                Welcome to your altara dashboard
-                </Text>
-				<View style={styles.cards}>
-				<Cards title="Get a Loan Now!!!" amount="Up to ₦500,000"/>
-				<Cards title="Order a Product Now!!!" amount="Up to ₦500,000"/>
-			</View>
-            </View>
-			
-		</View>
-	);
+      <View style={styles.main}>
+        <Text style={styles.name}>{user.first_name},</Text>
+        <Text style={styles.message}>Welcome to your altara dashboard</Text>
+        <View style={styles.cards}>
+          <Cards title="Get a Loan Now!!!" amount="Up to ₦500,000" />
+          <Cards title="Order a Product Now!!!" amount="Up to ₦500,000" />
+        </View>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

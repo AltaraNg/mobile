@@ -29,6 +29,8 @@ import { Intro } from '../screens/Intro';
 import Login from '../screens/Login';
 import Otp from '../screens/Otp';
 import Dashboard from '../screens/Dashboard';
+import ViewProfile from '../screens/ViewProfile'
+import SideMenu from '../components/SideMenu';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MyTheme = {
@@ -63,44 +65,54 @@ const apiKey = AsyncStorage.getItem('LOGIN_TOKEN');
 
 function RootNavigator() {
 	return (
-		<Stack.Navigator
-			initialRouteName="Intro"
-			screenOptions={{
-				headerTintColor: 'green',
-				headerStyle: { backgroundColor: 'tomato' },
-			}}
-		>
-			<Stack.Screen
-				name="Intro"
-				component={Intro}
-				options={{ headerShown: false }}
-			/>
-			<Stack.Screen
-				name="Root"
-				component={Login}
-				options={{ headerShown: false }}
-			/>
-			<Stack.Screen
-				name="OTP"
-				component={Otp}
-				options={{ headerShown: false }}
-			/>
-			<Stack.Screen
-				name="Dashboard"
-				component={Dashboard}
-				options={{ headerShown: false }}
-			/>
+    <Stack.Navigator
+      initialRouteName="Intro"
+      screenOptions={{
+        headerTintColor: "green",
+        headerStyle: { backgroundColor: "tomato" },
+      }}
+    >
+      <Stack.Screen
+        name="Intro"
+        component={Intro}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Root"
+        component={Login}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="OTP"
+        component={Otp}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Dashboard"
+        component={Dashboard}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ViewProfile"
+        component={ViewProfile}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SideMenu"
+        component={SideMenu}
+        options={{ headerShown: false }}
+      />
 
-			<Stack.Screen
-				name="NotFound"
-				component={NotFoundScreen}
-				options={{ title: 'Oops!' }}
-			/>
-			<Stack.Group screenOptions={{ presentation: 'modal' }}>
-				<Stack.Screen name="Modal" component={ModalScreen} />
-			</Stack.Group>
-		</Stack.Navigator>
-	);
+      <Stack.Screen
+        name="NotFound"
+        component={NotFoundScreen}
+        options={{ title: "Oops!" }}
+      />
+      <Stack.Group screenOptions={{ presentation: "modal" }}>
+        <Stack.Screen name="Modal" component={ModalScreen} />
+      </Stack.Group>
+    </Stack.Navigator>
+  );
 }
 
 /**

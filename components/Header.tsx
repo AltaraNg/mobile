@@ -13,6 +13,3 @@ export default function Header(props:any) {
 	);
 }
 
-const styles = StyleSheet.create({
-	
-});
