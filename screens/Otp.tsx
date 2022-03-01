@@ -147,6 +147,7 @@ export default function Otp({ navigation, route }) {
 						refCallback={refCallback(textInputRef)}
 					/>
 				))}
+				
 			</View>
 			{errorText != '' ? (
 				<Text style={styles.errorText}>{errorText}</Text>
