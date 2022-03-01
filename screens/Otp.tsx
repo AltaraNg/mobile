@@ -1,22 +1,27 @@
-import { Pressable, StyleSheet, TextInput } from 'react-native';
+import { Platform, Pressable, StyleSheet, TextInput } from 'react-native';
 import * as Device from 'expo-device';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
-import { useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import CustomTextInput from '../lib/CustomTextInput';
 import { GenericStyles } from '../styles/GenericStyles';
 import { AntDesign } from '@expo/vector-icons';
 import colors from '../common/colors';
 import { post } from '../utilities/api';
-import Lock from '../assets/svgs/lock.svg'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Lock from '../assets/svgs/lock.svg';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import { Context as AuthContext } from '../context/AuthContext';
 
 export default function Otp({ navigation, route }) {
+	const MY_SECURE_AUTH_STATE_KEY = 'MySecureAuthStateKey';
 	let [errorText, setErrorText] = useState('');
 	const [isLoading, setLoading] = useState(false);
+	const { state, signin } = useContext(AuthContext);
 	const phone = route.params;
 
 	let url = 'auth/login';
@@ -30,6 +35,7 @@ export default function Otp({ navigation, route }) {
 	const secondTextInputRef = useRef(null);
 	const thirdTextInputRef = useRef(null);
 	const fourthTextInputRef = useRef(null);
+
 	const onOtpChange = (index) => {
 		return (value) => {
 			if (isNaN(Number(value))) {
@@ -43,26 +49,34 @@ export default function Otp({ navigation, route }) {
 				const data = {
 					otp: otpArrayCopy.join(''),
 					phone_number: phone?.phone_number,
-					device_name: Device.deviceName
+					device_name: Device.deviceName,
 				};
-				post(url, data)
-					.then((res) => {
-						let loginInfo = res.data.data;
-						const token = loginInfo.token;
-						AsyncStorage.setItem('LOGIN_TOKEN', token);
-						navigation.navigate('Dashboard', {phone_number: loginInfo});
+				// post(url, data)
+				// 	.then((res) => {
+				// 		let loginInfo = res.data.data;
+				// 		const token = loginInfo.token;
 
-					})
-					.catch((err) => {
-						let message = err?.response?.data?.message;
-						setErrorText(message);
-					})
-					.finally(() => {
-						setLoading(false);
-						return
-					});
+				// 		if (Platform.OS !== 'web') {
+				// 			// Securely store the auth on your device
+				// 			Auth.set(loginInfo);
+				// 		}
+				// 		navigation.navigate('Dashboard');
+				// 	})
+				// 	.catch((err) => {
+				// 		console.log(err?.response?.data?.message);
+				// 		let message = err?.response?.data?.message;
+				// 		setErrorText(message);
+				// 	})
+				// 	.finally(() => {
+				// 		setLoading(false);
+				// 		navigation.navigate('Dashboard');
+
+				// 		return;
+				// 	});
+				let res = signin(data);
+				console.log(res)
+				// navigation.navigate('Dashboard');
 			}
-			
 
 			// auto focus to next InputText if value is not blank
 			if (value !== '') {
@@ -113,7 +127,7 @@ export default function Otp({ navigation, route }) {
 			<View style={styles.svg}>
 				<Lock size={72} />
 			</View>
-			<View style={[GenericStyles.row, GenericStyles.mt12, styles.otp,]}>
+			<View style={[GenericStyles.row, GenericStyles.mt12, styles.otp]}>
 				{[
 					firstTextInputRef,
 					secondTextInputRef,
@@ -136,11 +150,8 @@ export default function Otp({ navigation, route }) {
 				
 			</View>
 			{errorText != '' ? (
-              <Text style={styles.errorText}>
-                {errorText}
-              </Text>
-            ) : null}
-			
+				<Text style={styles.errorText}>{errorText}</Text>
+			) : null}
 		</View>
 	);
 }
@@ -194,7 +205,7 @@ const styles = StyleSheet.create({
 	errorText: {
 		color: 'red',
 		fontSize: 15,
-		textAlign: 'center'
+		textAlign: 'center',
 	},
 	buttonContainer: {
 		flexDirection: 'row',
@@ -220,14 +231,13 @@ const styles = StyleSheet.create({
 		color: '#074A74',
 		fontSize: 18,
 		width: '100%',
-		
 	},
 
 	lock: {
 		flex: 1,
 		justifyContent: 'center',
 	},
-	otp:{
-		backgroundColor: '#EFF5F9'
-	}
+	otp: {
+		backgroundColor: '#EFF5F9',
+	},
 });

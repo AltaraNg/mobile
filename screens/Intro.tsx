@@ -180,12 +180,12 @@ const RenderPagination = ({
 		</View>
 	);
 };
-export const Intro = ({ navigation }: IntroProps) => {
+export const Intro = ({ navigation }) => {
 	const sliderEl = useRef(null);
 	const keyExtractor = (item: Item) => item.title;
 	const onIntroCompleted = () => {
 	
-		navigation.navigate('Root');
+		navigation.navigate('Login');
 	};
 	return (
 		<View style={{ flex: 1 }}>

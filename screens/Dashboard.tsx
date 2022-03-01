@@ -11,17 +11,18 @@ import {
 
 import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header';
-import React, { useState, createRef, useEffect } from 'react';
+import React, { useState, createRef, useEffect, useContext } from 'react';
 import Hamburger from '../assets/svgs/hamburger.svg'
 import { Text, View } from '../components/Themed';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import Cards from '../components/Cards';
 import SideMenu from '../components/SideMenu'
+import { Context as AuthContext } from '../context/AuthContext';
 
 
 export default function Dashboard({ navigation, route }) {
-
+	const {state} = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
     const user = route.params?.phone_number?.user?.attributes;
 	console.log(route.params.phone_number.user);
@@ -37,7 +38,6 @@ export default function Dashboard({ navigation, route }) {
 
 		if(exitApp === 0){
 			setExitApp(exitApp + 1);
-			console.log(exitApp);
 
 			ToastAndroid.showWithGravity(
 				'press back button again to exit app',

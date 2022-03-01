@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     fontFamily: "Montserrat_700Bold",
+    color: 'white'
   },
   leaf: {
     position: "absolute",

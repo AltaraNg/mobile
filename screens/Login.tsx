@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
 		borderColor: '#074A74',
 		borderWidth: 1,
 		borderRadius: 10,
-		opacity: 0.1
+		opacity: 0.5
 	},
 	button: {
 		flex: 1,
