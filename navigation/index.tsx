@@ -29,7 +29,15 @@ import { Intro } from '../screens/Intro';
 import Login from '../screens/Login';
 import Otp from '../screens/Otp';
 import Dashboard from '../screens/Dashboard';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Provider as AuthProvider } from '../context/AuthContext';
+import { Context as AuthContext } from '../context/AuthContext';
+import { createStackNavigator } from '@react-navigation/stack';
+import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
+
+import axios from 'axios';
+let url = Constants?.manifest?.extra?.URL;
+axios.defaults.baseURL = url;
 
 const MyTheme = {
 	...DefaultTheme,
@@ -38,18 +46,56 @@ const MyTheme = {
 		backgroundColor: '#EFF5F9',
 	},
 };
+
+let token = ''
+let isLogin = false;
+let user = {};
+
+// const { auth } = React.useContext(AuthContext);
+
+async function getValueFor(key) {
+	let result = await SecureStore.getItemAsync(key);
+
+	if (result) {
+		result = JSON.parse(result);
+		try {
+			let res = await axios({
+				method: 'GET',
+				url: '/auth/user',
+				headers: { 'Authorization': `Bearer ${result.token}` },
+			});
+	
+			if(res.status === 200){
+				isLogin = true;
+				token = result.token;	
+				user = result.user;			
+			} else{
+				isLogin = false;
+			}
+		} catch (error) {
+			console.log(error.response);
+		}
+		
+
+	} else {
+		alert('No values stored under that key.');
+	}
+}
+
 export default function Navigation({
 	colorScheme,
 }: {
 	colorScheme: ColorSchemeName;
 }) {
 	return (
-		<NavigationContainer
-			linking={LinkingConfiguration}
-			theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-		>
-			<RootNavigator />
-		</NavigationContainer>
+		<AuthProvider>
+			<NavigationContainer
+				linking={LinkingConfiguration}
+				theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+			>
+				<RootNavigator />
+			</NavigationContainer>
+		</AuthProvider>
 	);
 }
 
@@ -57,39 +103,60 @@ export default function Navigation({
  * A root stack navigator is often used for displaying modals on top of all other content.
  * https://reactnavigation.org/docs/modal
  */
+getValueFor('MySecureAuthStateKey');
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const AuthStack = createNativeStackNavigator();
 
-const apiKey = AsyncStorage.getItem('LOGIN_TOKEN');
+function AuthFlow() {
+	return (
+		<AuthStack.Navigator>
+			<AuthStack.Screen
+				options={{ headerShown: false }}
+				name="Intro"
+				component={Intro}
+			/>
+			<AuthStack.Screen
+				options={{ headerShown: false }}
+				name="Login"
+				component={Login}
+			/>
+			<AuthStack.Screen
+				options={{ headerShown: false }}
+				name="OTP"
+				component={Otp}
+			/>
+		</AuthStack.Navigator>
+	);
+}
 
 function RootNavigator() {
+	let { state } = React.useContext(AuthContext);
+	if(isLogin) {
+		state.token = token;
+		state.user = user;
+	}
+	
+	console.log(isLogin);
 	return (
 		<Stack.Navigator
-			initialRouteName="Intro"
 			screenOptions={{
 				headerTintColor: 'green',
 				headerStyle: { backgroundColor: 'tomato' },
 			}}
 		>
-			<Stack.Screen
-				name="Intro"
-				component={Intro}
-				options={{ headerShown: false }}
-			/>
-			<Stack.Screen
-				name="Root"
-				component={Login}
-				options={{ headerShown: false }}
-			/>
-			<Stack.Screen
-				name="OTP"
-				component={Otp}
-				options={{ headerShown: false }}
-			/>
-			<Stack.Screen
-				name="Dashboard"
-				component={Dashboard}
-				options={{ headerShown: false }}
-			/>
+			{state.token === null ? (
+				<Stack.Screen
+					name="Auth"
+					component={AuthFlow}
+					options={{ headerShown: false }}
+				/>
+			) : (
+				<Stack.Screen
+					name="Dashboard"
+					component={Dashboard}
+					options={{ headerShown: false }}
+				/>
+			)}
 
 			<Stack.Screen
 				name="NotFound"
