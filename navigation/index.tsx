@@ -73,12 +73,11 @@ async function getValueFor(key) {
 				isLogin = false;
 			}
 		} catch (error) {
-			console.log(error.response);
+			
 		}
 		
 
 	} else {
-		alert('No values stored under that key.');
 	}
 }
 

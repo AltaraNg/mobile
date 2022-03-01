@@ -51,28 +51,7 @@ export default function Otp({ navigation, route }) {
 					phone_number: phone?.phone_number,
 					device_name: Device.deviceName,
 				};
-				// post(url, data)
-				// 	.then((res) => {
-				// 		let loginInfo = res.data.data;
-				// 		const token = loginInfo.token;
-
-				// 		if (Platform.OS !== 'web') {
-				// 			// Securely store the auth on your device
-				// 			Auth.set(loginInfo);
-				// 		}
-				// 		navigation.navigate('Dashboard');
-				// 	})
-				// 	.catch((err) => {
-				// 		console.log(err?.response?.data?.message);
-				// 		let message = err?.response?.data?.message;
-				// 		setErrorText(message);
-				// 	})
-				// 	.finally(() => {
-				// 		setLoading(false);
-				// 		navigation.navigate('Dashboard');
-
-				// 		return;
-				// 	});
+				
 				let res = signin(data);
 				console.log(res)
 				// navigation.navigate('Dashboard');
