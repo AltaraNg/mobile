@@ -3,6 +3,7 @@ import Auth from './auth';
 import Constants  from 'expo-constants';
 
 
+
 let url = Constants?.manifest?.extra?.URL;
 
 
@@ -18,7 +19,7 @@ export const put = (url, data) => axios({
     method: 'PUT',
     url,
     data,
-    headers: { 'Authorization': `Bearer ${Auth.state.api_token}` }
+    headers: { 'Authorization': `Bearer ${Auth.state.token}` }
 });
 export const patch = (url, data) => axios({
     method: 'PATCH',

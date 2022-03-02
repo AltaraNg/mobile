@@ -11,15 +11,13 @@ import React, { useState, createRef } from 'react';
 import { post } from '../utilities/api';
 
 import { Text, View } from '../components/Themed';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
-type OtpNavigationProps = StackNavigationProp<RootStackParamList, 'OTP'>;
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
-interface OtpProps {
-	navigation: OtpNavigationProps;
-}
 
-export default function Login({ navigation }: OtpProps) {
+
+export default function Login({ navigation }: Props) {
 	const [userPhone, setUserPhone] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [isDisabled, setIsDisabled] = useState(true);

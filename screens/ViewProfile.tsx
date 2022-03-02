@@ -8,12 +8,10 @@ import {
   Platform,
 } from "react-native";
 
-import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/Header";
 import React, { useState, createRef, useEffect, useContext } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
-import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types";
 import Cards from "../components/Cards";
 import SideMenu from "./SideMenu";
@@ -24,7 +22,6 @@ export default function Dashboard({ navigation, route }) {
   const { state } = useContext(AuthContext);
   const [showMenu, setShowMenu] = useState(false);
   const toggleSideMenu = async () => {
-    // setShowMenu(!showMenu);
     navigation.navigate("SideMenu");
   };
   const backAction = () => {
