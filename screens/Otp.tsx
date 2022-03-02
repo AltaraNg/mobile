@@ -18,9 +18,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Context as AuthContext } from '../context/AuthContext';
 
 export default function Otp({ navigation, route }) {
-	const MY_SECURE_AUTH_STATE_KEY = 'MySecureAuthStateKey';
 	let [errorText, setErrorText] = useState('');
-	const [isLoading, setLoading] = useState(false);
 	const { state, signin } = useContext(AuthContext);
 	const phone = route.params;
 
@@ -53,7 +51,6 @@ export default function Otp({ navigation, route }) {
 				};
 				
 				let res = signin(data);
-				console.log(res)
 				// navigation.navigate('Dashboard');
 			}
 
@@ -207,7 +204,6 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 	},
 	otpText: {
-		fontWeight: 'bold',
 		color: '#074A74',
 		fontSize: 18,
 		width: '100%',

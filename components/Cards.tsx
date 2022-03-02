@@ -3,7 +3,7 @@ import { Text, View } from "../components/Themed";
 import Leaf from "../assets/svgs/leaf.svg";
 import { LinearGradient } from "expo-linear-gradient";
 
-export default function Header(props: any) {
+export default function Cards(props: any) {
   return (
     <View style={styles.container}>
       <Leaf style={styles.leaf} />

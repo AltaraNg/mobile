@@ -6,6 +6,7 @@ import {
 	ToastAndroid,
 	BackHandler,
 	Platform,
+	TouchableOpacity
 } from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,12 +14,21 @@ import Header from '../components/Header';
 import React, { useState, createRef, useEffect, useContext } from 'react';
 import Hamburger from '../assets/svgs/hamburger.svg'
 import { Text, View } from '../components/Themed';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types';
+import Cards from '../components/Cards';
+import SideMenu from './SideMenu'
 import { Context as AuthContext } from '../context/AuthContext';
-import Cards from '../components/Cards'
+
 
 export default function Dashboard({ navigation, route }) {
 	const {state} = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
+	const [showMenu, setShowMenu] = useState(false);
+	const toggleSideMenu = async () => {
+		setShowMenu(!showMenu)
+	}
+
 	const backAction = () => {
 		if (Platform.OS === "ios") return;
 		setTimeout(() => {
@@ -46,34 +56,38 @@ export default function Dashboard({ navigation, route }) {
 		return () => backHandler.remove();
 	}, [])
 
-
+	const logout = () => {
+    navigation.navigate("Login");
+  };
 	return (
-		<View style={styles.container}>
-			<View style={styles.header}>
-				<Header></Header>
-				<Hamburger style={styles.hamburger} />
-			</View>
+    <View style={styles.container}>
+      {showMenu && <SideMenu  Logout="Logout" />}
+      <View style={styles.header}>
+        <Header></Header>
+        <TouchableOpacity>
+          <Pressable onPress={toggleSideMenu}>
+            <Hamburger style={styles.hamburger} />
+          </Pressable>
+        </TouchableOpacity>
+      </View>
 
-			<View style={styles.main}>
-                <Text style={styles.name}>
-                    {state.user.attributes.first_name},
-                </Text>
-                <Text style={styles.message}>
-                Welcome to your altara dashboard
-                </Text>
-				<View style={styles.cards}>
-				<Cards title="Get a Loan Now!!!" amount="Up to ₦500,000"/>
-				<Cards title="Order a Product Now!!!" amount="Up to ₦500,000"/>
-			</View>
-            </View>
-			
-		</View>
-	);
+      <View style={styles.main}>
+        <Text style={styles.name}>{state.user.attributes.first_name},</Text>
+        <Text style={styles.message}>Welcome to your altara dashboards </Text>
+        <View style={styles.cards}>
+          <Cards title="Get a Loan Now!!!" amount="Up to ₦500,000" />
+          <Cards title="Order a Product Now!!!" amount="Up to ₦500,000" />
+        </View>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		height:'100%',
+		position:'relative'
 		
 	},
 	hamburger:{
@@ -109,6 +123,12 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		color: '#72788D',
 		paddingBottom:30
+	},
+	menu:{
+		position:'absolute',
+		right:0,
+
+
 	}
 
 });

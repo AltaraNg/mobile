@@ -189,8 +189,8 @@ export const Intro = ({ navigation }) => {
 	};
 	return (
 		<View style={{ flex: 1 }}>
-			<StatusBar translucent backgroundColor="transparent" />
-			<Header></Header>
+			<StatusBar translucent backgroundColor="transparent"  />
+			<Header backgroundColor='#EFF5F9' ></Header>
 
 			<AppIntroSlider
 				keyExtractor={keyExtractor}
