@@ -30,7 +30,7 @@ import Login from '../screens/Login';
 import Otp from '../screens/Otp';
 import Dashboard from '../screens/Dashboard';
 import ViewProfile from '../screens/ViewProfile'
-import SideMenu from '../components/SideMenu';
+import SideMenu from '../screens/SideMenu';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Provider as AuthProvider } from '../context/AuthContext';
 import { Context as AuthContext } from '../context/AuthContext';

@@ -5,11 +5,7 @@ import { ProfileSvg, EditProfileSvg, LogOut } from "../assets/svgs/svg";
 import { RootStackParamList } from "../types";
 import { StackNavigationProp } from "@react-navigation/stack";
 
-export default function SideMenu( {navigation}){
-  
-  const Logout = () => {
-    navigation.navigate("Root");
-  };
+export default function SideMenu({Logout}) {
   return (
     <View style={styles.container}>
       <Header backgroundColor="white" />
@@ -24,7 +20,7 @@ export default function SideMenu( {navigation}){
           <EditProfileSvg />
           <Text style={styles.text}>Edit Profile</Text>
         </View>
-        <Pressable onPress={Logout}>
+        <Pressable onPress={()=>Logout()}>
           <View style={styles.menuItem}>
             <LogOut />
             <Text style={styles.text}>Log Out</Text>

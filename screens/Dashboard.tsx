@@ -17,19 +17,18 @@ import { Text, View } from '../components/Themed';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import Cards from '../components/Cards';
-import SideMenu from '../components/SideMenu'
+import SideMenu from './SideMenu'
 import { Context as AuthContext } from '../context/AuthContext';
 
 
 export default function Dashboard({ navigation, route }) {
 	const {state} = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
-    const user = route.params?.phone_number?.user?.attributes;
-	console.log(route.params.phone_number.user);
 	const [showMenu, setShowMenu] = useState(false);
 	const toggleSideMenu = async () => {
 		setShowMenu(!showMenu)
 	}
+
 	const backAction = () => {
 		if (Platform.OS === "ios") return;
 		setTimeout(() => {
@@ -57,10 +56,12 @@ export default function Dashboard({ navigation, route }) {
 		return () => backHandler.remove();
 	}, [])
 
-
+	const Logout = () => {
+    navigation.navigate("Login");
+  };
 	return (
     <View style={styles.container}>
-      {showMenu && <SideMenu />}
+      {showMenu && <SideMenu  Logout="Logout" />}
       <View style={styles.header}>
         <Header></Header>
         <TouchableOpacity>
@@ -71,8 +72,8 @@ export default function Dashboard({ navigation, route }) {
       </View>
 
       <View style={styles.main}>
-        <Text style={styles.name}>{user.first_name},</Text>
-        <Text style={styles.message}>Welcome to your altara dashboard</Text>
+        <Text style={styles.name}>{state.user.attributes.first_name},</Text>
+        <Text style={styles.message}>Welcome to your altara dashboards </Text>
         <View style={styles.cards}>
           <Cards title="Get a Loan Now!!!" amount="Up to ₦500,000" />
           <Cards title="Order a Product Now!!!" amount="Up to ₦500,000" />
