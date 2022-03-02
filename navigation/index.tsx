@@ -76,12 +76,11 @@ async function getValueFor(key) {
 				isLogin = false;
 			}
 		} catch (error) {
-			console.log(error.response);
+			
 		}
 		
 
 	} else {
-		alert('No values stored under that key.');
 	}
 }
 
@@ -109,6 +108,7 @@ export default function Navigation({
 getValueFor('MySecureAuthStateKey');
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const AuthStack = createNativeStackNavigator();
+const NormalStack = createNativeStackNavigator();
 
 function AuthFlow() {
 	return (
@@ -128,23 +128,32 @@ function AuthFlow() {
         name="OTP"
         component={Otp}
       />
-      <AuthStack.Screen
-        name="Dashboard"
-        component={Dashboard}
-        options={{ headerShown: false }}
-      />
-      <AuthStack.Screen
-        name="ViewProfile"
-        component={ViewProfile}
-        options={{ headerShown: false }}
-      />
-      <AuthStack.Screen
-        name="SideMenu"
-        component={SideMenu}
-        options={{ headerShown: false }}
-      />
+     
     </AuthStack.Navigator>
   );
+}
+
+function NormalFlow(){
+	return (
+		<NormalStack.Navigator>
+			<NormalStack.Screen
+			name='Dashboard'
+			component={Dashboard}
+			options={{ headerShown: false }}			
+			/>
+
+			<NormalStack.Screen
+			name='ViewProfile'
+			component={ViewProfile}
+			options={{ headerShown: false }}			
+			/>	
+			<NormalStack.Screen
+			name='SideMenu'
+			component={SideMenu}
+			options={{ headerShown: false }}			
+			/>		
+		</NormalStack.Navigator>
+	)
 }
 
 function RootNavigator() {
@@ -170,8 +179,8 @@ function RootNavigator() {
 				/>
 			) : (
 				<Stack.Screen
-					name="Dashboard"
-					component={Dashboard}
+					name="Normal"
+					component={NormalFlow}
 					options={{ headerShown: false }}
 				/>
 			)}

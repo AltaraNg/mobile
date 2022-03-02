@@ -56,7 +56,7 @@ export default function Dashboard({ navigation, route }) {
 		return () => backHandler.remove();
 	}, [])
 
-	const Logout = () => {
+	const logout = () => {
     navigation.navigate("Login");
   };
 	return (

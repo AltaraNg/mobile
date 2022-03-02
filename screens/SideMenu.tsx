@@ -2,10 +2,18 @@ import { StyleSheet, Pressable } from "react-native";
 import { Text, View } from "../components/Themed";
 import Header from "../components/Header";
 import { ProfileSvg, EditProfileSvg, LogOut } from "../assets/svgs/svg";
-import { RootStackParamList } from "../types";
-import { StackNavigationProp } from "@react-navigation/stack";
+import { useContext } from "react";
+import { Context as AuthContext } from '../context/AuthContext';
 
-export default function SideMenu({Logout}) {
+
+
+
+export default function SideMenu({navigation}) {
+const { state, signout } = useContext(AuthContext);
+
+  const logout = () => {
+    let res = signout();
+  };
   return (
     <View style={styles.container}>
       <Header backgroundColor="white" />
@@ -20,7 +28,7 @@ export default function SideMenu({Logout}) {
           <EditProfileSvg />
           <Text style={styles.text}>Edit Profile</Text>
         </View>
-        <Pressable onPress={()=>Logout()}>
+        <Pressable onPress={logout}>
           <View style={styles.menuItem}>
             <LogOut />
             <Text style={styles.text}>Log Out</Text>
