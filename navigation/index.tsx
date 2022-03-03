@@ -170,7 +170,6 @@ function RootNavigator() {
 		state.user = user;
 	}
 
-	console.log(isLogin);
 	return (
 		<Stack.Navigator
 			screenOptions={{
