@@ -131,28 +131,7 @@ function AuthFlow() {
   );
 }
 
-function NormalFlow(){
-	return (
-		<NormalStack.Navigator>
-			<NormalStack.Screen
-			name='Dashboard'
-			component={Dashboard}
-			options={{ headerShown: false }}			
-			/>
 
-			<NormalStack.Screen
-			name='ViewProfile'
-			component={ViewProfile}
-			options={{ headerShown: false }}			
-			/>	
-			<NormalStack.Screen
-			name='SideMenu'
-			component={SideMenu}
-			options={{ headerShown: false }}			
-			/>		
-		</NormalStack.Navigator>
-	)
-}
 
 function NormalFlow() {
 	return (
