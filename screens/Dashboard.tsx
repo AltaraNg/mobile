@@ -44,7 +44,6 @@ export default function Dashboard({ navigation, route }) {
 				ToastAndroid.CENTER
 			);
 		} else{
-			console.log('exit now');
 			BackHandler.exitApp();
 		}
 		
