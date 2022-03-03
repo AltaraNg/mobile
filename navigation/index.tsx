@@ -29,7 +29,7 @@ import { Intro } from '../screens/Intro';
 import Login from '../screens/Login';
 import Otp from '../screens/Otp';
 import Dashboard from '../screens/Dashboard';
-import ViewProfile from '../screens/ViewProfile'
+import ViewProfile from '../screens/ViewProfile';
 import SideMenu from '../screens/SideMenu';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Provider as AuthProvider } from '../context/AuthContext';
@@ -39,6 +39,8 @@ import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
 import axios from 'axios';
+import Notification from '../screens/Notification';
+import History from '../screens/History';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
@@ -50,7 +52,7 @@ const MyTheme = {
 	},
 };
 
-let token = ''
+let token = '';
 let isLogin = false;
 let user = {};
 
@@ -67,19 +69,15 @@ async function getValueFor(key) {
 				url: '/auth/user',
 				headers: { 'Authorization': `Bearer ${result.token}` },
 			});
-	
-			if(res.status === 200){
+
+			if (res.status === 200) {
 				isLogin = true;
-				token = result.token;	
-				user = result.user;			
-			} else{
+				token = result.token;
+				user = result.user;
+			} else {
 				isLogin = false;
 			}
-		} catch (error) {
-			
-		}
-		
-
+		} catch (error) {}
 	} else {
 	}
 }
@@ -133,37 +131,45 @@ function AuthFlow() {
   );
 }
 
-function NormalFlow(){
+
+
+function NormalFlow() {
 	return (
 		<NormalStack.Navigator>
 			<NormalStack.Screen
-			name='Dashboard'
-			component={Dashboard}
-			options={{ headerShown: false }}			
+				name="TabStack"
+				component={BottomTabNavigator}
+				options={{ headerShown: false }}
 			/>
 
 			<NormalStack.Screen
-			name='ViewProfile'
-			component={ViewProfile}
-			options={{ headerShown: false }}			
-			/>	
+				name="Dashboard"
+				component={Dashboard}
+				options={{ headerShown: false }}
+			/>
+
 			<NormalStack.Screen
-			name='SideMenu'
-			component={SideMenu}
-			options={{ headerShown: false }}			
-			/>		
+				name="SideMenu"
+				component={SideMenu}
+				options={{ headerShown: false }}
+			/>
+
+			<NormalStack.Screen
+				name="ViewProfile"
+				component={ViewProfile}
+				options={{ headerShown: false }}
+			/>
 		</NormalStack.Navigator>
-	)
+	);
 }
 
 function RootNavigator() {
 	let { state } = React.useContext(AuthContext);
-	if(isLogin) {
+	if (isLogin) {
 		state.token = token;
 		state.user = user;
 	}
-	
-	console.log(isLogin);
+
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -203,38 +209,49 @@ function RootNavigator() {
  */
 const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
+function TabBarIcon(props: {
+	name: React.ComponentProps<typeof FontAwesome>['name'];
+	color: string;
+}) {
+	return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
+}
+
 function BottomTabNavigator() {
 	const colorScheme = useColorScheme();
 
 	return (
 		<BottomTab.Navigator
-			initialRouteName="TabOne"
+			initialRouteName="Home"
 			screenOptions={{
 				tabBarActiveTintColor: Colors[colorScheme].tint,
 			}}
 		>
 			<BottomTab.Screen
-				name="TabOne"
-				component={WelcomeScreen}
-				options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-					title: 'Tab One',
-					tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-					headerRight: () => (
-						<Pressable
-							onPress={() => navigation.navigate('Modal')}
-							style={({ pressed }) => ({
-								opacity: pressed ? 0.5 : 1,
-							})}
-						>
-							<FontAwesome
-								name="info-circle"
-								size={25}
-								color={Colors[colorScheme].text}
-								style={{ marginRight: 15 }}
-							/>
-						</Pressable>
-					),
-				})}
+				name="Home"
+				component={Dashboard}
+				options={{
+					headerShown: false,
+					tabBarLabel: "",
+					tabBarIcon: ({color, size}) => (<FontAwesome size={size} color={color} name="home" style={{marginBottom: -16}} />)
+				}}
+			/>
+			<BottomTab.Screen
+				name="History"
+				component={History}
+				options={{
+					headerShown: false,
+					tabBarLabel: "",
+					tabBarIcon: ({color, size}) => (<FontAwesome size={size} color={color} name="folder-open" style={{marginBottom: -16}} />)
+				}}
+			/>
+			<BottomTab.Screen
+				name="Notification"
+				component={Notification}
+				options={{
+					headerShown: false,
+					tabBarLabel: "",
+					tabBarIcon: ({color, size}) => (<FontAwesome size={size} color={color} name="bell" style={{marginBottom: -16}} />)
+				}}
 			/>
 		</BottomTab.Navigator>
 	);
@@ -243,9 +260,3 @@ function BottomTabNavigator() {
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
  */
-function TabBarIcon(props: {
-	name: React.ComponentProps<typeof FontAwesome>['name'];
-	color: string;
-}) {
-	return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
-}

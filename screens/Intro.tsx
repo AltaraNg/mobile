@@ -19,6 +19,7 @@ import {
 import AppIntroSlider from 'react-native-app-intro-slider';
 import { RootStackParamList } from '../types';
 import Header from '../components/Header';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 const data = [
 	{
 		title: 'Altara Product',
@@ -43,10 +44,6 @@ type RenderPaginationProps = {
 	slider: AppIntroSlider | null;
 	onIntroCompleted: () => void;
 };
-type IntroNavigationProps = StackNavigationProp<RootStackParamList, 'Intro'>;
-interface IntroProps {
-	navigation: IntroNavigationProps;
-}
 const styles = StyleSheet.create({
 	slide: {
         
@@ -180,7 +177,9 @@ const RenderPagination = ({
 		</View>
 	);
 };
-export const Intro = ({ navigation }) => {
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Intro'>;
+export const Intro = ({ navigation }: Props) => {
 	const sliderEl = useRef(null);
 	const keyExtractor = (item: Item) => item.title;
 	const onIntroCompleted = () => {

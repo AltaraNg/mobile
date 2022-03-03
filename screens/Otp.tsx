@@ -1,23 +1,21 @@
 import { Platform, Pressable, StyleSheet, TextInput } from 'react-native';
 import * as Device from 'expo-device';
 
-import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header';
 import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
+import { RootStackParamList, RootTabScreenProps } from '../types';
 import { useContext, useRef, useState } from 'react';
 import CustomTextInput from '../lib/CustomTextInput';
 import { GenericStyles } from '../styles/GenericStyles';
-import { AntDesign } from '@expo/vector-icons';
-import colors from '../common/colors';
-import { post } from '../utilities/api';
 import Lock from '../assets/svgs/lock.svg';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Context as AuthContext } from '../context/AuthContext';
 
-export default function Otp({ navigation, route }) {
+type Props = NativeStackScreenProps<RootStackParamList, 'OTP'>;
+
+
+export default function Otp({ navigation, route }: Props) {
 	let [errorText, setErrorText] = useState('');
 	const { state, signin } = useContext(AuthContext);
 	const phone = route.params;
@@ -35,7 +33,7 @@ export default function Otp({ navigation, route }) {
 	const fourthTextInputRef = useRef(null);
 
 	const onOtpChange = (index) => {
-		return (value) => {
+		return (value: Number) => {
 			if (isNaN(Number(value))) {
 				// do nothing when a non digit is pressed
 				return;

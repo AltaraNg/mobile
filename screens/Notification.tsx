@@ -21,7 +21,7 @@ import SideMenu from './SideMenu'
 import { Context as AuthContext } from '../context/AuthContext';
 
 
-export default function Dashboard({ navigation, route }) {
+export default function Notification({ navigation, route }) {
 	const {state} = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
 	const [showMenu, setShowMenu] = useState(false);
@@ -50,11 +50,7 @@ export default function Dashboard({ navigation, route }) {
 		return true;
 	};
 
-	useEffect(() => {
-		const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction)
-		return () => backHandler.remove();
-	}, [])
-
+	
 	const logout = () => {
     navigation.navigate("Login");
   };
@@ -71,12 +67,9 @@ export default function Dashboard({ navigation, route }) {
       </View>
 
       <View style={styles.main}>
-        <Text style={styles.name}>{state.user.attributes.first_name},</Text>
-        <Text style={styles.message}>Welcome to your altara dashboards </Text>
-        <View style={styles.cards}>
-          <Cards title="Get a Loan Now!!!" amount="Up to ₦500,000" />
-          <Cards title="Order a Product Now!!!" amount="Up to ₦500,000" />
-        </View>
+        <Text style={styles.name}>{"Notifications"}</Text>
+		<Text style={styles.message}>Coming soon </Text>
+       
       </View>
     </View>
   );
