@@ -110,24 +110,48 @@ const NormalStack = createNativeStackNavigator();
 
 function AuthFlow() {
 	return (
-		<AuthStack.Navigator>
-			<AuthStack.Screen
-				options={{ headerShown: false }}
-				name="Intro"
-				component={Intro}
+    <AuthStack.Navigator>
+      <AuthStack.Screen
+        options={{ headerShown: false }}
+        name="Intro"
+        component={Intro}
+      />
+      <AuthStack.Screen
+        options={{ headerShown: false }}
+        name="Login"
+        component={Login}
+      />
+      <AuthStack.Screen
+        options={{ headerShown: false }}
+        name="OTP"
+        component={Otp}
+      />
+     
+    </AuthStack.Navigator>
+  );
+}
+
+function NormalFlow(){
+	return (
+		<NormalStack.Navigator>
+			<NormalStack.Screen
+			name='Dashboard'
+			component={Dashboard}
+			options={{ headerShown: false }}			
 			/>
-			<AuthStack.Screen
-				options={{ headerShown: false }}
-				name="Login"
-				component={Login}
-			/>
-			<AuthStack.Screen
-				options={{ headerShown: false }}
-				name="OTP"
-				component={Otp}
-			/>
-		</AuthStack.Navigator>
-	);
+
+			<NormalStack.Screen
+			name='ViewProfile'
+			component={ViewProfile}
+			options={{ headerShown: false }}			
+			/>	
+			<NormalStack.Screen
+			name='SideMenu'
+			component={SideMenu}
+			options={{ headerShown: false }}			
+			/>		
+		</NormalStack.Navigator>
+	)
 }
 
 function NormalFlow() {
@@ -189,16 +213,16 @@ function RootNavigator() {
 				/>
 			)}
 
-			<Stack.Screen
-				name="NotFound"
-				component={NotFoundScreen}
-				options={{ title: 'Oops!' }}
-			/>
-			<Stack.Group screenOptions={{ presentation: 'modal' }}>
-				<Stack.Screen name="Modal" component={ModalScreen} />
-			</Stack.Group>
-		</Stack.Navigator>
-	);
+      <Stack.Screen
+        name="NotFound"
+        component={NotFoundScreen}
+        options={{ title: "Oops!" }}
+      />
+      <Stack.Group screenOptions={{ presentation: "modal" }}>
+        <Stack.Screen name="Modal" component={ModalScreen} />
+      </Stack.Group>
+    </Stack.Navigator>
+  );
 }
 
 /**
