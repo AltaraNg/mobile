@@ -1,0 +1,60 @@
+import React from 'react';
+import {
+	SafeAreaView,
+	View,
+	StyleSheet,
+	Image,
+	Text,
+	Linking,
+} from 'react-native';
+
+import {
+	DrawerContentScrollView,
+	DrawerItemList,
+	DrawerItem,
+} from '@react-navigation/drawer';
+import SVGImage from '../assets/svgs/splash.svg';
+import { Feather, FontAwesome } from '@expo/vector-icons';
+
+const CustomSidebarMenu = (props: any) => {
+	const BASE_PATH =
+		'https://raw.githubusercontent.com/AboutReact/sampleresource/master/';
+	const proileImage = 'react_logo.png';
+
+	return (
+		<SafeAreaView style={{ flex: 1, marginTop: 30, fontFamily:  }}>
+			{/*Top Large Image */}
+			<SVGImage width={150} height={75} />
+			<DrawerContentScrollView {...props}>
+				<DrawerItemList {...props} />
+				<DrawerItem
+					label="Log Out"
+					icon={() => <Feather name="log-out" size={24} color="black" />}
+					onPress={() => Linking.openURL('https://aboutreact.com/')}
+				/>
+			</DrawerContentScrollView>
+		</SafeAreaView>
+	);
+};
+
+const styles = StyleSheet.create({
+	sideMenuProfileIcon: {
+		resizeMode: 'center',
+		width: 100,
+		height: 100,
+		borderRadius: 100 / 2,
+		alignSelf: 'center',
+	},
+	iconStyle: {
+		width: 15,
+		height: 15,
+		marginHorizontal: 5,
+	},
+	customItem: {
+		padding: 16,
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+});
+
+export default CustomSidebarMenu;

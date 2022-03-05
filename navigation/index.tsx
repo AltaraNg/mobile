@@ -3,7 +3,7 @@
  * https://reactnavigation.org/docs/getting-started
  *
  */
-import { FontAwesome } from '@expo/vector-icons';
+import { AntDesign, EvilIcons, FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
 	NavigationContainer,
@@ -20,6 +20,7 @@ import ModalScreen from '../screens/ModalScreen';
 
 import NotFoundScreen from '../screens/NotFoundScreen';
 import {
+	DrawerParamList,
 	RootStackParamList,
 	RootTabParamList,
 	RootTabScreenProps,
@@ -34,13 +35,15 @@ import SideMenu from '../screens/SideMenu';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Provider as AuthProvider } from '../context/AuthContext';
 import { Context as AuthContext } from '../context/AuthContext';
-import { createStackNavigator } from '@react-navigation/stack';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
 import axios from 'axios';
 import Notification from '../screens/Notification';
 import History from '../screens/History';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import CustomSidebarMenu from '../components/CustomeSideBarMenu';
+import EditProfile from '../screens/ViewProfile';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
@@ -55,8 +58,6 @@ const MyTheme = {
 let token = '';
 let isLogin = false;
 let user = {};
-
-// const { auth } = React.useContext(AuthContext);
 
 async function getValueFor(key) {
 	let result = await SecureStore.getItemAsync(key);
@@ -105,63 +106,6 @@ export default function Navigation({
  */
 getValueFor('MySecureAuthStateKey');
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const AuthStack = createNativeStackNavigator();
-const NormalStack = createNativeStackNavigator();
-
-function AuthFlow() {
-	return (
-    <AuthStack.Navigator>
-      <AuthStack.Screen
-        options={{ headerShown: false }}
-        name="Intro"
-        component={Intro}
-      />
-      <AuthStack.Screen
-        options={{ headerShown: false }}
-        name="Login"
-        component={Login}
-      />
-      <AuthStack.Screen
-        options={{ headerShown: false }}
-        name="OTP"
-        component={Otp}
-      />
-     
-    </AuthStack.Navigator>
-  );
-}
-
-
-
-function NormalFlow() {
-	return (
-		<NormalStack.Navigator>
-			<NormalStack.Screen
-				name="TabStack"
-				component={BottomTabNavigator}
-				options={{ headerShown: false }}
-			/>
-
-			<NormalStack.Screen
-				name="Dashboard"
-				component={Dashboard}
-				options={{ headerShown: false }}
-			/>
-
-			<NormalStack.Screen
-				name="SideMenu"
-				component={SideMenu}
-				options={{ headerShown: false }}
-			/>
-
-			<NormalStack.Screen
-				name="ViewProfile"
-				component={ViewProfile}
-				options={{ headerShown: false }}
-			/>
-		</NormalStack.Navigator>
-	);
-}
 
 function RootNavigator() {
 	let { state } = React.useContext(AuthContext);
@@ -178,36 +122,98 @@ function RootNavigator() {
 			}}
 		>
 			{state.token === null ? (
-				<Stack.Screen
-					name="Auth"
-					component={AuthFlow}
-					options={{ headerShown: false }}
-				/>
+				<Stack.Group>
+					<Stack.Screen
+						options={{ headerShown: false }}
+						name="Intro"
+						component={Intro}
+					/>
+					<Stack.Screen
+						options={{ headerShown: false }}
+						name="Login"
+						component={Login}
+					/>
+					<Stack.Screen
+						options={{ headerShown: false }}
+						name="OTP"
+						component={Otp}
+					/>
+				</Stack.Group>
 			) : (
-				<Stack.Screen
-					name="Normal"
-					component={NormalFlow}
-					options={{ headerShown: false }}
-				/>
+				<Stack.Group>
+					<Stack.Screen
+						name="Main"
+						component={DrawerNavigator}
+						options={{ headerShown: false }}
+					/>
+				</Stack.Group>
 			)}
 
-      <Stack.Screen
-        name="NotFound"
-        component={NotFoundScreen}
-        options={{ title: "Oops!" }}
-      />
-      <Stack.Group screenOptions={{ presentation: "modal" }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
-      </Stack.Group>
-    </Stack.Navigator>
-  );
+			<Stack.Screen
+				name="NotFound"
+				component={NotFoundScreen}
+				options={{ title: 'Oops!' }}
+			/>
+			<Stack.Group screenOptions={{ presentation: 'modal' }}>
+				<Stack.Screen name="Modal" component={ModalScreen} />
+			</Stack.Group>
+		</Stack.Navigator>
+	);
+}
+
+const DrawerNav = createDrawerNavigator<DrawerParamList>();
+
+function DrawerNavigator() {
+	const colorScheme = useColorScheme();
+	return (
+		<DrawerNav.Navigator
+			drawerContent={(props) => <CustomSidebarMenu {...props} />}
+		>
+			<DrawerNav.Screen
+				name="Home"
+				component={BottomTabNavigator}
+				options={{
+					headerShown: false,
+					drawerIcon: ({ color, size }) => (
+						<FontAwesome
+							size={24}
+							color="black"
+							name="home"
+							
+						/>
+					),
+				}}
+			/>
+
+			<DrawerNav.Screen
+				name="View Profile"
+				component={ViewProfile}
+				options={{
+					headerShown: false,
+					drawerIcon: ({ color, size }) => (
+						<EvilIcons name="user" size={24} color="black" />
+					),
+				}}
+			/>
+
+			<DrawerNav.Screen
+				name="Edit Profile"
+				component={EditProfile}
+				options={{
+					headerShown: false,
+					drawerIcon: ({ color, size }) => (
+						<AntDesign name="edit" size={24} color="black" />
+					),
+				}}
+			/>
+		</DrawerNav.Navigator>
+	);
 }
 
 /**
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
  * https://reactnavigation.org/docs/bottom-tab-navigator
  */
-const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
 function TabBarIcon(props: {
 	name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -216,23 +222,32 @@ function TabBarIcon(props: {
 	return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
 }
 
+const BottomTab = createBottomTabNavigator<RootTabParamList>();
+
 function BottomTabNavigator() {
 	const colorScheme = useColorScheme();
 
 	return (
 		<BottomTab.Navigator
-			initialRouteName="Home"
+			initialRouteName="Dashboard"
 			screenOptions={{
 				tabBarActiveTintColor: Colors[colorScheme].tint,
 			}}
 		>
 			<BottomTab.Screen
-				name="Home"
+				name="Dashboard"
 				component={Dashboard}
 				options={{
 					headerShown: false,
-					tabBarLabel: "",
-					tabBarIcon: ({color, size}) => (<FontAwesome size={size} color={color} name="home" style={{marginBottom: -16}} />)
+					tabBarLabel: '',
+					tabBarIcon: ({ color, size }) => (
+						<FontAwesome
+							size={size}
+							color={color}
+							name="home"
+							style={{ marginBottom: -16 }}
+						/>
+					),
 				}}
 			/>
 			<BottomTab.Screen
@@ -240,8 +255,15 @@ function BottomTabNavigator() {
 				component={History}
 				options={{
 					headerShown: false,
-					tabBarLabel: "",
-					tabBarIcon: ({color, size}) => (<FontAwesome size={size} color={color} name="folder-open" style={{marginBottom: -16}} />)
+					tabBarLabel: '',
+					tabBarIcon: ({ color, size }) => (
+						<FontAwesome
+							size={size}
+							color={color}
+							name="folder-open"
+							style={{ marginBottom: -16 }}
+						/>
+					),
 				}}
 			/>
 			<BottomTab.Screen
@@ -249,8 +271,15 @@ function BottomTabNavigator() {
 				component={Notification}
 				options={{
 					headerShown: false,
-					tabBarLabel: "",
-					tabBarIcon: ({color, size}) => (<FontAwesome size={size} color={color} name="bell" style={{marginBottom: -16}} />)
+					tabBarLabel: '',
+					tabBarIcon: ({ color, size }) => (
+						<FontAwesome
+							size={size}
+							color={color}
+							name="bell"
+							style={{ marginBottom: -16 }}
+						/>
+					),
 				}}
 			/>
 		</BottomTab.Navigator>
