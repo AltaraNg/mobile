@@ -167,7 +167,7 @@ function DrawerNavigator() {
 	const colorScheme = useColorScheme();
 	return (
 		<DrawerNav.Navigator
-			drawerContent={(props) => <CustomSidebarMenu {...props} />}
+			drawerContent={(props) => <CustomSidebarMenu {...props} /> }
 		>
 			<DrawerNav.Screen
 				name="Home"
@@ -177,7 +177,7 @@ function DrawerNavigator() {
 					drawerIcon: ({ color, size }) => (
 						<FontAwesome
 							size={24}
-							color="black"
+							color="white"
 							name="home"
 							
 						/>
@@ -191,7 +191,7 @@ function DrawerNavigator() {
 				options={{
 					headerShown: false,
 					drawerIcon: ({ color, size }) => (
-						<EvilIcons name="user" size={24} color="black" />
+						<EvilIcons name="user" size={24} color="white" />
 					),
 				}}
 			/>
@@ -202,7 +202,7 @@ function DrawerNavigator() {
 				options={{
 					headerShown: false,
 					drawerIcon: ({ color, size }) => (
-						<AntDesign name="edit" size={24} color="black" />
+						<AntDesign name="edit" size={24} color="white" />
 					),
 				}}
 			/>

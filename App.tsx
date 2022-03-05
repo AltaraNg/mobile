@@ -1,12 +1,13 @@
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import "react-native-gesture-handler";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import useCachedResources from './hooks/useCachedResources';
-import useColorScheme from './hooks/useColorScheme';
-import Navigation from './navigation';
-import AppLoading from 'expo-app-loading';
+import useCachedResources from "./hooks/useCachedResources";
+import useColorScheme from "./hooks/useColorScheme";
+import Navigation from "./navigation";
+import AppLoading from "expo-app-loading";
 
-import { 
+import {
   useFonts,
   Montserrat_100Thin,
   Montserrat_100Thin_Italic,
@@ -25,8 +26,8 @@ import {
   Montserrat_800ExtraBold,
   Montserrat_800ExtraBold_Italic,
   Montserrat_900Black,
-  Montserrat_900Black_Italic 
-} from '@expo-google-fonts/montserrat'
+  Montserrat_900Black_Italic,
+} from "@expo-google-fonts/montserrat";
 
 export default function App() {
   let [fontsLoaded] = useFonts({
@@ -47,7 +48,7 @@ export default function App() {
     Montserrat_800ExtraBold,
     Montserrat_800ExtraBold_Italic,
     Montserrat_900Black,
-    Montserrat_900Black_Italic 
+    Montserrat_900Black_Italic,
   });
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
@@ -58,7 +59,7 @@ export default function App() {
     return (
       <SafeAreaProvider>
         <Navigation colorScheme={colorScheme} />
-        <StatusBar style='dark'/>
+        <StatusBar style="dark" />
       </SafeAreaProvider>
     );
   }
