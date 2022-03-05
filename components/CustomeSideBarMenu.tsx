@@ -14,7 +14,7 @@ import {
 	DrawerItem,
 } from '@react-navigation/drawer';
 import SVGImage from '../assets/svgs/splash.svg';
-import { Feather, FontAwesome } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 
 const CustomSidebarMenu = (props: any) => {
 	const BASE_PATH =
@@ -22,7 +22,7 @@ const CustomSidebarMenu = (props: any) => {
 	const proileImage = 'react_logo.png';
 
 	return (
-		<SafeAreaView style={{ flex: 1, marginTop: 30,  }}>
+		<SafeAreaView style={{ flex: 1, marginTop: 30, paddingLeft:5, paddingTop: 30 }}>
 			{/*Top Large Image */}
 			<SVGImage width={150} height={75} style={{marginLeft:50}} />
 			<DrawerContentScrollView {...props}>
@@ -31,6 +31,7 @@ const CustomSidebarMenu = (props: any) => {
 					label="Log Out"
 					icon={() => <Feather name="log-out" size={24} color="white" />}
 					onPress={() => Linking.openURL('https://aboutreact.com/')}
+                    style={{ paddingVertical: 10}}
 				/>
 			</DrawerContentScrollView>
 		</SafeAreaView>
