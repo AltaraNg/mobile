@@ -22,20 +22,22 @@ const CustomSidebarMenu = (props: any) => {
 	const proileImage = 'react_logo.png';
 
 	return (
-		<SafeAreaView style={{ flex: 1, marginTop: 30, paddingLeft:5, paddingTop: 30 }}>
-			{/*Top Large Image */}
-			<SVGImage width={150} height={75} style={{marginLeft:50}} />
-			<DrawerContentScrollView {...props}>
-				<DrawerItemList {...props} />
-				<DrawerItem
-					label="Log Out"
-					icon={() => <Feather name="log-out" size={24} color="white" />}
-					onPress={() => Linking.openURL('https://aboutreact.com/')}
-                    style={{ paddingVertical: 10}}
-				/>
-			</DrawerContentScrollView>
-		</SafeAreaView>
-	);
+    <SafeAreaView
+      style={{ flex: 1, marginTop: 30, paddingLeft: 5, paddingTop: 30 }}
+    >
+      {/*Top Large Image */}
+      <SVGImage width={150} height={75} style={{ marginLeft: 50 }} />
+      <DrawerContentScrollView {...props}>
+        <DrawerItemList {...props}/>
+        <DrawerItem
+          label={() => <Text style={{ color: "#9C9696" }}>Log Out</Text>}
+          icon={() => <Feather name="log-out" size={24} color="#9C9696" />}
+          onPress={() => Linking.openURL("https://aboutreact.com/")}
+          style={{ paddingVertical: 10 }}
+        />
+      </DrawerContentScrollView>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({

@@ -164,48 +164,52 @@ const DrawerNav = createDrawerNavigator<DrawerParamList>();
 function DrawerNavigator() {
 	const colorScheme = useColorScheme();
 	return (
-		<DrawerNav.Navigator
-			drawerContent={(props) => <CustomSidebarMenu {...props} /> }
-		>
-			<DrawerNav.Screen
-				name="Home"
-				component={BottomTabNavigator}
-				options={{
-					headerShown: false,
-					drawerIcon: ({ color, size }) => (
-						<FontAwesome
-							size={24}
-							color="white"
-							name="home"
-							
-						/>
-					),
-				}}
-			/>
+    <DrawerNav.Navigator
+      screenOptions={{
+        drawerStyle: {
+          backgroundColor: "#fff",
+          width: 240,
+        },
+      }}
+      drawerContent={(props) => <CustomSidebarMenu {...props} />}
+    >
+      <DrawerNav.Screen
+        name="Home"
+        component={BottomTabNavigator}
+        options={{
+          drawerLabelStyle: { color: "#9C9696" },
+          headerShown: false,
+          drawerIcon: ({ color, size }) => (
+            <FontAwesome size={24} color="#9C9696" name="home" />
+          ),
+        }}
+      />
 
-			<DrawerNav.Screen
-				name="View Profile"
-				component={ViewProfile}
-				options={{
-					headerShown: false,
-					drawerIcon: ({ color, size }) => (
-						<EvilIcons name="user" size={24} color="white" />
-					),
-				}}
-			/>
+      <DrawerNav.Screen
+        name="View Profile"
+        component={ViewProfile}
+        options={{
+          drawerLabelStyle: { color: "#9C9696" },
+          headerShown: false,
+          drawerIcon: ({ color, size }) => (
+            <EvilIcons name="user" size={24} color="#9C9696" />
+          ),
+        }}
+      />
 
-			<DrawerNav.Screen
-				name="Edit Profile"
-				component={EditProfile}
-				options={{
-					headerShown: false,
-					drawerIcon: ({ color, size }) => (
-						<AntDesign name="edit" size={24} color="white" />
-					),
-				}}
-			/>
-		</DrawerNav.Navigator>
-	);
+      <DrawerNav.Screen
+        name="Edit Profile"
+        component={EditProfile}
+        options={{
+          drawerLabelStyle: { color: "#9C9696" },
+          headerShown: false,
+          drawerIcon: ({ color, size }) => (
+            <AntDesign name="edit" size={24} color="#9C9696" />
+          ),
+        }}
+      />
+    </DrawerNav.Navigator>
+  );
 }
 
 /**
@@ -226,62 +230,63 @@ function BottomTabNavigator() {
 	const colorScheme = useColorScheme();
 
 	return (
-		<BottomTab.Navigator
-			initialRouteName="Dashboard"
-			screenOptions={{
-				tabBarActiveTintColor: Colors[colorScheme].tint,
-			}}
-		>
-			<BottomTab.Screen
-				name="Dashboard"
-				component={Dashboard}
-				options={{
-					headerShown: false,
-					tabBarLabel: '',
-					tabBarIcon: ({ color, size }) => (
-						<FontAwesome
-							size={size}
-							color={color}
-							name="home"
-							style={{ marginBottom: -16 }}
-						/>
-					),
-				}}
-			/>
-			<BottomTab.Screen
-				name="History"
-				component={History}
-				options={{
-					headerShown: false,
-					tabBarLabel: '',
-					tabBarIcon: ({ color, size }) => (
-						<FontAwesome
-							size={size}
-							color={color}
-							name="folder-open"
-							style={{ marginBottom: -16 }}
-						/>
-					),
-				}}
-			/>
-			<BottomTab.Screen
-				name="Notification"
-				component={Notification}
-				options={{
-					headerShown: false,
-					tabBarLabel: '',
-					tabBarIcon: ({ color, size }) => (
-						<FontAwesome
-							size={size}
-							color={color}
-							name="bell"
-							style={{ marginBottom: -16 }}
-						/>
-					),
-				}}
-			/>
-		</BottomTab.Navigator>
-	);
+    <BottomTab.Navigator
+      initialRouteName="Dashboard"
+      screenOptions={{
+        tabBarActiveTintColor: "#074A74",
+        tabBarStyle: { backgroundColor: "#EFF5F9" },
+      }}
+    >
+      <BottomTab.Screen
+        name="Dashboard"
+        component={Dashboard}
+        options={{
+          headerShown: false,
+          tabBarLabel: "",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome
+              size={size}
+              color={color}
+              name="home"
+              style={{ marginBottom: -16 }}
+            />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="History"
+        component={History}
+        options={{
+          headerShown: false,
+          tabBarLabel: "",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome
+              size={size}
+              color={color}
+              name="folder-open"
+              style={{ marginBottom: -16 }}
+            />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="Notification"
+        component={Notification}
+        options={{
+          headerShown: false,
+          tabBarLabel: "",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome
+              size={size}
+              color={color}
+              name="bell"
+              style={{ marginBottom: -16 }}
+            />
+          ),
+        }}
+      />
+    </BottomTab.Navigator>
+  );
 }
 
 /**

@@ -30,14 +30,18 @@ const CustomTextInput = function(props) {
 
 const styles = StyleSheet.create({
   containerStyle: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderWidth: 1,
-    borderColor: '#074A74',
+    borderColor: "#074A74",
     borderRadius: 4,
     padding: 8,
   },
   textInputStyle: {
     padding: 0,
+    color: "#074A74",
+    fontSize: 18,
+    width: "100%",
+    textAlign: "center",
   },
 });
 
