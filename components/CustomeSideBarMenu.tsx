@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
 	SafeAreaView,
 	View,
@@ -14,30 +14,31 @@ import {
 	DrawerItem,
 } from '@react-navigation/drawer';
 import SVGImage from '../assets/svgs/splash.svg';
+import { Context as AuthContext } from '../context/AuthContext';
+
 import { Feather } from '@expo/vector-icons';
 
+
 const CustomSidebarMenu = (props: any) => {
-	const BASE_PATH =
-		'https://raw.githubusercontent.com/AboutReact/sampleresource/master/';
-	const proileImage = 'react_logo.png';
+const { state, signout } = useContext(AuthContext);
 
 	return (
-    <SafeAreaView
-      style={{ flex: 1, marginTop: 30, paddingLeft: 5, paddingTop: 30 }}
-    >
-      {/*Top Large Image */}
-      <SVGImage width={150} height={75} style={{ marginLeft: 50 }} />
-      <DrawerContentScrollView {...props}>
-        <DrawerItemList {...props}/>
-        <DrawerItem
-          label={() => <Text style={{ color: "#9C9696" }}>Log Out</Text>}
-          icon={() => <Feather name="log-out" size={24} color="#9C9696" />}
-          onPress={() => Linking.openURL("https://aboutreact.com/")}
-          style={{ paddingVertical: 10 }}
-        />
-      </DrawerContentScrollView>
-    </SafeAreaView>
-  );
+		<SafeAreaView
+			style={{ flex: 1, marginTop: 30, paddingLeft: 5, paddingTop: 30 }}
+		>
+			{/*Top Large Image */}
+			<SVGImage width={150} height={75} style={{ marginLeft: 50 }} />
+			<DrawerContentScrollView {...props}>
+				<DrawerItemList {...props} />
+				<DrawerItem
+					label={() => <Text style={{ color: '#9C9696' }}>Log Out</Text>}
+					icon={() => <Feather name="log-out" size={24} color="#9C9696" />}
+					onPress={() => signout()}
+					style={{ paddingVertical: 10 }}
+				/>
+			</DrawerContentScrollView>
+		</SafeAreaView>
+	);
 };
 
 const styles = StyleSheet.create({
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
 		height: 100,
 		borderRadius: 100 / 2,
 		alignSelf: 'center',
-		color:'white'
+		color: 'white',
 	},
 	iconStyle: {
 		width: 15,
