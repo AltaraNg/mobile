@@ -4,42 +4,45 @@
  */
 
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
+import {
+	CompositeScreenProps,
+	NavigatorScreenParams,
+} from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 declare global {
-  namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
-  }
+	namespace ReactNavigation {
+		interface RootParamList extends RootStackParamList {}
+	}
 }
 
 export type RootStackParamList = {
-  Auth: undefined;
-  Normal: undefined;
-  Intro: undefined;
-  Modal: undefined;
-  NotFound: undefined;
-  Dashboard: undefined;
-  OTP: {phone_number: string};
-  ViewProfile: {user: object};
-  SideMenu:undefined;
-  Login: undefined;
-  TabStack: undefined;
+	Intro: undefined;
+	Modal: undefined;
+	NotFound: undefined;
+	Main: undefined;
+	OTP: { phone_number: string };
+	Login: undefined;
 };
 
-export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
-  RootStackParamList,
-  Screen
->;
+export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
+	NativeStackScreenProps<RootStackParamList, Screen>;
 
 export type RootTabParamList = {
-  Home: undefined;
-  History: undefined;
-  Notification: undefined;
-
+	Dashboard: undefined;
+	History: undefined;
+	Notification: undefined;
 };
 
-export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
-  BottomTabScreenProps<RootTabParamList, Screen>,
-  NativeStackScreenProps<RootStackParamList>
->;
+export type DrawerParamList = {
+  Home: undefined;
+	"View Profile": { user: object };
+	"Edit Profile": { user: object };
+
+
+}
+export type RootTabScreenProps<Screen extends keyof RootTabParamList> =
+	CompositeScreenProps<
+		BottomTabScreenProps<RootTabParamList, Screen>,
+		NativeStackScreenProps<RootStackParamList>
+	>;

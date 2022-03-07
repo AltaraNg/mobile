@@ -15,19 +15,23 @@ import React, { useState, createRef, useEffect, useContext } from 'react';
 import Hamburger from '../assets/svgs/hamburger.svg'
 import { Text, View } from '../components/Themed';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types';
+import { RootStackParamList, RootTabParamList } from '../types';
 import Cards from '../components/Cards';
 import SideMenu from './SideMenu'
 import { Context as AuthContext } from '../context/AuthContext';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+type Props = NativeStackScreenProps<RootTabParamList, 'Notification'>
 
 
-export default function Notification({ navigation, route }) {
+
+export default function Notification({ navigation, route }: Props) {
 	const {state} = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
 	const [showMenu, setShowMenu] = useState(false);
 	const toggleSideMenu = async () => {
-		setShowMenu(!showMenu)
-	}
+		navigation.toggleDrawer();
+	};
 
 	const backAction = () => {
 		if (Platform.OS === "ios") return;

@@ -19,13 +19,17 @@ import Header from '../components/Header';
 import React, { useState, createRef, useEffect, useContext } from 'react';
 import Hamburger from '../assets/svgs/hamburger.svg';
 import { Text, View } from '../components/Themed';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types';
+import { DrawerParamList, RootStackParamList, RootTabParamList } from '../types';
 import Cards from '../components/Cards';
 import SideMenu from './SideMenu';
 import { Context as AuthContext } from '../context/AuthContext';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export default function Dashboard({ navigation, route }) {
+
+type Props = NativeStackScreenProps<RootTabParamList, 'Dashboard'>
+
+
+export default function Dashboard({ navigation, route }: Props) {
 	const { state } = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
 	const [isError, setIsError] = useState(false);
@@ -34,7 +38,7 @@ export default function Dashboard({ navigation, route }) {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [showMenu, setShowMenu] = useState(false);
 	const toggleSideMenu = async () => {
-		setShowMenu(!showMenu);
+		navigation.toggleDrawer();
 	};
 	let successMessage = 'You have successfully applied for  an E-loan';
 	let errorMessage = 'Sorry! Your Order is unsuccessful';

@@ -15,19 +15,23 @@ import React, { useState, createRef, useEffect, useContext } from 'react';
 import Hamburger from '../assets/svgs/hamburger.svg'
 import { Text, View } from '../components/Themed';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types';
+import { RootStackParamList, RootTabParamList } from '../types';
 import Cards from '../components/Cards';
 import SideMenu from './SideMenu'
+import { ELoan, Rental, ProductLoan } from "../assets/svgs/svg";
 import { Context as AuthContext } from '../context/AuthContext';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+type Props = NativeStackScreenProps<RootTabParamList, 'History'>
 
 
-export default function History({ navigation, route }) {
+
+export default function History({ navigation, route }: Props) {
 	const {state} = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
 	const [showMenu, setShowMenu] = useState(false);
 	const toggleSideMenu = async () => {
-		setShowMenu(!showMenu)
-	}
+		navigation.toggleDrawer();
+	};
 
 	const backAction = () => {
 		if (Platform.OS === "ios") return;
@@ -57,7 +61,7 @@ export default function History({ navigation, route }) {
   };
 	return (
     <View style={styles.container}>
-      {showMenu && <SideMenu  Logout="Logout" />}
+      {showMenu && <SideMenu Logout="Logout" />}
       <View style={styles.header}>
         <Header></Header>
         <TouchableOpacity>
@@ -69,60 +73,128 @@ export default function History({ navigation, route }) {
 
       <View style={styles.main}>
         <Text style={styles.name}>{"History"}</Text>
-		<Text style={styles.message}>Coming soon </Text>
-
-       
+        <View style={styles.order}>
+          <View style={styles.details}>
+            <ELoan />
+            <View style={styles.title}>
+              <Text
+                style={{
+                  color: "#074A74",
+                  fontFamily: "Montserrat_700Bold",
+                }}
+              >
+                E-LOAN ₦60,000{" "}
+              </Text>
+              <Text style={{ color: "#000", fontSize: 12 }}>
+                Order ID: 36584AG6
+              </Text>
+            </View>
+          </View>
+          <Text style={{ color: "#000", fontSize: 13 }}>12/22/2022</Text>
+        </View>
+        <View style={styles.order}>
+          <View style={styles.details}>
+            <Rental />
+            <View style={styles.title}>
+              <Text
+                style={{
+                  color: "#074A74",
+                  fontFamily: "Montserrat_700Bold",
+                }}
+              >
+                RENTAL LOAN ₦60,000
+              </Text>
+              <Text style={{ color: "#000", fontSize: 12 }}>
+                Order ID: 36584AG6
+              </Text>
+            </View>
+          </View>
+          <Text style={{ color: "#000", fontSize: 13 }}>12/22/2022</Text>
+        </View>
+        <View style={styles.order}>
+          <View style={styles.details}>
+            <ProductLoan />
+            <View style={styles.title}>
+              <Text
+                style={{
+                  color: "#074A74",
+                  fontFamily: "Montserrat_700Bold",
+                }}
+              >
+                INFINIX HOT 10 LITE
+              </Text>
+              <Text style={{ color: "#000", fontSize: 12 }}>
+                Order ID: 36584AG6
+              </Text>
+            </View>
+          </View>
+          <Text style={{ color: "#000", fontSize: 13 }}>12/22/2022</Text>
+        </View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		height:'100%',
-		position:'relative'
-		
-	},
-	hamburger:{
-		marginTop: 80,
-        marginRight: 24,
-	},
-	cards:{
-		backgroundColor: '#EFF5F9',
-		flexDirection:'column',
-		alignItems:'center'
-	},
-	header: {
-		flex: 1,
-		flexDirection:'row',
-		justifyContent: 'space-between',
-		backgroundColor: '#EFF5F9',
-	},
-    main: {
-        flex: 3,
-		backgroundColor: '#EFF5F9'
-    },
-	name:{
-		marginHorizontal: 30,
-		fontSize: 25,
-		color: '#074A74',
-		fontFamily: 'Montserrat_700Bold',
-		
-	},
-	message:{
-		fontFamily: 'Montserrat_400Regular',
-		marginTop: 10,
-		marginHorizontal: 30,
-		fontSize: 12,
-		color: '#72788D',
-		paddingBottom:30
-	},
-	menu:{
-		position:'absolute',
-		right:0,
-
-
-	}
-
+  container: {
+    flex: 1,
+    height: "100%",
+    position: "relative",
+  },
+  hamburger: {
+    marginTop: 80,
+    marginRight: 24,
+  },
+  cards: {
+    backgroundColor: "#EFF5F9",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  title: {
+    backgroundColor: "#EFF5F9",
+	marginLeft:10,
+  },
+  details: {
+    backgroundColor: "#EFF5F9",
+    flexDirection: "row",
+	alignItems:'center',
+  },
+  order: {
+    backgroundColor: "#EFF5F9",
+    flexDirection: "row",
+    marginLeft: 26,
+	marginRight:20,
+    alignItems: "center",
+	justifyContent:'space-between',
+    marginBottom: 30,
+  },
+  header: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#EFF5F9",
+  },
+  main: {
+    flex: 3,
+    backgroundColor: "#EFF5F9",
+  },
+  name: {
+    marginHorizontal: 30,
+    fontSize: 25,
+    color: "#074A74",
+    fontFamily: "Montserrat_700Bold",
+    marginBottom: 60,
+  },
+  message: {
+    fontFamily: "Montserrat_400Regular",
+    marginTop: 10,
+    marginHorizontal: 30,
+    fontSize: 12,
+    color: "#72788D",
+    paddingBottom: 30,
+  },
+  menu: {
+    position: "absolute",
+    right: 0,
+  },
 });

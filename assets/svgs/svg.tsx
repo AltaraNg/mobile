@@ -134,3 +134,126 @@ export const LogOut = function () {
 		</Svg>
 	);
 };
+
+export const ELoan = function(){
+	return (
+    <Svg
+      width="44"
+      height="44"
+      viewBox="0 0 44 44"
+      fill="none"
+    >
+      <Circle opacity="0.2" cx="22" cy="22" r="22" fill="#074A74" />
+      <Path
+        d="M35 14H9C8.44772 14 8 14.4477 8 15V29C8 29.5523 8.44772 30 9 30H35C35.5523 30 36 29.5523 36 29V15C36 14.4477 35.5523 14 35 14Z"
+        stroke="#074A74"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M22 26C24.2091 26 26 24.2091 26 22C26 19.7909 24.2091 18 22 18C19.7909 18 18 19.7909 18 22C18 24.2091 19.7909 26 22 26Z"
+        stroke="#074A74"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M28 14L36 21"
+        stroke="#074A74"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M28 30L36 23"
+        stroke="#074A74"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M16 14L8 21"
+        stroke="#074A74"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M16 30L8 23"
+        stroke="#074A74"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export const Rental = function(){
+	return (
+    <Svg
+      width="44"
+      height="44"
+      viewBox="0 0 44 44"
+      fill="none"
+    >
+      <Circle opacity="0.2" cx="22" cy="22" r="22" fill="#FDC228" />
+      <Path
+        d="M33 33.0001V20.4425C33 20.3031 32.9709 20.1653 32.9145 20.0379C32.8582 19.9105 32.7758 19.7963 32.6727 19.7025L22.672 10.6107C22.4879 10.4433 22.2481 10.3506 21.9993 10.3506C21.7505 10.3506 21.5106 10.4433 21.3266 10.6107L11.3273 19.7026C11.2242 19.7963 11.1418 19.9105 11.0855 20.0379C11.0291 20.1653 11 20.3031 11 20.4424V33.0001"
+        stroke="#FDC228"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M8 33H36"
+        stroke="#FDC228"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M24.999 32.999V25.999C24.999 25.7338 24.8937 25.4795 24.7061 25.2919C24.5186 25.1044 24.2642 24.999 23.999 24.999H19.999C19.7338 24.999 19.4795 25.1044 19.2919 25.2919C19.1044 25.4795 18.999 25.7338 18.999 25.999V32.999"
+        stroke="#FDC228"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export const ProductLoan = function(){
+	return (
+    <Svg
+      width="44"
+      height="44"
+      viewBox="0 0 44 44"
+      fill="none"
+    >
+      <Circle opacity="0.2" cx="22" cy="22" r="22" fill="#FF4133" />
+      <Path
+        d="M33 12H11C10.4477 12 10 12.4477 10 13V31C10 31.5523 10.4477 32 11 32H33C33.5523 32 34 31.5523 34 31V13C34 12.4477 33.5523 12 33 12Z"
+        stroke="#DB2721"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M10 16H34"
+        stroke="#DB2721"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M27 20C27 21.3261 26.4732 22.5979 25.5355 23.5355C24.5979 24.4732 23.3261 25 22 25C20.6739 25 19.4021 24.4732 18.4645 23.5355C17.5268 22.5979 17 21.3261 17 20"
+        stroke="#DB2721"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </Svg>
+  );
+}
