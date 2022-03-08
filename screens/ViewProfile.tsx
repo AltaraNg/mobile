@@ -28,8 +28,9 @@ import {
 import SideMenu from './SideMenu';
 import { Context as AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type Props = NativeStackScreenProps<DrawerParamList, 'View Profile'>;
+type Props = DrawerScreenProps<DrawerParamList, 'View Profile'>;
 
 export default function ViewProfile({ navigation, route }: Props) {
 	const { state } = useContext(AuthContext);

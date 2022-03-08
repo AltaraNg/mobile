@@ -7,6 +7,11 @@ import Constants from 'expo-constants';
 import { useContext } from 'react';
 import { Context as AuthContext } from '../context/AuthContext';
 
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList, RootTabParamList } from '../types';
+
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Modal'>
 
 export default function Cards(props: any) {
 	let url = Constants?.manifest?.extra?.URL;

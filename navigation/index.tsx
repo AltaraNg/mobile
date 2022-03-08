@@ -16,7 +16,7 @@ import { ColorSchemeName, Pressable } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import ModalScreen from '../screens/ModalScreen';
+import ModalScreen from '../modals/ModalScreen';
 
 import NotFoundScreen from '../screens/NotFoundScreen';
 import {
@@ -41,7 +41,8 @@ import Notification from '../screens/Notification';
 import History from '../screens/History';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomSidebarMenu from '../components/CustomeSideBarMenu';
-import EditProfile from '../screens/EditProfile';
+import EditProfile from '../screens/ViewProfile';
+import RequestModal from '../modals/requestModal';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
@@ -152,8 +153,15 @@ function RootNavigator() {
 				component={NotFoundScreen}
 				options={{ title: 'Oops!' }}
 			/>
-			<Stack.Group screenOptions={{ presentation: 'modal' }}>
+			<Stack.Group
+				screenOptions={{
+					presentation: 'transparentModal',
+					headerShown: true,
+					animation: 'fade_from_bottom',
+				}}
+			>
 				<Stack.Screen name="Modal" component={ModalScreen} />
+				<Stack.Screen name="RequestModal" component={RequestModal} />
 			</Stack.Group>
 		</Stack.Navigator>
 	);
@@ -164,52 +172,55 @@ const DrawerNav = createDrawerNavigator<DrawerParamList>();
 function DrawerNavigator() {
 	const colorScheme = useColorScheme();
 	return (
-    <DrawerNav.Navigator
-      screenOptions={{
-        drawerStyle: {
-          backgroundColor: "#fff",
-          width: 240,
-        },
-      }}
-      drawerContent={(props) => <CustomSidebarMenu {...props} />}
-    >
-      <DrawerNav.Screen
-        name="Home"
-        component={BottomTabNavigator}
-        options={{
-          drawerLabelStyle: { color: "#9C9696" },
-          headerShown: false,
-          drawerIcon: ({ color, size }) => (
-            <FontAwesome size={24} color="#9C9696" name="home" />
-          ),
-        }}
-      />
+		<DrawerNav.Navigator
+    initialRouteName="Home"
+    backBehavior='initialRoute'
+			screenOptions={{
+				drawerStyle: {
+					backgroundColor: '#fff',
+					width: 240,
+				},
+			}}
 
-      <DrawerNav.Screen
-        name="View Profile"
-        component={ViewProfile}
-        options={{
-          drawerLabelStyle: { color: "#9C9696" },
-          headerShown: false,
-          drawerIcon: ({ color, size }) => (
-            <EvilIcons name="user" size={24} color="#9C9696" />
-          ),
-        }}
-      />
+			drawerContent={(props) => <CustomSidebarMenu {...props} />}
+		>
+			<DrawerNav.Screen
+				name="Home"
+				component={BottomTabNavigator}
+				options={{
+					drawerLabelStyle: { color: '#9C9696' },
+					headerShown: false,
+					drawerIcon: ({ color, size }) => (
+						<FontAwesome size={24} color="#9C9696" name="home" />
+					),
+				}}
+			/>
 
-      <DrawerNav.Screen
-        name="Edit Profile"
-        component={EditProfile}
-        options={{
-          drawerLabelStyle: { color: "#9C9696" },
-          headerShown: false,
-          drawerIcon: ({ color, size }) => (
-            <AntDesign name="edit" size={24} color="#9C9696" />
-          ),
-        }}
-      />
-    </DrawerNav.Navigator>
-  );
+			<DrawerNav.Screen
+				name="View Profile"
+				component={ViewProfile}
+				options={{
+					drawerLabelStyle: { color: '#9C9696' },
+					headerShown: false,
+					drawerIcon: ({ color, size }) => (
+						<EvilIcons name="user" size={24} color="#9C9696" />
+					),
+				}}
+			/>
+
+			<DrawerNav.Screen
+				name="Edit Profile"
+				component={EditProfile}
+				options={{
+					drawerLabelStyle: { color: '#9C9696' },
+					headerShown: false,
+					drawerIcon: ({ color, size }) => (
+						<AntDesign name="edit" size={24} color="#9C9696" />
+					),
+				}}
+			/>
+		</DrawerNav.Navigator>
+	);
 }
 
 /**
@@ -230,63 +241,63 @@ function BottomTabNavigator() {
 	const colorScheme = useColorScheme();
 
 	return (
-    <BottomTab.Navigator
-      initialRouteName="Dashboard"
-      screenOptions={{
-        tabBarActiveTintColor: "#074A74",
-        tabBarStyle: { backgroundColor: "#EFF5F9" },
-      }}
-    >
-      <BottomTab.Screen
-        name="Dashboard"
-        component={Dashboard}
-        options={{
-          headerShown: false,
-          tabBarLabel: "",
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome
-              size={size}
-              color={color}
-              name="home"
-              style={{ marginBottom: -16 }}
-            />
-          ),
-        }}
-      />
-      <BottomTab.Screen
-        name="History"
-        component={History}
-        options={{
-          headerShown: false,
-          tabBarLabel: "",
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome
-              size={size}
-              color={color}
-              name="folder-open"
-              style={{ marginBottom: -16 }}
-            />
-          ),
-        }}
-      />
-      <BottomTab.Screen
-        name="Notification"
-        component={Notification}
-        options={{
-          headerShown: false,
-          tabBarLabel: "",
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome
-              size={size}
-              color={color}
-              name="bell"
-              style={{ marginBottom: -16 }}
-            />
-          ),
-        }}
-      />
-    </BottomTab.Navigator>
-  );
+		<BottomTab.Navigator
+			initialRouteName="Dashboard"
+			screenOptions={{
+				tabBarActiveTintColor: '#074A74',
+				tabBarStyle: { backgroundColor: '#EFF5F9' },
+			}}
+		>
+			<BottomTab.Screen
+				name="Dashboard"
+				component={Dashboard}
+				options={{
+					headerShown: false,
+					tabBarLabel: '',
+					tabBarIcon: ({ color, size }) => (
+						<FontAwesome
+							size={size}
+							color={color}
+							name="home"
+							style={{ marginBottom: -16 }}
+						/>
+					),
+				}}
+			/>
+			<BottomTab.Screen
+				name="History"
+				component={History}
+				options={{
+					headerShown: false,
+					tabBarLabel: '',
+					tabBarIcon: ({ color, size }) => (
+						<FontAwesome
+							size={size}
+							color={color}
+							name="folder-open"
+							style={{ marginBottom: -16 }}
+						/>
+					),
+				}}
+			/>
+			<BottomTab.Screen
+				name="Notification"
+				component={Notification}
+				options={{
+					headerShown: false,
+					tabBarLabel: '',
+					tabBarIcon: ({ color, size }) => (
+						<FontAwesome
+							size={size}
+							color={color}
+							name="bell"
+							style={{ marginBottom: -16 }}
+						/>
+					),
+				}}
+			/>
+		</BottomTab.Navigator>
+	);
 }
 
 /**
