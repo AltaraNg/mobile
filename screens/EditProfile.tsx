@@ -27,6 +27,7 @@ import Cards from "../components/Cards";
 import SideMenu from "./SideMenu";
 import { Context as AuthContext } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { UserInterfaceIdiom } from "expo-constants";
 
 type Props = NativeStackScreenProps<RootTabParamList, "Dashboard">;
 
@@ -34,9 +35,10 @@ export default function Dashboard({ navigation, route }: Props) {
   const { state } = useContext(AuthContext);
   const [exitApp, setExitApp] = useState(1);
   const [isError, setIsError] = useState(false);
-
+  
   const [modalResponse, setModalResponse] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
+  const [user, setUser] = useState(state.user.attributes);
   const [showMenu, setShowMenu] = useState(false);
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
@@ -68,6 +70,9 @@ export default function Dashboard({ navigation, route }: Props) {
     setModalResponse(res);
     setModalVisible(true);
   }
+  function handleUpdate (){
+    console.log(state.user.attributes)
+  }
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -96,21 +101,29 @@ export default function Dashboard({ navigation, route }: Props) {
         <Text style={styles.title}>Edit Profile</Text>
         <View style={styles.data}>
           <Text style={styles.label}>First Name</Text>
-          <Text style={styles.input}>{state.user.attributes.first_name}</Text>
+          <TextInput
+            style={styles.input}
+            value={state.user ? state.user.attributes.first_name :""}
+            onChangeText={(txt) => setUser ({...user.attributes, first_name:txt})}
+          ></TextInput>
         </View>
         <View style={styles.data}>
           <Text style={styles.label}>Last Name</Text>
-          <Text style={styles.input}>{state.user.attributes.last_name}</Text>
+          <TextInput style={styles.input}>
+            {state.user.attributes.last_name}
+          </TextInput>
         </View>
         <View style={styles.data}>
           <Text style={styles.label}>Phone Number</Text>
-          <Text style={styles.input}>{state.user.attributes.phone_number}</Text>
+          <TextInput style={styles.input}>
+            {state.user.attributes.phone_number}
+          </TextInput>
         </View>
         <View style={styles.data}>
           <Text style={styles.label}>Email Address</Text>
-          <Text style={styles.input}>
+          <TextInput style={styles.input}>
             {state.user.attributes.email_address}
-          </Text>
+          </TextInput>
         </View>
         <LinearGradient
           colors={["#074A77", "#089CA4"]}
@@ -118,7 +131,7 @@ export default function Dashboard({ navigation, route }: Props) {
           start={{ x: 1, y: 0.5 }}
           end={{ x: 0, y: 0.5 }}
         >
-          <Pressable style={[styles.button]} >
+          <Pressable style={[styles.button]} onPress={handleUpdate}>
             <Text style={styles.buttonText}>Save</Text>
           </Pressable>
         </LinearGradient>
