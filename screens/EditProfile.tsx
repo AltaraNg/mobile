@@ -28,16 +28,19 @@ import SideMenu from "./SideMenu";
 import { Context as AuthContext } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { UserInterfaceIdiom } from "expo-constants";
+import axios from "axios";
 
 type Props = NativeStackScreenProps<RootTabParamList, "Dashboard">;
+import Constants from 'expo-constants';
+
+
+let url = Constants?.manifest?.extra?.URL;
+axios.defaults.baseURL = url;
 
 export default function Dashboard({ navigation, route }: Props) {
   const { state } = useContext(AuthContext);
   const [exitApp, setExitApp] = useState(1);
-  const [isError, setIsError] = useState(false);
-  
-  const [modalResponse, setModalResponse] = useState({});
-  const [modalVisible, setModalVisible] = useState(false);
+  const [isError, setIsError] = useState(false);  
   const [user, setUser] = useState(state.user.attributes);
   const [showMenu, setShowMenu] = useState(false);
   const toggleSideMenu = async () => {
@@ -65,13 +68,27 @@ export default function Dashboard({ navigation, route }: Props) {
     return true;
   };
 
-  function handleRequest(res: object, status: String) {
-    status === "success" ? setIsError(false) : setIsError(true);
-    setModalResponse(res);
-    setModalVisible(true);
-  }
-  function handleUpdate (){
-    console.log(state.user.attributes)
+  
+  async function handleUpdate (){
+    try {
+      let result = await axios({
+        method: 'PATCH',
+        url: '/customers',
+        headers: { 'Authorization': `Bearer ${state.token}` },
+        data: user
+      });
+    } catch (error) {
+      console.log(error.response.data)
+    }
+    let result = await axios({
+      method: 'PATCH',
+      url: '/customers',
+      headers: { 'Authorization': `Bearer ${state.token}` },
+      data: user
+    });
+    if(result){
+      console.log(result.data)
+    }
   }
 
   useEffect(() => {
@@ -103,26 +120,35 @@ export default function Dashboard({ navigation, route }: Props) {
           <Text style={styles.label}>First Name</Text>
           <TextInput
             style={styles.input}
-            value={state.user ? state.user.attributes.first_name :""}
-            onChangeText={(txt) => setUser ({...user.attributes, first_name:txt})}
+            value={user.first_name}
+            onChangeText={(txt) => setUser ({...user, first_name:txt})}
           ></TextInput>
         </View>
         <View style={styles.data}>
           <Text style={styles.label}>Last Name</Text>
-          <TextInput style={styles.input}>
-            {state.user.attributes.last_name}
+          <TextInput style={styles.input}
+          
+          onChangeText={(txt) => setUser ({...user, last_name:txt})}
+          >
+            {user.last_name}
           </TextInput>
         </View>
         <View style={styles.data}>
           <Text style={styles.label}>Phone Number</Text>
-          <TextInput style={styles.input}>
-            {state.user.attributes.phone_number}
+          <TextInput style={styles.input}
+            onChangeText={(txt) => setUser ({...user, phone_number:txt})}
+            
+          >
+            {user.phone_number}
           </TextInput>
         </View>
         <View style={styles.data}>
           <Text style={styles.label}>Email Address</Text>
-          <TextInput style={styles.input}>
-            {state.user.attributes.email_address}
+          <TextInput style={styles.input}
+            onChangeText={(txt) => setUser ({...user, email:txt})}
+          
+          >
+            {user.email_address}
           </TextInput>
         </View>
         <LinearGradient
