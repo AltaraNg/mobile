@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View, ViewPropTypes, TextInput} from 'react-native';
+import {StyleSheet, View, ViewPropTypes, TextInput, TextPropTypes} from 'react-native';
 import PropTypes from 'prop-types';
 import colors from '../common/colors';
 import {GenericStyles} from '../styles/GenericStyles';
@@ -52,7 +52,7 @@ CustomTextInput.defaultProps = {
 
 CustomTextInput.propTypes = {
   containerStyle: ViewPropTypes.style,
-  style: ViewPropTypes.style,
+  style: Object,
   LeftComponent: PropTypes.object,
   RightComponent: PropTypes.object,
   refCallback: PropTypes.func,

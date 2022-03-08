@@ -5,7 +5,6 @@ import { Platform } from 'react-native';
 let url = 'auth/login';
 const MY_SECURE_AUTH_STATE_KEY = 'MySecureAuthStateKey';
 
-
 const authReducer = (state, action) => {
 	switch (action.type) {
 		case 'signout':
@@ -14,6 +13,7 @@ const authReducer = (state, action) => {
 			return {
 				token: action.payload.token,
 				user: action.payload.user,
+				id: action.payload.id,
 			};
 		default:
 			return state;
@@ -21,8 +21,8 @@ const authReducer = (state, action) => {
 };
 
 const signin = (dispatch) => {
-    let token = '';
-    let user = ''
+	let token = '';
+	let user = '';
 	return ({ otp, phone_number, device_name }) => {
 		const data = {
 			otp: otp,
@@ -33,54 +33,47 @@ const signin = (dispatch) => {
 			.then((res) => {
 				let loginInfo = res.data.data;
 				token = loginInfo.token;
-                user = loginInfo.user;	
+				user = loginInfo.user;
 
-                const storageValue = JSON.stringify(loginInfo);
+				const storageValue = JSON.stringify(loginInfo);
 
-                if(Platform.OS !== 'web'){
-                    SecureStore.setItemAsync(MY_SECURE_AUTH_STATE_KEY, storageValue)
-                }
-                dispatch({
-                    type: 'signin',
-                    payload: {
-                        token: token,
-                        user: user,
-                    },
-                });
-
-
-
+				if (Platform.OS !== 'web') {
+					SecureStore.setItemAsync(MY_SECURE_AUTH_STATE_KEY, storageValue);
+				}
+				dispatch({
+					type: 'signin',
+					payload: {
+						token: token,
+						user: user,
+					},
+				});
 			})
 			.catch((err) => {
-               return err.response.data
-        })
-			.finally(() => {
-			
-			});
+				return err.response.data;
+			})
+			.finally(() => {});
 		// Do some API Request here
-		
-		
 	};
 };
 
 const signout = (dispatch) => {
 	return () => {
-		if(Platform.OS !== 'web'){
-			SecureStore.deleteItemAsync(MY_SECURE_AUTH_STATE_KEY)
+		if (Platform.OS !== 'web') {
+			SecureStore.deleteItemAsync(MY_SECURE_AUTH_STATE_KEY);
 		}
-		
-		dispatch({ 
+
+		dispatch({
 			type: 'signout',
 			payload: {
 				token: null,
-				user: ''
-			}
-		 });
+				user: '',
+			},
+		});
 	};
 };
 
 export const { Provider, Context } = createDataContext(
 	authReducer,
 	{ signin, signout },
-	{ token: null, user: '' }
+	{ token: null, user: ''}
 );
