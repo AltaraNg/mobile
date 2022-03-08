@@ -41,7 +41,7 @@ import Notification from '../screens/Notification';
 import History from '../screens/History';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomSidebarMenu from '../components/CustomeSideBarMenu';
-import EditProfile from '../screens/ViewProfile';
+import EditProfile from '../screens/EditProfile';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 

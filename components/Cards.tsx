@@ -43,7 +43,7 @@ export default function Cards(props: any) {
 				end={{ x: 0, y: 0.5 }}
 			>
 				<Pressable style={[styles.button]} onPress={doSome}>
-					<Text style={styles.buttonText}>Next</Text>
+					<Text style={styles.buttonText}>Order Now</Text>
 				</Pressable>
 			</LinearGradient>
 		</View>

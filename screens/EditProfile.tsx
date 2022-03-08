@@ -14,7 +14,6 @@ import {
 
 import { LinearGradient } from "expo-linear-gradient";
 import { SuccessSvg, FailSvg, LogOut } from "../assets/svgs/svg";
-
 import Header from "../components/Header";
 import React, { useState, createRef, useEffect, useContext } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
@@ -84,54 +83,6 @@ export default function Dashboard({ navigation, route }: Props) {
   return (
     <View style={styles.container}>
       {showMenu && <SideMenu Logout="Logout" />}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-        style={{ justifyContent: "flex-end", margin: 0 }}
-      >
-        {!isError ? (
-          <View style={styles.modalContainer}>
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={styles.modalHeaderCloseText}>X</Text>
-            </TouchableOpacity>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <SuccessSvg />
-                <Text style={styles.modalHeading}>
-                  You have{" "}
-                  <Text style={{ color: "#074A74" }}>successfully</Text> applied
-                  for an E-loan
-                </Text>
-              </View>
-            </View>
-          </View>
-        ) : (
-          <View style={styles.modalContainer}>
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={styles.modalHeaderCloseText}>X</Text>
-            </TouchableOpacity>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <FailSvg />
-                <Text style={styles.modalHeading}>
-                  Sorry! Your Order is{" "}
-                  <Text style={{ color: "red" }}>unsuccessful</Text>
-                </Text>
-              </View>
-            </View>
-          </View>
-        )}
-      </Modal>
       <View style={styles.header}>
         <Header></Header>
         <TouchableOpacity>
@@ -142,18 +93,35 @@ export default function Dashboard({ navigation, route }: Props) {
       </View>
 
       <View style={styles.main}>
-        <Text style={styles.name}>{state.user.attributes.first_name},</Text>
-        
-        <View style={styles.cards}>
-          
-
-          <Cards
-            title="Order a Product Now!!!"
-            amount="Up to ₦500,000"
-            type="Product"
-            onRequest={handleRequest}
-          />
+        <Text style={styles.title}>Edit Profile</Text>
+        <View style={styles.data}>
+          <Text style={styles.label}>First Name</Text>
+          <Text style={styles.input}>{state.user.attributes.first_name}</Text>
         </View>
+        <View style={styles.data}>
+          <Text style={styles.label}>Last Name</Text>
+          <Text style={styles.input}>{state.user.attributes.last_name}</Text>
+        </View>
+        <View style={styles.data}>
+          <Text style={styles.label}>Phone Number</Text>
+          <Text style={styles.input}>{state.user.attributes.phone_number}</Text>
+        </View>
+        <View style={styles.data}>
+          <Text style={styles.label}>Email Address</Text>
+          <Text style={styles.input}>
+            {state.user.attributes.email_address}
+          </Text>
+        </View>
+        <LinearGradient
+          colors={["#074A77", "#089CA4"]}
+          style={styles.buttonContainer}
+          start={{ x: 1, y: 0.5 }}
+          end={{ x: 0, y: 0.5 }}
+        >
+          <Pressable style={[styles.button]} >
+            <Text style={styles.buttonText}>Save</Text>
+          </Pressable>
+        </LinearGradient>
       </View>
     </View>
   );
@@ -164,6 +132,47 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     position: "relative",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    borderColor: "#074A74",
+    borderWidth: 1,
+    borderRadius: 10,
+    width: 250,
+    paddingVertical: 10,
+    marginHorizontal: Dimensions.get("window").width * 0.15,
+  },
+  button: {
+    flex: 1,
+    alignItems: "center",
+    borderRadius: 4,
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontFamily: "Montserrat_600SemiBold",
+    textAlign: "center",
+    fontSize: 18,
+  },
+  input: {
+    backgroundColor: "#E8EBF7",
+    color: "#72788D",
+    marginRight: 25,
+    paddingVertical: 13,
+    borderColor: "#222",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    fontSize: 15,
+    fontFamily: "Montserrat_600SemiBold",
+  },
+  label: {
+    color: "#000",
+    fontFamily: "Montserrat_500Medium",
+    paddingBottom: 3,
+  },
+  data: {
+    backgroundColor: "#EFF5F9",
+    paddingLeft: 30,
+    marginBottom: 30,
   },
   hamburger: {
     marginTop: 80,
@@ -184,46 +193,15 @@ const styles = StyleSheet.create({
     flex: 3,
     backgroundColor: "#EFF5F9",
   },
-  name: {
+  title: {
     marginHorizontal: 30,
     fontSize: 25,
     color: "#074A74",
     fontFamily: "Montserrat_700Bold",
-  },
-  message: {
-    fontFamily: "Montserrat_400Regular",
-    marginTop: 10,
-    marginHorizontal: 30,
-    fontSize: 12,
-    color: "#72788D",
-    paddingBottom: 30,
+    marginBottom: 45,
   },
   menu: {
     position: "absolute",
     right: 0,
-  },
-
-  modalContainer: {
-    height: Dimensions.get("screen").height / 2.1,
-    alignItems: "center",
-    marginTop: "auto",
-    borderRadius: 15,
-  },
-  modalContent: {
-    paddingVertical: 20,
-    alignItems: "center",
-  },
-  modalHeading: {
-    fontFamily: "Montserrat_700Bold",
-    fontSize: 30,
-  },
-  modalHeaderCloseText: {
-    backgroundColor: "white",
-    textAlign: "center",
-    paddingLeft: 5,
-    paddingRight: 5,
-    width: 30,
-    fontSize: 15,
-    borderRadius: 50,
   },
 });
