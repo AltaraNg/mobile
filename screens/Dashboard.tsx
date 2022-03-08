@@ -24,9 +24,11 @@ import Cards from '../components/Cards';
 import SideMenu from './SideMenu';
 import { Context as AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
 
-type Props = NativeStackScreenProps<RootTabParamList, 'Dashboard'>
+type Props = DrawerScreenProps<DrawerParamList, 'Home'>
 
 
 export default function Dashboard({ navigation, route }: Props) {
@@ -63,20 +65,21 @@ export default function Dashboard({ navigation, route }: Props) {
 	};
 
 	function handleRequest(res: object, status: String) {
-		status === 'success' ? setIsError(false) : setIsError(true)
+		status === 'success' ? setIsError(false) : setIsError(true);
+		// navigation.navigate('RequestModal');
 		setModalResponse(res);
 		setModalVisible(true);
 	}
 
 	
 
-	useEffect(() => {
-		const backHandler = BackHandler.addEventListener(
-			'hardwareBackPress',
-			backAction
-		);
-		return () => backHandler.remove();
-	}, []);
+	// useEffect(() => {
+	// 	const backHandler = BackHandler.addEventListener(
+	// 		'hardwareBackPress',
+	// 		backAction
+	// 	);
+	// 	return () => backHandler.remove();
+	// }, []);
 
 	const logout = () => {
 		navigation.navigate('Login');
@@ -85,7 +88,7 @@ export default function Dashboard({ navigation, route }: Props) {
 		<View style={styles.container}>
 			{showMenu && <SideMenu Logout="Logout" />}
 			<Modal
-				animationType="slide"
+				animationType="slide"				
 				transparent={true}
 				visible={modalVisible}
 				onRequestClose={() => {

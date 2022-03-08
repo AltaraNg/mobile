@@ -7,6 +7,7 @@ import {
 	BackHandler,
 	Platform,
 	TouchableOpacity,
+	Touchable,
 } from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
@@ -53,6 +54,10 @@ export default function History({ navigation, route }: Props) {
 		}
 	};
 
+	const viewDetail = (order: object) => {
+		console.log(order);
+	};
+
 	useEffect(() => {
 		fetchOrder();
 	}, []);
@@ -74,34 +79,34 @@ export default function History({ navigation, route }: Props) {
 						data={orders}
 						keyExtractor={(item) => item.id}
 						renderItem={({ item }) => (
+							<Pressable onPress={() => viewDetail(item)}>
 							<View style={styles.order}>
 								<View style={styles.details}>
-									<ELoan />
-									<View style={styles.title}>
-										<Text
-											style={{
-												color: '#074A74',
-												fontFamily: 'Montserrat_700Bold',
-											}}
-											numberOfLines={1}
-											ellipsizeMode={'tail'}
-										>
-											{item.included.product.name}{' '}
-										</Text>
-										<Text style={{ color: '#000', fontSize: 12 }}>
-											Order ID: {item?.attributes?.order_number}
-										</Text>
-									</View>
+										<ELoan />
+										<View style={styles.title}>
+											<Text
+												style={{
+													color: '#074A74',
+													fontFamily: 'Montserrat_700Bold',
+												}}
+												numberOfLines={1}
+												ellipsizeMode={'tail'}
+											>
+												{item.included.product.name}{' '}
+											</Text>
+											<Text style={{ color: '#000', fontSize: 12 }}>
+												Order ID: {item?.attributes?.order_number}
+											</Text>
+										</View>
 								</View>
 								<Text style={{ color: '#000', fontSize: 13 }}>
 									{item?.attributes?.order_date}
 								</Text>
 							</View>
+							</Pressable>
 						)}
 					/>
 				)}
-
-				
 			</View>
 		</View>
 	);

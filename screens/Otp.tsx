@@ -205,7 +205,8 @@ const styles = StyleSheet.create({
 		color: '#074A74',
 		fontSize: 18,
 		width: '100%',
-		textAlign:'center'
+		textAlign:'center',
+		fontWeight: '700'
 	},
 
 	lock: {

@@ -52,7 +52,7 @@ CustomTextInput.defaultProps = {
 
 CustomTextInput.propTypes = {
   containerStyle: ViewPropTypes.style,
-  style: Object,
+  style: PropTypes.array,
   LeftComponent: PropTypes.object,
   RightComponent: PropTypes.object,
   refCallback: PropTypes.func,
