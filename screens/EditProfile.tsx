@@ -70,6 +70,7 @@ export default function Dashboard({ navigation, route }: Props) {
 
   
   async function handleUpdate (){
+    console.log(user)
     try {
       let result = await axios({
         method: 'PATCH',

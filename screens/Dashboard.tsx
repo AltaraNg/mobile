@@ -8,10 +8,11 @@ import {
 	Platform,
 	TouchableOpacity,
 	Modal,
+	TouchableHighlight,
 	Alert,
 	Dimensions,
 } from 'react-native';
-
+import { Button, Overlay, Icon } from "react-native-elements";
 import { LinearGradient } from 'expo-linear-gradient';
 import { SuccessSvg, FailSvg, LogOut } from '../assets/svgs/svg';
 
@@ -85,152 +86,184 @@ export default function Dashboard({ navigation, route }: Props) {
 		navigation.navigate('Login');
 	};
 	return (
-		<View style={styles.container}>
-			{showMenu && <SideMenu Logout="Logout" />}
-			<Modal
-				animationType="slide"				
-				transparent={true}
-				visible={modalVisible}
-				onRequestClose={() => {
-					setModalVisible(!modalVisible);
-				}}
-				style={{ justifyContent: 'flex-end', margin: 0 }}
-			>
-				{!isError ? (
-					<View style={styles.modalContainer}>
-						<TouchableOpacity
-							style={{ alignItems: 'center' }}
-							onPress={() => setModalVisible(!modalVisible)}
-						>
-							<Text style={styles.modalHeaderCloseText}>X</Text>
-						</TouchableOpacity>
-						<View style={styles.modalContainer}>
-							<View style={styles.modalContent}>
-								<SuccessSvg />
-								<Text style={styles.modalHeading}>
-									You have{' '}
-									<Text style={{ color: '#074A74' }}>successfully</Text> applied
-									for an E-loan
-								</Text>
-							</View>
-						</View>
-					</View>
-				) : (
-					<View style={styles.modalContainer}>
-						<TouchableOpacity
-							style={{ alignItems: 'center' }}
-							onPress={() => setModalVisible(!modalVisible)}
-						>
-							<Text style={styles.modalHeaderCloseText}>X</Text>
-						</TouchableOpacity>
-						<View style={styles.modalContainer}>
-							<View style={styles.modalContent}>
-								<FailSvg />
-								<Text style={styles.modalHeading}>
-								Sorry! Your Order is <Text style={{ color: 'red' }}>unsuccessful</Text>
-								</Text>
-							</View>
-						</View>
-					</View>
-				)}
-			</Modal>
-			<View style={styles.header}>
-				<Header></Header>
-				<TouchableOpacity>
-					<Pressable onPress={toggleSideMenu}>
-						<Hamburger style={styles.hamburger} />
-					</Pressable>
-				</TouchableOpacity>
-			</View>
+    <View style={styles.container}>
+      {showMenu && <SideMenu Logout="Logout" />}
+      <Overlay isVisible={modalVisible} onBackdropPress ={()=> {setModalVisible(!modalVisible)}}/>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+        style={{ justifyContent: "flex-end", margin: 0 }}
+      >
+        {!isError ? (
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={styles.modalHeaderCloseText}>X</Text>
+            </TouchableOpacity>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <SuccessSvg />
+                <Text style={styles.modalHeading}>
+                  You have{" "}
+                  <Text style={{ color: "#074A74" }}>successfully</Text> applied
+                  for an E-loan
+                </Text>
+              </View>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={styles.modalHeaderCloseText}>X</Text>
+            </TouchableOpacity>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <TouchableHighlight
+                  style={{
+                    borderRadius:
+                      Math.round(
+                        Dimensions.get("window").width +
+                          Dimensions.get("window").height
+                      ) / 2,
+                    width: Dimensions.get("window").width * 0.3,
+                    height: Dimensions.get("window").width * 0.3,
+                    backgroundColor: "#DB2721",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  underlayColor="#ccc"
+                >
+                  <Text
+                    style={{
+                      fontSize: 68,
+                      color: "#fff",
+                      fontFamily: "Montserrat_900Black",
+                    }}
+                  >
+                    &#x2715;
+                  </Text>
+                </TouchableHighlight>
+                <Text style={styles.modalHeading}>
+                  Sorry! Your Order is{" "}
+                  <Text style={{ color: "red" }}>unsuccessful</Text>
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+      </Modal>
+      <View style={styles.header}>
+        <Header></Header>
+        <TouchableOpacity>
+          <Pressable onPress={toggleSideMenu}>
+            <Hamburger style={styles.hamburger} />
+          </Pressable>
+        </TouchableOpacity>
+      </View>
 
-			<View style={styles.main}>
-				<Text style={styles.name}>{state.user.attributes.first_name},</Text>
-				<Text style={styles.message}>Welcome to your altara dashboards </Text>
-				<View style={styles.cards}>
-					<Cards
-						title="Get a Loan Now!!!"
-						amount="Up to ₦500,000"
-						type="Loan"
-						onRequest={handleRequest}
-					/>
+      <View style={styles.main}>
+        <Text style={styles.name}>{state.user.attributes.first_name},</Text>
+        <Text style={styles.message}>Welcome to your altara dashboards </Text>
+        <View style={styles.cards}>
+          <Cards
+            title="Get a Loan Now!!!"
+            amount="Up to ₦500,000"
+            type="Loan"
+            onRequest={handleRequest}
+          />
 
-					<Cards
-						title="Order a Product Now!!!"
-						amount="Up to ₦500,000"
-						type="Product"
-						onRequest={handleRequest}
-					/>
-				</View>
-			</View>
-		</View>
-	);
+          <Cards
+            title="Order a Product Now!!!"
+            amount="Up to ₦500,000"
+            type="Product"
+            onRequest={handleRequest}
+          />
+        </View>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		height: '100%',
-		position: 'relative',
-	},
-	hamburger: {
-		marginTop: 80,
-		marginRight: 24,
-	},
-	cards: {
-		backgroundColor: '#EFF5F9',
-		flexDirection: 'column',
-		alignItems: 'center',
-	},
-	header: {
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		backgroundColor: '#EFF5F9',
-	},
-	main: {
-		flex: 3,
-		backgroundColor: '#EFF5F9',
-	},
-	name: {
-		marginHorizontal: 30,
-		fontSize: 25,
-		color: '#074A74',
-		fontFamily: 'Montserrat_700Bold',
-	},
-	message: {
-		fontFamily: 'Montserrat_400Regular',
-		marginTop: 10,
-		marginHorizontal: 30,
-		fontSize: 12,
-		color: '#72788D',
-		paddingBottom: 30,
-	},
-	menu: {
-		position: 'absolute',
-		right: 0,
-	},
+  container: {
+    flex: 1,
+    height: "100%",
+    position: "relative",
+  },
+  hamburger: {
+    marginTop: 80,
+    marginRight: 24,
+  },
+  cards: {
+    backgroundColor: "#EFF5F9",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  header: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#EFF5F9",
+  },
+  main: {
+    flex: 3,
+    backgroundColor: "#EFF5F9",
+  },
+  name: {
+    marginHorizontal: 30,
+    fontSize: 25,
+    color: "#074A74",
+    fontFamily: "Montserrat_700Bold",
+  },
+  message: {
+    fontFamily: "Montserrat_400Regular",
+    marginTop: 10,
+    marginHorizontal: 30,
+    fontSize: 12,
+    color: "#72788D",
+    paddingBottom: 30,
+  },
+  menu: {
+    position: "absolute",
+    right: 0,
+  },
 
-	modalContainer: {
-		height: Dimensions.get('screen').height / 2.1,
-		alignItems: 'center',
-		marginTop: 'auto',
-		borderRadius: 15,
-	},
-	modalContent: {
-		paddingVertical: 20,
-		alignItems: 'center',
-	},
-	modalHeading: {
-		fontFamily: 'Montserrat_700Bold',
-		fontSize: 30,
-	},
-	modalHeaderCloseText: {
-		backgroundColor: 'white',
-		textAlign: 'center',
-		paddingLeft: 5,
-		paddingRight: 5,
-		width: 30,
-		fontSize: 15,
-		borderRadius: 50,
-	},
+  modalContainer: {
+    height: Dimensions.get("screen").height / 2.1,
+    alignItems: "center",
+    marginTop: "auto",
+    borderTopLeftRadius: 30,
+	borderTopRightRadius:30,
+    backgroundColor: "white",
+  },
+  modalContent: {
+    paddingVertical: 20,
+    alignItems: "center",
+    backgroundColor: "white",
+  },
+  modalHeading: {
+    fontFamily: "Montserrat_700Bold",
+    fontSize: 30,
+    textAlign: "center",
+	color:'black',
+	marginTop:20
+  },
+  modalHeaderCloseText: {
+    backgroundColor: "white",
+    textAlign: "center",
+    paddingLeft: 5,
+    paddingRight: 5,
+    width: 30,
+    fontSize: 15,
+    borderRadius: 50,
+  },
 });
