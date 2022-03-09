@@ -37,7 +37,7 @@ export default function Dashboard({ navigation, route }: Props) {
 	const [exitApp, setExitApp] = useState(1);
 	const [isError, setIsError] = useState(false);
 
-	const [modalResponse, setModalResponse] = useState({});
+	const [modalResponse, setModalResponse] = useState(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [showMenu, setShowMenu] = useState(false);
 	const toggleSideMenu = async () => {
@@ -67,27 +67,17 @@ export default function Dashboard({ navigation, route }: Props) {
 
 	function handleRequest(res: object, status: String) {
 		status === 'success' ? setIsError(false) : setIsError(true);
-		// navigation.navigate('RequestModal');
 		setModalResponse(res);
 		setModalVisible(true);
 	}
 
 	
 
-	// useEffect(() => {
-	// 	const backHandler = BackHandler.addEventListener(
-	// 		'hardwareBackPress',
-	// 		backAction
-	// 	);
-	// 	return () => backHandler.remove();
-	// }, []);
+	
 
-	const logout = () => {
-		navigation.navigate('Login');
-	};
+	
 	return (
     <View style={styles.container}>
-      {showMenu && <SideMenu Logout="Logout" />}
       <Overlay isVisible={modalVisible} onBackdropPress ={()=> {setModalVisible(!modalVisible)}}/>
       <Modal
         animationType="slide"
@@ -114,6 +104,10 @@ export default function Dashboard({ navigation, route }: Props) {
                   <Text style={{ color: "#074A74" }}>successfully</Text> applied
                   for an E-loan
                 </Text>
+
+				{modalResponse && (<Text>
+					{modalResponse.data.message}
+				</Text>)}
               </View>
             </View>
           </View>
@@ -154,8 +148,11 @@ export default function Dashboard({ navigation, route }: Props) {
                 </TouchableHighlight>
                 <Text style={styles.modalHeading}>
                   Sorry! Your Order is{" "}
-                  <Text style={{ color: "red" }}>unsuccessful</Text>
+                  <Text style={{ color: "red" }}>unsuccessful</Text>				  
                 </Text>
+				{modalResponse && (<Text style={styles.errText}>
+					{modalResponse.data.error_message}
+				</Text>)}
               </View>
             </View>
           </View>
@@ -266,4 +263,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     borderRadius: 50,
   },
+
+  errText: {
+	  fontSize: 15,
+	  marginTop: 20,
+	  paddingHorizontal: 15,
+	  textAlign: "center",
+
+  }
 });
