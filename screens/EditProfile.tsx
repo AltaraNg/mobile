@@ -69,25 +69,19 @@ export default function Dashboard({ navigation, route }: Props) {
   };
 
   
-  async function handleUpdate (){
+  const handleUpdate = async () => {
     try {
       let result = await axios({
-        method: 'PATCH',
-        url: '/customers',
-        headers: { 'Authorization': `Bearer ${state.token}` },
-        data: user
+        method: "PATCH",
+        url: `/customers/${state.user.id}`,
+        headers: { Authorization: `Bearer ${state.token}` },
+        data: user,
       });
+      console.log(result.data)
     } catch (error) {
+      console.log("error", error.response.data);
     }
-    let result = await axios({
-      method: 'PATCH',
-      url: '/customers',
-      headers: { 'Authorization': `Bearer ${state.token}` },
-      data: user
-    });
-    if(result){
-    }
-  }
+  };
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(

@@ -71,93 +71,139 @@ export default function Dashboard({ navigation, route }: Props) {
 		setModalVisible(true);
 	}
 
-	
+	 const Message = function(){
+		return (
+      <View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}
+          style={{
+            justifyContent: "flex-end",
+            margin: 0,
+            position: "relative",
+          }}
+        >
+          <TouchableHighlight
+            onPress={() => setModalVisible(!modalVisible)}
+            style={{
+              borderRadius:
+                Math.round(
+                  Dimensions.get("window").width +
+                    Dimensions.get("window").height
+                ) / 2,
+              width: Dimensions.get("window").width * 0.13,
+              height: Dimensions.get("window").width * 0.13,
+              backgroundColor: "#fff",
+              position: "absolute",
+            //   top: 1 / 2,
+              marginHorizontal: Dimensions.get("window").width * 0.43,
+              marginVertical: Dimensions.get("window").width * 0.76,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            underlayColor="#ccc"
+          >
+            <Text
+              style={{
+                fontSize: 20,
+                color: "#000",
+                fontFamily: "Montserrat_900Black",
+              }}
+            >
+              &#x2715;
+            </Text>
+          </TouchableHighlight>
+          
+          {!isError ? (
+            <View style={styles.modalContainer}>
+              <TouchableOpacity
+                style={{ alignItems: "center" }}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Text style={styles.modalHeaderCloseText}>X</Text>
+              </TouchableOpacity>
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <SuccessSvg />
+                  <Text style={styles.modalHeading}>
+                    You have{" "}
+                    <Text style={{ color: "#074A74" }}>successfully</Text>{" "}
+                    applied for an E-loan
+                  </Text>
+
+                  {modalResponse && (
+                    <Text style={{ color: "black" }}>
+                      {modalResponse.data.message}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <TouchableHighlight
+                    style={{
+                      borderRadius:
+                        Math.round(
+                          Dimensions.get("window").width +
+                            Dimensions.get("window").height
+                        ) / 2,
+                      width: Dimensions.get("window").width * 0.3,
+                      height: Dimensions.get("window").width * 0.3,
+                      backgroundColor: "#DB2721",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                    underlayColor="#ccc"
+                  >
+                    <Text
+                      style={{
+                        fontSize: 68,
+                        color: "#fff",
+                        fontFamily: "Montserrat_900Black",
+                      }}
+                    >
+                      &#x2715;
+                    </Text>
+                  </TouchableHighlight>
+                  <Text style={styles.modalHeading}>
+                    Sorry! Your Order is{" "}
+                    <Text style={{ color: "red" }}>unsuccessful</Text>
+                  </Text>
+                  {modalResponse && (
+                    <Text style={styles.errText}>
+                      {modalResponse.data.error_message}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            </View>
+          )}
+        </Modal>
+      </View>
+    );
+	}
 
 	
 
 	
 	return (
     <View style={styles.container}>
-      <Overlay isVisible={modalVisible} onBackdropPress ={()=> {setModalVisible(!modalVisible)}}/>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
+      <Overlay
+        ModalComponent={Modal}
+        isVisible={modalVisible}
+        onBackdropPress={() => {
           setModalVisible(!modalVisible);
         }}
-        style={{ justifyContent: "flex-end", margin: 0 }}
-      >
-        {!isError ? (
-          <View style={styles.modalContainer}>
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={styles.modalHeaderCloseText}>X</Text>
-            </TouchableOpacity>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <SuccessSvg />
-                <Text style={styles.modalHeading}>
-                  You have{" "}
-                  <Text style={{ color: "#074A74" }}>successfully</Text> applied
-                  for an E-loan
-                </Text>
+      />
 
-				{modalResponse && (<Text>
-					{modalResponse.data.message}
-				</Text>)}
-              </View>
-            </View>
-          </View>
-        ) : (
-          <View style={styles.modalContainer}>
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={styles.modalHeaderCloseText}>X</Text>
-            </TouchableOpacity>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <TouchableHighlight
-                  style={{
-                    borderRadius:
-                      Math.round(
-                        Dimensions.get("window").width +
-                          Dimensions.get("window").height
-                      ) / 2,
-                    width: Dimensions.get("window").width * 0.3,
-                    height: Dimensions.get("window").width * 0.3,
-                    backgroundColor: "#DB2721",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                  underlayColor="#ccc"
-                >
-                  <Text
-                    style={{
-                      fontSize: 68,
-                      color: "#fff",
-                      fontFamily: "Montserrat_900Black",
-                    }}
-                  >
-                    &#x2715;
-                  </Text>
-                </TouchableHighlight>
-                <Text style={styles.modalHeading}>
-                  Sorry! Your Order is{" "}
-                  <Text style={{ color: "red" }}>unsuccessful</Text>				  
-                </Text>
-				{modalResponse && (<Text style={styles.errText}>
-					{modalResponse.data.error_message}
-				</Text>)}
-              </View>
-            </View>
-          </View>
-        )}
-      </Modal>
+      <Message />
       <View style={styles.header}>
         <Header></Header>
         <TouchableOpacity>
@@ -166,7 +212,6 @@ export default function Dashboard({ navigation, route }: Props) {
           </Pressable>
         </TouchableOpacity>
       </View>
-
       <View style={styles.main}>
         <Text style={styles.name}>{state.user.attributes.first_name},</Text>
         <Text style={styles.message}>Welcome to your altara dashboards </Text>
@@ -239,20 +284,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: "auto",
     borderTopLeftRadius: 30,
-	borderTopRightRadius:30,
+    borderTopRightRadius: 30,
     backgroundColor: "white",
   },
   modalContent: {
     paddingVertical: 20,
     alignItems: "center",
     backgroundColor: "white",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
   modalHeading: {
     fontFamily: "Montserrat_700Bold",
     fontSize: 30,
     textAlign: "center",
-	color:'black',
-	marginTop:20
+    color: "black",
+    marginTop: 20,
   },
   modalHeaderCloseText: {
     backgroundColor: "white",
@@ -265,10 +312,11 @@ const styles = StyleSheet.create({
   },
 
   errText: {
-	  fontSize: 15,
-	  marginTop: 20,
-	  paddingHorizontal: 15,
-	  textAlign: "center",
-
-  }
+    fontSize: 15,
+    marginTop: 20,
+    paddingHorizontal: 30,
+    textAlign: "center",
+    color: "black",
+    fontFamily: "Montserrat_500Medium",
+  },
 });
