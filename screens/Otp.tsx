@@ -49,7 +49,6 @@ export default function Otp({ navigation, route }: Props) {
 				};
 				
 				let res = signin(data);
-				// navigation.navigate('Dashboard');
 			}
 
 			// auto focus to next InputText if value is not blank

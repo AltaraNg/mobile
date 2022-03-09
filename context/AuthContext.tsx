@@ -8,12 +8,16 @@ const MY_SECURE_AUTH_STATE_KEY = 'MySecureAuthStateKey';
 const authReducer = (state, action) => {
 	switch (action.type) {
 		case 'signout':
-			return { token: null, email: '' };
+			return { token: null, user: '' };
 		case 'signin':
 			return {
 				token: action.payload.token,
 				user: action.payload.user,
 				id: action.payload.id,
+			};
+		case 'error':
+			return {
+				error: action.payload.error,
 			};
 		default:
 			return state;
@@ -49,9 +53,12 @@ const signin = (dispatch) => {
 				});
 			})
 			.catch((err) => {
-				return err.response.data;
+				err = err.response.data;
+				console.log(err);
+				
 			})
 			.finally(() => {});
+
 		// Do some API Request here
 	};
 };
@@ -75,5 +82,5 @@ const signout = (dispatch) => {
 export const { Provider, Context } = createDataContext(
 	authReducer,
 	{ signin, signout },
-	{ token: null, user: ''}
+	{ token: null, user: '', err: '' }
 );
