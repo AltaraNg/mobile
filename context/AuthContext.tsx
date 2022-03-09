@@ -15,10 +15,6 @@ const authReducer = (state, action) => {
 				user: action.payload.user,
 				id: action.payload.id,
 			};
-		case 'error':
-			return {
-				error: action.payload.error,
-			};
 		default:
 			return state;
 	}
@@ -53,12 +49,9 @@ const signin = (dispatch) => {
 				});
 			})
 			.catch((err) => {
-				err = err.response.data;
-				console.log(err);
-				
+				return err.response.data;
 			})
 			.finally(() => {});
-
 		// Do some API Request here
 	};
 };
@@ -82,5 +75,5 @@ const signout = (dispatch) => {
 export const { Provider, Context } = createDataContext(
 	authReducer,
 	{ signin, signout },
-	{ token: null, user: '', err: '' }
+	{ token: null, user: ''}
 );

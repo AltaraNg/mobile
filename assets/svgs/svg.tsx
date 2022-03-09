@@ -33,44 +33,43 @@ export const EditProfileSvg = function () {
 
 export const FailSvg = function () {
 	return (
-		<Svg
-			width="114"
-			height="121"
-			viewBox="0 0 114 121"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<Ellipse
-				cx="56.8329"
-				cy="59.06"
-				rx="45.892"
-				ry="48.7097"
-				fill="#DB2721"
-			/>
-			<Ellipse
-				cx="56.5292"
-				cy="60.0278"
-				rx="56.5292"
-				ry="60"
-				fill="#DB2721"
-				fill-opacity="0.3"
-			/>
-			<Path
-				d="M74.6995 40.7422L38.3594 79.3136"
-				stroke="white"
-				stroke-width="50"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			/>
-			<Path
-				d="M74.6995 79.3136L38.3594 40.7422"
-				stroke="white"
-				stroke-width="50"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			/>
-		</Svg>
-	);
+    <Svg
+      width="114"
+      height="121"
+      viewBox="0 0 114 121"
+      fill="none"
+    >
+      <Ellipse
+        cx="56.8329"
+        cy="59.06"
+        rx="45.892"
+        ry="48.7097"
+        fill="#DB2721"
+      />
+      <Ellipse
+        cx="56.5292"
+        cy="60.0278"
+        rx="56.5292"
+        ry="60"
+        fill="#DB2721"
+        fill-opacity="0.3"
+      />
+      <Path
+        d="M74.6995 40.7422L38.3594 79.3136"
+        stroke="white"
+        stroke-width="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M74.6995 79.3136L38.3594 40.7422"
+        stroke="white"
+        stroke-width="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </Svg>
+  );
 };
 
 export const SuccessSvg = function () {
