@@ -78,7 +78,6 @@ export default function Dashboard({ navigation, route }: Props) {
         data: user
       });
     } catch (error) {
-      console.log(error.response.data)
     }
     let result = await axios({
       method: 'PATCH',
@@ -87,7 +86,6 @@ export default function Dashboard({ navigation, route }: Props) {
       data: user
     });
     if(result){
-      console.log(result.data)
     }
   }
 
