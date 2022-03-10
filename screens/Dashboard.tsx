@@ -27,6 +27,7 @@ import { Context as AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { DrawerScreenProps } from '@react-navigation/drawer';
+import axios from 'axios';
 
 
 type Props = DrawerScreenProps<DrawerParamList, 'Home'>
@@ -39,7 +40,7 @@ export default function Dashboard({ navigation, route }: Props) {
 
 	const [modalResponse, setModalResponse] = useState(null);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [showMenu, setShowMenu] = useState(false);
+	const [user, setUser] = useState(null);
 	const toggleSideMenu = async () => {
 		navigation.toggleDrawer();
 	};
@@ -64,6 +65,30 @@ export default function Dashboard({ navigation, route }: Props) {
 
 		return true;
 	};
+
+	const fetchUser = async () => {
+		try {
+			let response = await axios({
+				method: 'GET',
+				url: `/auth/user`,
+				headers: { 'Authorization': `Bearer ${state.token}` },
+			});
+			const user = response.data.data[0];
+			setUser(user);
+		} catch (error: any) {
+			ToastAndroid.showWithGravity(
+				"Unable to fetch user",
+				ToastAndroid.SHORT,
+				ToastAndroid.CENTER
+			  );
+		}
+	};
+
+
+
+	useEffect(() => {
+		fetchUser();
+	}, []);
 
 	function handleRequest(res: object, status: String) {
 		status === 'success' ? setIsError(false) : setIsError(true);
@@ -213,7 +238,8 @@ export default function Dashboard({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
       <View style={styles.main}>
-        <Text style={styles.name}>{state.user.attributes.first_name},</Text>
+		  {user &&  <Text style={styles.name}>{user.attributes.first_name},</Text>}
+       
         <Text style={styles.message}>Welcome to your altara dashboards </Text>
         <View style={styles.cards}>
           <Cards
