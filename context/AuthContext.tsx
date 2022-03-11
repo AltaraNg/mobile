@@ -66,7 +66,7 @@ const signout = (dispatch) => {
 			type: 'signout',
 			payload: {
 				token: null,
-				user: '',
+				user: null,
 			},
 		});
 	};

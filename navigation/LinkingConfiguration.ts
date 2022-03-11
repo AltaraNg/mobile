@@ -13,9 +13,11 @@ const linking: LinkingOptions<RootStackParamList> = {
   prefixes: [Linking.makeUrl('/')],
   config: {
     screens: {
-      Root: {
+      Main: {
         screens: {
-          
+          Home: {},
+          "View Profile" : {},
+          "Edit Profile" : {}
         },
       },
       Intro: {},
