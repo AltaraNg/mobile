@@ -49,7 +49,6 @@ export default function Otp({ navigation, route }: Props) {
 				};
 				
 				let res = signin(data);
-				console.log(res);
 				// navigation.navigate('Dashboard');
 			}
 

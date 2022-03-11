@@ -58,7 +58,6 @@ const signin = (dispatch) => {
 
 const signout = (dispatch) => {
 	return () => {
-		console.log('signed out')
 		if (Platform.OS !== 'web') {
 			SecureStore.deleteItemAsync(MY_SECURE_AUTH_STATE_KEY);
 		}
