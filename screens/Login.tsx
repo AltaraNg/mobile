@@ -39,13 +39,16 @@ export default function Login({ navigation }: Props) {
 				navigation.navigate('OTP', { phone_number: userPhone });
 			})
 			.catch((err) => {
-				let message = err?.response?.data?.message;
+				let message = err?.response?.data?.data.errors?.phone_number[0];
 				setErrorText(message);
+				if(message !== "The selected phone number is invalid."){
+					navigation.navigate('OTP', { phone_number: userPhone });
+				}
 			})
 			.finally(() => {
 				setLoading(false);
 				setIsDisabled(true);
-				navigation.navigate('OTP', { phone_number: userPhone });
+				
 
 			});
 	};
