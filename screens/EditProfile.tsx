@@ -10,6 +10,7 @@ import {
 	Modal,
 	Alert,
 	Dimensions,
+  ScrollView
 } from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
@@ -113,68 +114,70 @@ export default function Dashboard({ navigation, route }: Props) {
 	}, []);
 
 	return (
-		<View style={styles.container}>
-			{showMenu && <SideMenu Logout="Logout" />}
-			<View style={styles.header}>
-				<Header></Header>
-				<TouchableOpacity>
-					<Pressable onPress={toggleSideMenu}>
-						<Hamburger style={styles.hamburger} />
-					</Pressable>
-				</TouchableOpacity>
-			</View>
-			{user && (
-				<View style={styles.main}>
-					<Text style={styles.title}>Edit Profile</Text>
-					<View style={styles.data}>
-						<Text style={styles.label}>First Name</Text>
-						<TextInput
-							style={styles.input}
-							value={user.first_name}
-							onChangeText={(txt) => setUser({ ...user, first_name: txt })}
-						></TextInput>
-					</View>
-					<View style={styles.data}>
-						<Text style={styles.label}>Last Name</Text>
-						<TextInput
-							style={styles.input}
-							onChangeText={(txt) => setUser({ ...user, last_name: txt })}
-						>
-							{user.last_name}
-						</TextInput>
-					</View>
-					<View style={styles.data}>
-						<Text style={styles.label}>Phone Number</Text>
-						<TextInput
-							style={styles.input}
-							onChangeText={(txt) => setUser({ ...user, phone_number: txt })}
-						>
-							{user.phone_number}
-						</TextInput>
-					</View>
-					<View style={styles.data}>
-						<Text style={styles.label}>Email Address</Text>
-						<TextInput
-							style={styles.input}
-							onChangeText={(txt) => setUser({ ...user, email: txt })}
-						>
-							{user.email_address}
-						</TextInput>
-					</View>
-					<LinearGradient
-						colors={['#074A77', '#089CA4']}
-						style={styles.buttonContainer}
-						start={{ x: 1, y: 0.5 }}
-						end={{ x: 0, y: 0.5 }}
-					>
-						<Pressable style={[styles.button]} onPress={handleUpdate}>
-							<Text style={styles.buttonText}>Save</Text>
-						</Pressable>
-					</LinearGradient>
-				</View>
-			)}
-		</View>
-	);
+    <ScrollView style={{ backgroundColor: "#EFF5F9" }}>
+      <View style={styles.container}>
+        {showMenu && <SideMenu Logout="Logout" />}
+        <View style={styles.header}>
+          <Header></Header>
+          <TouchableOpacity>
+            <Pressable onPress={toggleSideMenu}>
+              <Hamburger style={styles.hamburger} />
+            </Pressable>
+          </TouchableOpacity>
+        </View>
+        {user && (
+          <View style={styles.main}>
+            <Text style={styles.title}>Edit Profile</Text>
+            <View style={styles.data}>
+              <Text style={styles.label}>First Name</Text>
+              <TextInput
+                style={styles.input}
+                value={user.first_name}
+                onChangeText={(txt) => setUser({ ...user, first_name: txt })}
+              ></TextInput>
+            </View>
+            <View style={styles.data}>
+              <Text style={styles.label}>Last Name</Text>
+              <TextInput
+                style={styles.input}
+                onChangeText={(txt) => setUser({ ...user, last_name: txt })}
+              >
+                {user.last_name}
+              </TextInput>
+            </View>
+            <View style={styles.data}>
+              <Text style={styles.label}>Phone Number</Text>
+              <TextInput
+                style={styles.input}
+                onChangeText={(txt) => setUser({ ...user, phone_number: txt })}
+              >
+                {user.phone_number}
+              </TextInput>
+            </View>
+            <View style={styles.data}>
+              <Text style={styles.label}>Email Address</Text>
+              <TextInput
+                style={styles.input}
+                onChangeText={(txt) => setUser({ ...user, email: txt })}
+              >
+                {user.email_address}
+              </TextInput>
+            </View>
+            <LinearGradient
+              colors={["#074A77", "#089CA4"]}
+              style={styles.buttonContainer}
+              start={{ x: 1, y: 0.5 }}
+              end={{ x: 0, y: 0.5 }}
+            >
+              <Pressable style={[styles.button]} onPress={handleUpdate}>
+                <Text style={styles.buttonText}>Save</Text>
+              </Pressable>
+            </LinearGradient>
+          </View>
+        )}
+      </View>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
