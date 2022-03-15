@@ -111,8 +111,13 @@ export default function History({ navigation, route }: Props) {
           </TouchableHighlight>
 
           <View style={styles.modalContainer}>
-            
-            <View >
+            <View
+              style={{
+                backgroundColor: "white",
+                borderTopLeftRadius: 30,
+                borderTopRightRadius: 30,
+              }}
+            >
               <View style={styles.modalContent}>
                 <View
                   style={{
