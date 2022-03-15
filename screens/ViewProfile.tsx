@@ -108,7 +108,7 @@ export default function ViewProfile({ navigation, route }: Props) {
 								}}
 							>
 								{' '}
-								{state.user.attributes.first_name.charAt(0).toUpperCase()}{' '}
+								{user.attributes.first_name.charAt(0).toUpperCase()}{' '}
 							</Text>
 						</TouchableHighlight>
 					</View>
