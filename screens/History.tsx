@@ -8,6 +8,7 @@ import {
   ToastAndroid,
   BackHandler,
   Platform,
+  ScrollView,
   Modal,
   TouchableHighlight,
   Alert,
@@ -134,6 +135,8 @@ export default function History({ navigation, route }: Props) {
                       style={{
                         color: "#000",
                         fontFamily: "Montserrat_700Bold",
+                        width: 200,
+                        fontSize: 13,
                       }}
                     >
                       {props?.item?.included?.product?.name}{" "}
@@ -196,7 +199,10 @@ export default function History({ navigation, route }: Props) {
                           fontSize: 14,
                         }}
                       >
-                        ₦{props?.item?.attributes?.down_payment}
+                        ₦
+                        {props?.item?.attributes?.down_payment
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </Text>
                     </View>
                     <View
@@ -226,10 +232,9 @@ export default function History({ navigation, route }: Props) {
                         }}
                       >
                         ₦
-                        {
-                          props?.item?.included?.amortizations[0]
-                            .expected_amount
-                        }
+                        {props?.item?.included?.amortizations[0].expected_amount
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </Text>
                     </View>
                     <View
@@ -258,7 +263,10 @@ export default function History({ navigation, route }: Props) {
                           fontSize: 14,
                         }}
                       >
-                        ₦{props?.item?.attributes?.product_price}
+                        ₦
+                        {props?.item?.attributes?.product_price
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </Text>
                     </View>
                     <View
@@ -296,7 +304,9 @@ export default function History({ navigation, route }: Props) {
                               },
                               0
                             )
-                        )}
+                        )
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </Text>
                     </View>
                     <View
@@ -334,10 +344,25 @@ export default function History({ navigation, route }: Props) {
                               },
                               0
                             )
-                        )}
+                        )
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </Text>
                     </View>
                   </View>
+                </View>
+                <View
+                  style={{
+                    borderBottomColor: "gray",
+                    borderBottomWidth: 1,
+                    marginTop: 3,
+                  }}
+                />
+                <View style={{ backgroundColor: "white" }}>
+                  <Text style={{ color: "black" }}>
+                    Next Repayment:
+                    {}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -351,64 +376,67 @@ export default function History({ navigation, route }: Props) {
     fetchOrder();
   }, []);
   return (
-    <View style={styles.container}>
-      <Overlay
-        // ModalComponent={Modal}
-        isVisible={modalVisible}
-        onBackdropPress={() => {
-          setModalVisible(!modalVisible);
-        }}
-      />
+   
+      <View style={styles.container}>
+        <Overlay
+          // ModalComponent={Modal}
+          isVisible={modalVisible}
+          onBackdropPress={() => {
+            setModalVisible(!modalVisible);
+          }}
+        />
 
-      <View style={styles.header}>
-        <Header></Header>
-        <TouchableOpacity>
-          <Pressable onPress={toggleSideMenu}>
-            <Hamburger style={styles.hamburger} />
-          </Pressable>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.header}>
+          <Header></Header>
+          <TouchableOpacity>
+            <Pressable onPress={toggleSideMenu}>
+              <Hamburger style={styles.hamburger} />
+            </Pressable>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.main}>
-        <Text style={styles.name}>{"History"}</Text>
-        {orders && (
-          <FlatList
-            data={orders}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={{ backgroundColor: "#EFF5F9" }}>
-                <Pressable onPress={() => viewDetail(item)}>
-                  <View style={styles.order}>
-                    <View style={styles.details}>
-                      <ELoan />
-                      <View style={styles.title}>
-                        <Text
-                          style={{
-                            color: "#074A74",
-                            fontFamily: "Montserrat_700Bold",
-                          }}
-                          numberOfLines={1}
-                          ellipsizeMode={"tail"}
-                        >
-                          {item.included.product.name}{" "}
-                        </Text>
-                        <Text style={{ color: "#000", fontSize: 12 }}>
-                          Order ID: {item?.attributes?.order_number}
-                        </Text>
+        <View style={styles.main}>
+          <Text style={styles.name}>{"History"}</Text>
+          {orders && (
+            <FlatList
+			scrollEnabled= {true}
+              data={orders}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={{ backgroundColor: "#EFF5F9" }}>
+                  <Pressable onPress={() => viewDetail(item)}>
+                    <View style={styles.order}>
+                      <View style={styles.details}>
+                        <ELoan />
+                        <View style={styles.title}>
+                          <Text
+                            style={{
+                              color: "#074A74",
+                              fontFamily: "Montserrat_700Bold",
+                            }}
+                            numberOfLines={1}
+                            ellipsizeMode={"tail"}
+                          >
+                            {item.included.product.name}{" "}
+                          </Text>
+                          <Text style={{ color: "#000", fontSize: 12 }}>
+                            Order ID: {item?.attributes?.order_number}
+                          </Text>
+                        </View>
                       </View>
+                      <Text style={{ color: "#000", fontSize: 13 }}>
+                        {item?.attributes?.order_date}
+                      </Text>
                     </View>
-                    <Text style={{ color: "#000", fontSize: 13 }}>
-                      {item?.attributes?.order_date}
-                    </Text>
-                  </View>
-                </Pressable>
-                <OrderDetails item={pressedOrder} />
-              </View>
-            )}
-          />
-        )}
+                  </Pressable>
+                  <OrderDetails item={pressedOrder} />
+                </View>
+              )}
+            />
+          )}
+        </View>
       </View>
-    </View>
+    
   );
 }
 

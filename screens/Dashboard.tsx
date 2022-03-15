@@ -27,7 +27,7 @@ import { Context as AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-
+import axios from "axios";
 
 type Props = DrawerScreenProps<DrawerParamList, 'Home'>
 
@@ -36,7 +36,7 @@ export default function Dashboard({ navigation, route }: Props) {
 	const { state } = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
 	const [isError, setIsError] = useState(false);
-
+	const [user, setUser] = useState(null);
 	const [modalResponse, setModalResponse] = useState(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [showMenu, setShowMenu] = useState(false);
@@ -70,6 +70,27 @@ export default function Dashboard({ navigation, route }: Props) {
 		setModalResponse(res);
 		setModalVisible(true);
 	}
+	const fetchUser = async () => {
+    try {
+      let response = await axios({
+        method: "GET",
+        url: `/auth/user`,
+        headers: { Authorization: `Bearer ${state.token}` },
+      });
+      const user = response.data.data[0];
+      setUser(user);
+    } catch (error: any) {
+      ToastAndroid.showWithGravity(
+        "Unable to fetch user",
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
 	
 
@@ -78,7 +99,12 @@ export default function Dashboard({ navigation, route }: Props) {
 	
 	return (
     <View style={styles.container}>
-      <Overlay isVisible={modalVisible} onBackdropPress ={()=> {setModalVisible(!modalVisible)}}/>
+      <Overlay
+        isVisible={modalVisible}
+        onBackdropPress={() => {
+          setModalVisible(!modalVisible);
+        }}
+      />
       <Modal
         animationType="slide"
         transparent={true}
@@ -86,8 +112,37 @@ export default function Dashboard({ navigation, route }: Props) {
         onRequestClose={() => {
           setModalVisible(!modalVisible);
         }}
-        style={{ justifyContent: "flex-end", margin: 0 }}
+        style={{ justifyContent: "flex-end", margin: 0, position: "relative" }}
       >
+        <TouchableHighlight
+          onPress={() => setModalVisible(!modalVisible)}
+          style={{
+            borderRadius:
+              Math.round(
+                Dimensions.get("window").width + Dimensions.get("window").height
+              ) / 2,
+            width: Dimensions.get("window").width * 0.13,
+            height: Dimensions.get("window").width * 0.13,
+            backgroundColor: "#fff",
+            position: "absolute",
+            //   top: 1 / 2,
+            marginHorizontal: Dimensions.get("window").width * 0.43,
+            marginVertical: Dimensions.get("window").width * 0.76,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          underlayColor="#ccc"
+        >
+          <Text
+            style={{
+              fontSize: 20,
+              color: "#000",
+              fontFamily: "Montserrat_900Black",
+            }}
+          >
+            &#x2715;
+          </Text>
+        </TouchableHighlight>
         {!isError ? (
           <View style={styles.modalContainer}>
             <TouchableOpacity
@@ -105,9 +160,7 @@ export default function Dashboard({ navigation, route }: Props) {
                   for an E-loan
                 </Text>
 
-				{modalResponse && (<Text>
-					{modalResponse.data.message}
-				</Text>)}
+                {modalResponse && <Text>{modalResponse.data.message}</Text>}
               </View>
             </View>
           </View>
@@ -148,11 +201,13 @@ export default function Dashboard({ navigation, route }: Props) {
                 </TouchableHighlight>
                 <Text style={styles.modalHeading}>
                   Sorry! Your Order is{" "}
-                  <Text style={{ color: "red" }}>unsuccessful</Text>				  
+                  <Text style={{ color: "red" }}>unsuccessful</Text>
                 </Text>
-				{modalResponse && (<Text style={styles.errText}>
-					{modalResponse.data.error_message}
-				</Text>)}
+                {modalResponse && (
+                  <Text style={styles.errText}>
+                    {modalResponse.data.error_message}
+                  </Text>
+                )}
               </View>
             </View>
           </View>
@@ -169,7 +224,7 @@ export default function Dashboard({ navigation, route }: Props) {
 
       <View style={styles.main}>
         <Text style={styles.name}>{state.user.attributes.first_name},</Text>
-        <Text style={styles.message}>Welcome to your altara dashboards </Text>
+        <Text style={styles.message}>Welcome to your altara dashboard </Text>
         <View style={styles.cards}>
           <Cards
             title="Get a Loan Now!!!"
@@ -239,11 +294,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: "auto",
     borderTopLeftRadius: 30,
-	borderTopRightRadius:30,
+    borderTopRightRadius: 30,
     backgroundColor: "white",
   },
   modalContent: {
     paddingVertical: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
     alignItems: "center",
     backgroundColor: "white",
   },
@@ -251,8 +308,8 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat_700Bold",
     fontSize: 30,
     textAlign: "center",
-	color:'black',
-	marginTop:20
+    color: "black",
+    marginTop: 20,
   },
   modalHeaderCloseText: {
     backgroundColor: "white",
@@ -265,10 +322,10 @@ const styles = StyleSheet.create({
   },
 
   errText: {
-	  fontSize: 15,
-	  marginTop: 20,
-	  paddingHorizontal: 15,
-	  textAlign: "center",
-
-  }
+    fontSize: 15,
+    marginTop: 20,
+    paddingHorizontal: 15,
+    textAlign: "center",
+	color:'#000'
+  },
 });
