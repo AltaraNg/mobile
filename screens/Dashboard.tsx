@@ -27,8 +27,7 @@ import { Context as AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import axios from 'axios';
-
+import axios from "axios";
 
 type Props = DrawerScreenProps<DrawerParamList, 'Home'>
 
@@ -37,10 +36,10 @@ export default function Dashboard({ navigation, route }: Props) {
 	const { state } = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
 	const [isError, setIsError] = useState(false);
-
+	const [user, setUser] = useState(null);
 	const [modalResponse, setModalResponse] = useState(null);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [user, setUser] = useState(null);
+	const [showMenu, setShowMenu] = useState(false);
 	const toggleSideMenu = async () => {
 		navigation.toggleDrawer();
 	};
@@ -66,154 +65,34 @@ export default function Dashboard({ navigation, route }: Props) {
 		return true;
 	};
 
-	const fetchUser = async () => {
-		try {
-			let response = await axios({
-				method: 'GET',
-				url: `/auth/user`,
-				headers: { 'Authorization': `Bearer ${state.token}` },
-			});
-			const user = response.data.data[0];
-			setUser(user);
-		} catch (error: any) {
-			ToastAndroid.showWithGravity(
-				"Unable to fetch user",
-				ToastAndroid.SHORT,
-				ToastAndroid.CENTER
-			  );
-		}
-	};
-
-
-
-	useEffect(() => {
-		fetchUser();
-	}, []);
-
 	function handleRequest(res: object, status: String) {
 		status === 'success' ? setIsError(false) : setIsError(true);
 		setModalResponse(res);
 		setModalVisible(true);
 	}
+	const fetchUser = async () => {
+    try {
+      let response = await axios({
+        method: "GET",
+        url: `/auth/user`,
+        headers: { Authorization: `Bearer ${state.token}` },
+      });
+      const user = response.data.data[0];
+      setUser(user);
+    } catch (error: any) {
+      ToastAndroid.showWithGravity(
+        "Unable to fetch user",
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
+      );
+    }
+  };
 
-	 const Message = function(){
-		return (
-      <View>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}
-          style={{
-            justifyContent: "flex-end",
-            margin: 0,
-            position: "relative",
-          }}
-        >
-          <TouchableHighlight
-            onPress={() => setModalVisible(!modalVisible)}
-            style={{
-              borderRadius:
-                Math.round(
-                  Dimensions.get("window").width +
-                    Dimensions.get("window").height
-                ) / 2,
-              width: Dimensions.get("window").width * 0.13,
-              height: Dimensions.get("window").width * 0.13,
-              backgroundColor: "#fff",
-              position: "absolute",
-            //   top: 1 / 2,
-              marginHorizontal: Dimensions.get("window").width * 0.43,
-              marginVertical: Dimensions.get("window").width * 0.76,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            underlayColor="#ccc"
-          >
-            <Text
-              style={{
-                fontSize: 20,
-                color: "#000",
-                fontFamily: "Montserrat_900Black",
-              }}
-            >
-              &#x2715;
-            </Text>
-          </TouchableHighlight>
-          
-          {!isError ? (
-            <View style={styles.modalContainer}>
-              <TouchableOpacity
-                style={{ alignItems: "center" }}
-                onPress={() => setModalVisible(!modalVisible)}
-              >
-                <Text style={styles.modalHeaderCloseText}>X</Text>
-              </TouchableOpacity>
-              <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                  <SuccessSvg />
-                  <Text style={styles.modalHeading}>
-                    You have{" "}
-                    <Text style={{ color: "#074A74" }}>successfully</Text>{" "}
-                    applied for an E-loan
-                  </Text>
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
-                  {modalResponse && (
-                    <Text style={{ color: "black" }}>
-                      {modalResponse.data.message}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </View>
-          ) : (
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                  <TouchableHighlight
-                    style={{
-                      borderRadius:
-                        Math.round(
-                          Dimensions.get("window").width +
-                            Dimensions.get("window").height
-                        ) / 2,
-                      width: Dimensions.get("window").width * 0.3,
-                      height: Dimensions.get("window").width * 0.3,
-                      backgroundColor: "#DB2721",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                    underlayColor="#ccc"
-                  >
-                    <Text
-                      style={{
-                        fontSize: 68,
-                        color: "#fff",
-                        fontFamily: "Montserrat_900Black",
-                      }}
-                    >
-                      &#x2715;
-                    </Text>
-                  </TouchableHighlight>
-                  <Text style={styles.modalHeading}>
-                    Sorry! Your Order is{" "}
-                    <Text style={{ color: "red" }}>unsuccessful</Text>
-                  </Text>
-                  {modalResponse && (
-                    <Text style={styles.errText}>
-                      {modalResponse.data.error_message}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </View>
-          )}
-        </Modal>
-      </View>
-    );
-	}
+	
 
 	
 
@@ -221,14 +100,119 @@ export default function Dashboard({ navigation, route }: Props) {
 	return (
     <View style={styles.container}>
       <Overlay
-        ModalComponent={Modal}
         isVisible={modalVisible}
         onBackdropPress={() => {
           setModalVisible(!modalVisible);
         }}
       />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+        style={{ justifyContent: "flex-end", margin: 0, position: "relative" }}
+      >
+        <TouchableHighlight
+          onPress={() => setModalVisible(!modalVisible)}
+          style={{
+            borderRadius:
+              Math.round(
+                Dimensions.get("window").width + Dimensions.get("window").height
+              ) / 2,
+            width: Dimensions.get("window").width * 0.13,
+            height: Dimensions.get("window").width * 0.13,
+            backgroundColor: "#fff",
+            position: "absolute",
+            //   top: 1 / 2,
+            marginHorizontal: Dimensions.get("window").width * 0.43,
+            marginVertical: Dimensions.get("window").width * 0.76,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          underlayColor="#ccc"
+        >
+          <Text
+            style={{
+              fontSize: 20,
+              color: "#000",
+              fontFamily: "Montserrat_900Black",
+            }}
+          >
+            &#x2715;
+          </Text>
+        </TouchableHighlight>
+        {!isError ? (
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={styles.modalHeaderCloseText}>X</Text>
+            </TouchableOpacity>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <SuccessSvg />
+                <Text style={styles.modalHeading}>
+                  You have{" "}
+                  <Text style={{ color: "#074A74" }}>successfully</Text> applied
+                  for an E-loan
+                </Text>
 
-      <Message />
+                {modalResponse && <Text>{modalResponse.data.message}</Text>}
+              </View>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={styles.modalHeaderCloseText}>X</Text>
+            </TouchableOpacity>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <TouchableHighlight
+                  style={{
+                    borderRadius:
+                      Math.round(
+                        Dimensions.get("window").width +
+                          Dimensions.get("window").height
+                      ) / 2,
+                    width: Dimensions.get("window").width * 0.3,
+                    height: Dimensions.get("window").width * 0.3,
+                    backgroundColor: "#DB2721",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  underlayColor="#ccc"
+                >
+                  <Text
+                    style={{
+                      fontSize: 68,
+                      color: "#fff",
+                      fontFamily: "Montserrat_900Black",
+                    }}
+                  >
+                    &#x2715;
+                  </Text>
+                </TouchableHighlight>
+                <Text style={styles.modalHeading}>
+                  Sorry! Your Order is{" "}
+                  <Text style={{ color: "red" }}>unsuccessful</Text>
+                </Text>
+                {modalResponse && (
+                  <Text style={styles.errText}>
+                    {modalResponse.data.error_message}
+                  </Text>
+                )}
+              </View>
+            </View>
+          </View>
+        )}
+      </Modal>
       <View style={styles.header}>
         <Header></Header>
         <TouchableOpacity>
@@ -237,10 +221,10 @@ export default function Dashboard({ navigation, route }: Props) {
           </Pressable>
         </TouchableOpacity>
       </View>
+
       <View style={styles.main}>
-		  {user &&  <Text style={styles.name}>{user.attributes.first_name},</Text>}
-       
-        <Text style={styles.message}>Welcome to your altara dashboards </Text>
+        <Text style={styles.name}>{state.user.attributes.first_name},</Text>
+        <Text style={styles.message}>Welcome to your altara dashboard </Text>
         <View style={styles.cards}>
           <Cards
             title="Get a Loan Now!!!"
@@ -315,10 +299,10 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     paddingVertical: 20,
-    alignItems: "center",
-    backgroundColor: "white",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
+    alignItems: "center",
+    backgroundColor: "white",
   },
   modalHeading: {
     fontFamily: "Montserrat_700Bold",
@@ -340,9 +324,8 @@ const styles = StyleSheet.create({
   errText: {
     fontSize: 15,
     marginTop: 20,
-    paddingHorizontal: 30,
+    paddingHorizontal: 15,
     textAlign: "center",
-    color: "black",
-    fontFamily: "Montserrat_500Medium",
+	color:'#000'
   },
 });

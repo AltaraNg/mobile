@@ -93,7 +93,8 @@ export default function Notification({ navigation, route }: Props) {
 
 									<Text style={{ fontSize: 12, 
 											fontFamily: 'Montserrat_500Medium',
-											marginVertical: 14
+											marginVertical: 14,
+											color:'black'
 										}}>
 										Dear Elizabeth,this is a remainder that your next payment is
 										due on the 12/2/2022
