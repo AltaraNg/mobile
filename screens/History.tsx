@@ -59,8 +59,8 @@ export default function History({ navigation, route }: Props) {
   };
   const viewDetail = (item) => {
     setModalVisible(true);
-    const clickOrder = orders.find((order) => order.id === item.id);
-    setPressedOrder(clickOrder);
+    // const clickOrder = orders.find((order) => order.id === item.id);
+    setPressedOrder(item);
   };
 
   const OrderDetails = function (props: any) {
@@ -111,13 +111,8 @@ export default function History({ navigation, route }: Props) {
           </TouchableHighlight>
 
           <View style={styles.modalContainer}>
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={styles.modalHeaderCloseText}>X</Text>
-            </TouchableOpacity>
-            <View style={styles.modalContainer}>
+            
+            <View >
               <View style={styles.modalContent}>
                 <View
                   style={{
