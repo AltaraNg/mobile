@@ -62,6 +62,64 @@ export default function History({ navigation, route }: Props) {
     // const clickOrder = orders.find((order) => order.id === item.id);
     setPressedOrder(item);
   };
+  const orderStatus =(props)=>{
+	const totalDebt = props?.item?.attributes?.repayment - props?.item?.included?.amortizations.reduce((accumulator, object) => {
+        return accumulator + object.actual_amount;
+      }, 0) 
+	  const Today = new Date().setHours(0,0,0,0)
+	  const expiryDate = new Date(
+      props?.item?.included?.amortizations[
+        props?.item?.included?.amortizations.length - 1
+      ].expected_payment_date
+    ).setHours(0, 0, 0, 0);
+	
+	  if (totalDebt <= 0){
+			return 'Completed'
+	  }
+	  if ((totalDebt >= 0) && (Today <= expiryDate) ){
+		  return 'Pending'
+	  }else {
+		  return 'Overdue'
+	  }
+	 
+     
+  }
+  const styleStatus= (props)=>{
+	  if (orderStatus(props) == 'Completed'){
+		  return {
+        backgroundColor: "#d0dce4",
+        color: "#074a74",
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 6,
+        fontFamily: "Montserrat_700Bold",
+      };
+	  }
+	  	  if (orderStatus(props) == "Pending") {
+          return {
+            backgroundColor: "#fff4d4",
+            color: "#FDC228",
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderRadius: 6,
+            fontFamily: "Montserrat_700Bold",
+          };
+        }
+			  if (orderStatus(props) == "Overdue") {
+          return {
+            backgroundColor: "#ffd4d4",
+            color: "#DB2721",
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderRadius: 6,
+            fontFamily: "Montserrat_700Bold",
+          };
+        }
+  }
+  const nextRepayment =(props:Object)=>{
+	 const nextDate = props?.item?.included?.amortizations.find((item)=>  item.actual_amount == 0)
+	return nextDate?.expected_payment_date
+  }
 
   const OrderDetails = function (props: any) {
     return (
@@ -142,17 +200,7 @@ export default function History({ navigation, route }: Props) {
                       {props?.item?.included?.product?.name}{" "}
                     </Text>
                   </View>
-                  <Text
-                    style={{
-                      backgroundColor: "#acd4e4",
-                      color: "#074a74",
-                      paddingHorizontal: 10,
-                      paddingVertical: 6,
-                      borderRadius: 6,
-                    }}
-                  >
-                    Complete
-                  </Text>
+                  <Text style={styleStatus(props)}>{orderStatus(props)}</Text>
                 </View>
                 <View
                   style={{
@@ -360,7 +408,15 @@ export default function History({ navigation, route }: Props) {
                 />
                 <View style={{ backgroundColor: "white" }}>
                   <Text style={{ color: "black" }}>
-                    Next Repayment:
+                    Next Repayment:{" "}
+                    <Text
+                      style={{
+                        color: "black",
+                        fontFamily: "Montserrat_700Bold",
+                      }}
+                    >
+                      {nextRepayment(props)}
+                    </Text>
                     {}
                   </Text>
                 </View>

@@ -163,16 +163,25 @@ export default function Dashboard({ navigation, route }: Props) {
                 {user.email_address}
               </TextInput>
             </View>
-            <LinearGradient
-              colors={["#074A77", "#089CA4"]}
-              style={styles.buttonContainer}
-              start={{ x: 1, y: 0.5 }}
-              end={{ x: 0, y: 0.5 }}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#EFF5F9",
+              }}
             >
-              <Pressable style={[styles.button]} onPress={handleUpdate}>
-                <Text style={styles.buttonText}>Save</Text>
-              </Pressable>
-            </LinearGradient>
+              <LinearGradient
+                colors={["#074A77", "#089CA4"]}
+                style={styles.buttonContainer}
+                start={{ x: 1, y: 0.5 }}
+                end={{ x: 0, y: 0.5 }}
+              >
+                <Pressable style={[styles.button]} onPress={handleUpdate}>
+                  <Text style={styles.buttonText}>Save</Text>
+                </Pressable>
+              </LinearGradient>
+            </View>
           </View>
         )}
       </View>
@@ -193,7 +202,6 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		width: 250,
 		paddingVertical: 10,
-		marginHorizontal: Dimensions.get('window').width * 0.15,
 	},
 	button: {
 		flex: 1,
