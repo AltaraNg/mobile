@@ -48,7 +48,7 @@ export default function Notification({ navigation, route }: Props) {
 				headers: { 'Authorization': `Bearer ${state.token}` },
 			});
 
-			const notifications = response.data.data.notifications.data;
+			const notifications = response?.data?.data?.notifications?.data;
 			setNotifications(notifications);
 		} catch (error: any) {
 		}
