@@ -77,7 +77,7 @@ export default function History({ navigation, route }: Props) {
 			return 'Completed'
 	  }
 	  if ((totalDebt >= 0) && (Today <= expiryDate) ){
-		  return 'Pending'
+		  return 'In Progress'
 	  }else {
 		  return 'Overdue'
 	  }
@@ -95,7 +95,7 @@ export default function History({ navigation, route }: Props) {
         fontFamily: "Montserrat_700Bold",
       };
 	  }
-	  	  if (orderStatus(props) == "Pending") {
+	  	  if (orderStatus(props) == "In Progress") {
           return {
             backgroundColor: "#fff4d4",
             color: "#FDC228",
@@ -118,7 +118,7 @@ export default function History({ navigation, route }: Props) {
   }
   const nextRepayment =(props:Object)=>{
 	 const nextDate = props?.item?.included?.amortizations.find((item)=>  item.actual_amount == 0)
-	return nextDate?.expected_payment_date
+	return nextDate?.expected_payment_date || 'Completed'
   }
 
   const OrderDetails = function (props: any) {
@@ -345,7 +345,12 @@ export default function History({ navigation, route }: Props) {
                       >
                         ₦
                         {Math.floor(
-                          props?.item?.attributes?.repayment -
+                          props?.item?.included?.amortizations.reduce(
+                            (accumulator, object) => {
+                              return accumulator + object.expected_amount;
+                            },
+                            0
+                          ) -
                             props?.item?.included?.amortizations.reduce(
                               (accumulator, object) => {
                                 return accumulator + object.actual_amount;
