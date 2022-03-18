@@ -43,8 +43,6 @@ export default function Dashboard({ navigation, route }: Props) {
 	const toggleSideMenu = async () => {
 		navigation.toggleDrawer();
 	};
-	let successMessage = 'You have successfully applied for  an E-loan';
-	let errorMessage = 'Sorry! Your Order is unsuccessful';
 
 	const backAction = () => {
 		if (Platform.OS === 'ios') return;
@@ -160,7 +158,20 @@ export default function Dashboard({ navigation, route }: Props) {
                   for an E-loan
                 </Text>
 
-                {modalResponse && <Text>{modalResponse.data.message}</Text>}
+                {modalResponse && (
+                  <Text
+                    style={{
+                      color: "#474A57",
+                      fontFamily: "Montserrat_500Medium",
+                      marginTop: 30,
+                      marginHorizontal: 30,
+                      fontSize: 12,
+                      textAlign: "center",
+                    }}
+                  >
+                    {modalResponse.message}
+                  </Text>
+                )}
               </View>
             </View>
           </View>
@@ -205,7 +216,7 @@ export default function Dashboard({ navigation, route }: Props) {
                 </Text>
                 {modalResponse && (
                   <Text style={styles.errText}>
-                    {modalResponse.data.error_message}
+                    {modalResponse.error_message}
                   </Text>
                 )}
               </View>

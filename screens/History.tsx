@@ -59,9 +59,14 @@ export default function History({ navigation, route }: Props) {
   };
   const viewDetail = (item) => {
     setModalVisible(true);
-    // const clickOrder = orders.find((order) => order.id === item.id);
     setPressedOrder(item);
   };
+  const monthlyRepayment= (props)=>{
+
+	  return props?.item?.included?.amortizations[0].expected_amount
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   const orderStatus =(props)=>{
 	const totalDebt = props?.item?.attributes?.repayment - props?.item?.included?.amortizations.reduce((accumulator, object) => {
         return accumulator + object.actual_amount;
@@ -216,8 +221,9 @@ export default function History({ navigation, route }: Props) {
                       width: Dimensions.get("window").width * 0.25,
                     }}
                   >
-                    Altara Pay 20% Rate @{" "}
-                    {props?.item?.included?.amortizations?.length / 2}Months
+                    {props?.item?.included?.order_type?.name}{" "}
+                    {props?.item?.included?.down_payment_rate?.percent}% Rate @{" "}
+                    {props?.item?.included?.repayment_duration?.name}
                   </Text>
                   <View style={styles.verticleLine}></View>
                   <View style={{ backgroundColor: "white", marginLeft: 5 }}>
@@ -270,7 +276,13 @@ export default function History({ navigation, route }: Props) {
                           fontSize: 12,
                         }}
                       >
-                        Monthly Repayment:{" "}
+                        {props?.item?.included?.repayment_cycle?.name
+                          .charAt(0)
+                          .toUpperCase() +
+                          props?.item?.included?.repayment_cycle?.name.slice(
+                            1
+                          )}{" "}
+                        Repayment:{" "}
                       </Text>
                       <Text
                         style={{
@@ -279,10 +291,7 @@ export default function History({ navigation, route }: Props) {
                           fontSize: 14,
                         }}
                       >
-                        ₦
-                        {props?.item?.included?.amortizations[0].expected_amount
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                        ₦{monthlyRepayment(props)}
                       </Text>
                     </View>
                     <View
