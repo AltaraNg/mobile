@@ -22,7 +22,7 @@ export default function Cards(props: any) {
 	async function doSome() {
     try {
       let res = await axios({
-        method: 'PATCH',
+        method: 'POST',
         data: {
           order_type: props.type
         },
@@ -34,6 +34,7 @@ export default function Cards(props: any) {
       }
     } catch (error) {
       props.onRequest(error.response.data, 'failed')
+	  
     }
   }
 	return (
