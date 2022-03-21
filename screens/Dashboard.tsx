@@ -40,6 +40,7 @@ export default function Dashboard({ navigation, route }: Props) {
 	const [modalResponse, setModalResponse] = useState(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [showMenu, setShowMenu] = useState(false);
+  const [type, setType] = useState("")
 	const toggleSideMenu = async () => {
 		navigation.toggleDrawer();
 	};
@@ -63,9 +64,10 @@ export default function Dashboard({ navigation, route }: Props) {
 		return true;
 	};
 
-	function handleRequest(res: object, status: String) {
+	function handleRequest(res: object, status: String, type:string) {
 		status === 'success' ? setIsError(false) : setIsError(true);
 		setModalResponse(res);
+    setType(type)
 		setModalVisible(true);
 	}
 	const fetchUser = async () => {
@@ -155,7 +157,7 @@ export default function Dashboard({ navigation, route }: Props) {
                 <Text style={styles.modalHeading}>
                   You have{" "}
                   <Text style={{ color: "#074A74" }}>successfully</Text> applied
-                  for an E-loan
+                  for {type}
                 </Text>
 
                 {modalResponse && (
@@ -240,14 +242,14 @@ export default function Dashboard({ navigation, route }: Props) {
           <Cards
             title="Get a Loan Now!!!"
             amount="Up to ₦500,000"
-            type="Loan"
+            type="an E-Loan"
             onRequest={handleRequest}
           />
 
           <Cards
             title="Order a Product Now!!!"
             amount="Up to ₦500,000"
-            type="Product"
+            type="a Product"
             onRequest={handleRequest}
           />
         </View>
