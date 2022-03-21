@@ -134,7 +134,7 @@ export const LogOut = function () {
 	);
 };
 
-export const ELoan = function(){
+export const ELoan = function(props:any){
 	return (
     <Svg
       width="44"
@@ -142,45 +142,45 @@ export const ELoan = function(){
       viewBox="0 0 44 44"
       fill="none"
     >
-      <Circle opacity="0.2" cx="22" cy="22" r="22" fill="#074A74" />
+      <Circle opacity="0.2" cx="22" cy="22" r="22" fill={props.color} />
       <Path
         d="M35 14H9C8.44772 14 8 14.4477 8 15V29C8 29.5523 8.44772 30 9 30H35C35.5523 30 36 29.5523 36 29V15C36 14.4477 35.5523 14 35 14Z"
-        stroke="#074A74"
+        stroke={props.color}
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <Path
         d="M22 26C24.2091 26 26 24.2091 26 22C26 19.7909 24.2091 18 22 18C19.7909 18 18 19.7909 18 22C18 24.2091 19.7909 26 22 26Z"
-        stroke="#074A74"
+        stroke={props.color}
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <Path
         d="M28 14L36 21"
-        stroke="#074A74"
+        stroke={props.color}
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <Path
         d="M28 30L36 23"
-        stroke="#074A74"
+        stroke={props.color}
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <Path
         d="M16 14L8 21"
-        stroke="#074A74"
+        stroke={props.color}
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <Path
         d="M16 30L8 23"
-        stroke="#074A74"
+        stroke={props.color}
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"

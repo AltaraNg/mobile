@@ -41,6 +41,30 @@ export default function History({ navigation, route }: Props) {
   const [exitApp, setExitApp] = useState(1);
   const [pressedOrder, setPressedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [OrderStatus, setOrderStatus] = useState("")
+  const styleSVG = (item:any) => {
+    const totalDebt =
+      item?.attributes?.repayment -
+      item?.included?.amortizations.reduce((accumulator, object) => {
+        return accumulator + object.actual_amount;
+      }, 0);
+    const Today = new Date().setHours(0, 0, 0, 0);
+    const expiryDate = new Date(
+      item?.included?.amortizations[
+        item?.included?.amortizations.length - 1
+      ].expected_payment_date
+    ).setHours(0, 0, 0, 0);
+
+    if (totalDebt <= 0) {
+      return "#074A74";
+    }
+    if (totalDebt >= 0 && Today <= expiryDate) {
+      return "#FDC228";
+    } else {
+      return "#FF4133";
+    }
+   
+  };
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
   };
@@ -121,6 +145,7 @@ export default function History({ navigation, route }: Props) {
           };
         }
   }
+
   const nextRepayment =(props:Object)=>{
 	 const nextDate = props?.item?.included?.amortizations.find((item)=>  item.actual_amount == 0)
 	return nextDate?.expected_payment_date || 'Completed'
@@ -446,67 +471,65 @@ export default function History({ navigation, route }: Props) {
     fetchOrder();
   }, []);
   return (
-   
-      <View style={styles.container}>
-        <Overlay
-          // ModalComponent={Modal}
-          isVisible={modalVisible}
-          onBackdropPress={() => {
-            setModalVisible(!modalVisible);
-          }}
-        />
+    <View style={styles.container}>
+      <Overlay
+        // ModalComponent={Modal}
+        isVisible={modalVisible}
+        onBackdropPress={() => {
+          setModalVisible(!modalVisible);
+        }}
+      />
 
-        <View style={styles.header}>
-          <Header></Header>
-          <TouchableOpacity>
-            <Pressable onPress={toggleSideMenu}>
-              <Hamburger style={styles.hamburger} />
-            </Pressable>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.main}>
-          <Text style={styles.name}>{"History"}</Text>
-          {orders && (
-            <FlatList
-			scrollEnabled= {true}
-              data={orders}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View style={{ backgroundColor: "#EFF5F9" }}>
-                  <Pressable onPress={() => viewDetail(item)}>
-                    <View style={styles.order}>
-                      <View style={styles.details}>
-                        <ELoan />
-                        <View style={styles.title}>
-                          <Text
-                            style={{
-                              color: "#074A74",
-                              fontFamily: "Montserrat_700Bold",
-                            }}
-                            numberOfLines={1}
-                            ellipsizeMode={"tail"}
-                          >
-                            {item.included.product.name}{" "}
-                          </Text>
-                          <Text style={{ color: "#000", fontSize: 12 }}>
-                            Order ID: {item?.attributes?.order_number}
-                          </Text>
-                        </View>
-                      </View>
-                      <Text style={{ color: "#000", fontSize: 13 }}>
-                        {item?.attributes?.order_date}
-                      </Text>
-                    </View>
-                  </Pressable>
-                  <OrderDetails item={pressedOrder} />
-                </View>
-              )}
-            />
-          )}
-        </View>
+      <View style={styles.header}>
+        <Header></Header>
+        <TouchableOpacity>
+          <Pressable onPress={toggleSideMenu}>
+            <Hamburger style={styles.hamburger} />
+          </Pressable>
+        </TouchableOpacity>
       </View>
-    
+
+      <View style={styles.main}>
+        <Text style={styles.name}>{"History"}</Text>
+        {orders && (
+          <FlatList
+            scrollEnabled={true}
+            data={orders}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={{ backgroundColor: "#EFF5F9" }}>
+                <Pressable onPress={() => viewDetail(item)}>
+                  <View style={styles.order}>
+                    <View style={styles.details}>
+                      <ELoan color={styleSVG(item)} />
+                      <View style={styles.title}>
+                        <Text
+                          style={{
+                            color: "#074A74",
+                            fontFamily: "Montserrat_700Bold",
+                          }}
+                          numberOfLines={1}
+                          ellipsizeMode={"tail"}
+                        >
+                          {item.included.product.name}{" "}
+                        </Text>
+                        <Text style={{ color: "#000", fontSize: 12 }}>
+                          Order ID: {item?.attributes?.order_number}
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={{ color: "#000", fontSize: 13 }}>
+                      {item?.attributes?.order_date}
+                    </Text>
+                  </View>
+                </Pressable>
+                <OrderDetails item={pressedOrder} />
+              </View>
+            )}
+          />
+        )}
+      </View>
+    </View>
   );
 }
 

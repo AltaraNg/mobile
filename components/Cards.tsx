@@ -30,10 +30,10 @@ export default function Cards(props: any) {
 				headers: { 'Authorization': `Bearer ${state.token}` },
       })
       if(res.status === 200){
-        props.onRequest(res.data, 'success')
+        props.onRequest(res.data, 'success', props.type)
       }
     } catch (error) {
-      props.onRequest(error.response.data, 'failed')
+      props.onRequest(error.response.data, 'failed', props.type)
 	  
     }
   }
