@@ -79,7 +79,6 @@ export default function History({ navigation, route }: Props) {
 
       const order = response.data.data[0].included.orders;
       setOrders(order);
-      console.log(orders)
     } catch (error: any) {}
   };
   const viewDetail = (item) => {
