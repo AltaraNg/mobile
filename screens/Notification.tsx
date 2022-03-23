@@ -53,7 +53,6 @@ export default function Notification({ navigation, route }: Props) {
 
 			const notifications = response?.data?.data?.notifications?.data;
 			setNotifications(notifications);
-			console.log(notifications);
 		} catch (error: any) {
 		}
 	};
