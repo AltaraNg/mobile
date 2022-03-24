@@ -27,7 +27,7 @@ import Constants from 'expo-constants';
 import { Context as AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import axios from 'axios';
-import { ELoan } from '../assets/svgs/svg';
+import { Loader } from '../assets/svgs/svg';
 
 type Props = NativeStackScreenProps<RootTabParamList, 'Notification'>;
 
@@ -38,21 +38,23 @@ export default function Notification({ navigation, route }: Props) {
 	const { state } = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
 	const [showMenu, setShowMenu] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
 	const [notifications, setNotifications] = useState(null);
 	const toggleSideMenu = async () => {
 		navigation.toggleDrawer();
 	};
 
 	const fetchNotification = async () => {
+    setShowLoader(true)
 		try {
 			let response = await axios({
 				method: 'GET',
 				url: `/customers/${state.user.id}/notifications`,
 				headers: { 'Authorization': `Bearer ${state.token}` },
 			});
-
-			const notifications = response?.data?.data?.notifications?.data;
-			setNotifications(notifications);
+      setShowLoader(false)
+			const notification = response?.data?.data?.notifications?.data;
+			setNotifications(notification);
 		} catch (error: any) {
 		}
 	};
@@ -74,56 +76,64 @@ export default function Notification({ navigation, route }: Props) {
 
       <View style={styles.main}>
         <Text style={styles.name}>{"Notifications"}</Text>
-        {notifications?.length < 0 ? (
-          <FlatList
-            data={notifications}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Pressable>
-                <View style={styles.order}>
-                  <Text
-                    style={{
-                      fontFamily: "Montserrat_700Bold",
-                      fontSize: 18,
-                      color: "#074A74",
-                    }}
-                  >
-                    Altara Update
-                  </Text>
-                  <Text style={{ color: "#777", fontSize: 12 }}>
-                    {item.created_at}
-                  </Text>
-
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontFamily: "Montserrat_500Medium",
-                      marginVertical: 14,
-                      color: "black",
-                    }}
-                  >
-                    Dear Elizabeth,this is a remainder that your next payment is
-                    due on the 12/2/2022
-                  </Text>
-                </View>
-              </Pressable>
-            )}
+        {showLoader ? (
+          <Image
+            source={require("../assets/gifs/loader.gif")}
+            style={styles.image}
           />
         ) : (
-          <View
-            style={{
-              backgroundColor: "#EFF5F9",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-			  marginTop:40
-            }}
-          >
-            <Image
-              source={require("../assets/images/zeroNotifications.png")}
-              style={styles.image}
-            />
-            <Text style={{ color: "black" }}>No notification</Text>
+          <View style={{ backgroundColor: "#EFF5F9" }}>
+            {notifications?.length > 0 ? (
+              <FlatList
+                data={notifications}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <Pressable>
+                    <View style={styles.order}>
+                      <Text
+                        style={{
+                          fontFamily: "Montserrat_700Bold",
+                          fontSize: 18,
+                          color: "#074A74",
+                        }}
+                      >
+                        {JSON.parse(item.data).subject}
+                      </Text>
+                      <Text style={{ color: "#777", fontSize: 12 }}>
+                        {item.created_at}
+                      </Text>
+
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          fontFamily: "Montserrat_500Medium",
+                          marginVertical: 14,
+                          color: "black",
+                        }}
+                      >
+                        {JSON.parse(item.data).message}
+                      </Text>
+                    </View>
+                  </Pressable>
+                )}
+              />
+            ) : (
+              <View
+                style={{
+                  backgroundColor: "#EFF5F9",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: 40,
+                }}
+              >
+                <Image
+                  source={require("../assets/images/zeroNotifications.png")}
+                  style={styles.image}
+                />
+                <Text style={{ color: "black" }}>No notification</Text>
+              </View>
+            )}
           </View>
         )}
       </View>
