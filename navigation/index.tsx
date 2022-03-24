@@ -17,7 +17,8 @@ import { ColorSchemeName, Pressable } from 'react-native';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../modals/ModalScreen';
-
+import { createStackNavigator } from "@react-navigation/stack";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import NotFoundScreen from '../screens/NotFoundScreen';
 import {
 	DrawerParamList,
@@ -81,6 +82,22 @@ async function getValueFor(key) {
 	} else {
 	}
 }
+function getHeaderTitle(route) {
+  // If the focused route is not found, we need to assume it's the initial screen
+  // This can happen during if there hasn't been any navigation inside the screen
+  // In our case, it's "Feed" as that's the first screen inside the navigator
+  const routeName = getFocusedRouteNameFromRoute(route) ?? "Dashboard";
+
+  switch (routeName) {
+    case "Dashboard":
+      return "Dashboard";
+    case "History":
+      return "History";
+    case "Notification":
+      return "Notification";
+  }
+}
+
 
 export default function Navigation({
 	colorScheme,
@@ -167,60 +184,65 @@ function RootNavigator() {
 	);
 }
 
+
+
+
+
 const DrawerNav = createDrawerNavigator<DrawerParamList>();
 
-function DrawerNavigator() {
+function DrawerNavigator({route, navigation}) {
 	const colorScheme = useColorScheme();
 	return (
-		<DrawerNav.Navigator
-    initialRouteName="Home"
-    backBehavior='initialRoute'
-			screenOptions={{
-				drawerStyle: {
-					backgroundColor: '#fff',
-					width: 240,
-				},
-			}}
+    <DrawerNav.Navigator
+      initialRouteName="Home"
+      backBehavior="initialRoute"
+      screenOptions={{
+        drawerStyle: {
+          backgroundColor: "#fff",
+          width: 240,
+        },
+      }}
+      drawerContent={(props) => <CustomSidebarMenu {...props} />}
+    >
+      <DrawerNav.Screen
+        name="Home"
+        component={BottomTabNavigator}
+        options={({ route }) => ({
+          tabBarStyle: {
+            display: getHeaderTitle(Dashboard),
+          },
+          drawerLabelStyle: { color: "#9C9696" },
+          headerShown: false,
+          drawerIcon: ({ color, size }) => (
+            <FontAwesome size={24} color="#9C9696" name="home" />
+          ),
+        })}
+      />
 
-			drawerContent={(props) => <CustomSidebarMenu {...props} />}
-		>
-			<DrawerNav.Screen
-				name="Home"
-				component={BottomTabNavigator}
-				options={{
-					drawerLabelStyle: { color: '#9C9696' },
-					headerShown: false,
-					drawerIcon: ({ color, size }) => (
-						<FontAwesome size={24} color="#9C9696" name="home" />
-					),
-				}}
-			/>
-
-			<DrawerNav.Screen
-				name="View Profile"
-				component={ViewProfile}
-				options={{
-					drawerLabelStyle: { color: '#9C9696' },
-					headerShown: false,
-					drawerIcon: ({ color, size }) => (
-						<EvilIcons name="user" size={24} color="#9C9696" />
-					),
-				}}
-			/>
-
-			<DrawerNav.Screen
-				name="Edit Profile"
-				component={EditProfile}
-				options={{
-					drawerLabelStyle: { color: '#9C9696' },
-					headerShown: false,
-					drawerIcon: ({ color, size }) => (
-						<AntDesign name="edit" size={24} color="#9C9696" />
-					),
-				}}
-			/>
-		</DrawerNav.Navigator>
-	);
+      <DrawerNav.Screen
+        name="View Profile"
+        component={ViewProfile}
+        options={{
+          drawerLabelStyle: { color: "#9C9696" },
+          headerShown: false,
+          drawerIcon: ({ color, size }) => (
+            <EvilIcons name="user" size={24} color="#9C9696" />
+          ),
+        }}
+      />
+      <DrawerNav.Screen
+        name="Edit Profile"
+        component={EditProfile}
+        options={{
+          drawerLabelStyle: { color: "#9C9696" },
+          headerShown: false,
+          drawerIcon: ({ color, size }) => (
+            <AntDesign name="edit" size={24} color="#9C9696" />
+          ),
+        }}
+      />
+    </DrawerNav.Navigator>
+  );
 }
 
 /**
