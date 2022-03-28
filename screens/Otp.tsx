@@ -47,8 +47,9 @@ export default function Otp({ navigation, route }: Props) {
 					phone_number: phone?.phone_number,
 					device_name: Device.deviceName,
 				};
-				
-				let res = signin(data);
+				const error ='OTP is incorrect'
+				let res = signin(data, error);
+				setErrorText(error);
 				// navigation.navigate('Dashboard');
 			}
 

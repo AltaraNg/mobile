@@ -20,7 +20,7 @@ const authReducer = (state, action) => {
 	}
 };
 
-const signin = (dispatch) => {
+const signin = (dispatch, error) => {
 	let token = '';
 	let user = '';
 	return ({ otp, phone_number, device_name }) => {
@@ -49,7 +49,7 @@ const signin = (dispatch) => {
 				});
 			})
 			.catch((err) => {
-				return err.response.data;
+				return error('')
 			})
 			.finally(() => {});
 		// Do some API Request here
