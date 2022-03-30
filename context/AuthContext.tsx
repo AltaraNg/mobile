@@ -49,7 +49,7 @@ const signin = (dispatch, error) => {
 				});
 			})
 			.catch((err) => {
-				return error('')
+				return error
 			})
 			.finally(() => {});
 		// Do some API Request here

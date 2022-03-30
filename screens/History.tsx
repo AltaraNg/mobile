@@ -223,8 +223,8 @@ export default function History({ navigation, route }: Props) {
                       style={{
                         color: "#000",
                         fontFamily: "Montserrat_700Bold",
-                        width: 200,
-                        fontSize: 13,
+                        width: 230,
+                        fontSize: 11,
                       }}
                     >
                       {props?.item?.included?.product?.name}{" "}
@@ -234,7 +234,7 @@ export default function History({ navigation, route }: Props) {
                 </View>
                 <View
                   style={{
-                    marginTop: 30,
+                    marginTop: 10,
                     flexDirection: "row",
                     backgroundColor: "#fff",
                     alignItems: "center",
