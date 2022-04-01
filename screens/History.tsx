@@ -50,9 +50,9 @@ export default function History({ navigation, route }: Props) {
       }, 0);
     const Today = new Date().setHours(0, 0, 0, 0);
     const expiryDate = new Date(
-      item?.included?.amortizations[
-        item?.included?.amortizations.length - 1
-      ].expected_payment_date
+      item?.included?.amortizations.find(
+        (item) => item.actual_amount == 0
+      )?.expected_payment_date
     ).setHours(0, 0, 0, 0);
 
     if (totalDebt <= 0) {
@@ -97,9 +97,9 @@ export default function History({ navigation, route }: Props) {
       }, 0) 
 	  const Today = new Date().setHours(0,0,0,0)
 	  const expiryDate = new Date(
-      props?.item?.included?.amortizations[
-        props?.item?.included?.amortizations.length - 1
-      ].expected_payment_date
+      props?.item?.included?.amortizations.find(
+        (item) => item.actual_amount == 0
+      )?.expected_payment_date
     ).setHours(0, 0, 0, 0);
 	
 	  if (totalDebt <= 0){
@@ -223,8 +223,8 @@ export default function History({ navigation, route }: Props) {
                       style={{
                         color: "#000",
                         fontFamily: "Montserrat_700Bold",
-                        width: 200,
-                        fontSize: 13,
+                        width: 240,
+                        fontSize: 11,
                       }}
                     >
                       {props?.item?.included?.product?.name}{" "}
@@ -234,7 +234,7 @@ export default function History({ navigation, route }: Props) {
                 </View>
                 <View
                   style={{
-                    marginTop: 30,
+                    marginTop: 10,
                     flexDirection: "row",
                     backgroundColor: "#fff",
                     alignItems: "center",

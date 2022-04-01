@@ -82,7 +82,13 @@ export default function Notification({ navigation, route }: Props) {
             style={styles.image}
           />
         ) : (
-          <View style={{ backgroundColor: "#EFF5F9" }}>
+          <View
+            style={{
+              backgroundColor: "#EFF5F9",
+              marginTop: 30,
+              marginBottom: 60,
+            }}
+          >
             {notifications?.length > 0 ? (
               <FlatList
                 data={notifications}
@@ -107,7 +113,7 @@ export default function Notification({ navigation, route }: Props) {
                         style={{
                           fontSize: 12,
                           fontFamily: "Montserrat_500Medium",
-                          marginVertical: 14,
+                          marginVertical: 8,
                           color: "black",
                         }}
                       >
@@ -200,14 +206,11 @@ const styles = StyleSheet.create({
   },
   order: {
     backgroundColor: "#EFF5F9",
-    paddingVertical: 16,
+    marginTop: 10,
     marginLeft: 26,
     marginRight: 20,
     alignItems: "flex-start",
-    marginTop: 30,
-    borderStyle: "dashed",
     borderColor: "#074A74",
-    borderTopWidth: 1,
     borderBottomWidth: 1,
   },
 });
