@@ -48,14 +48,11 @@ export default function Otp({ navigation, route }: Props) {
 				};
 				const error = 'OTP is incorrect';
 				let res = signin(data);
-				console.log(res);
 				if (res === undefined) {
 					setTimeout(() => {
 						setErrorText(error);
 					}, 3000);
 				}
-				// setErrorText(res.catch);
-				// navigation.navigate('Dashboard');
 			}
 
 			// auto focus to next InputText if value is not blank
