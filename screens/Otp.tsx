@@ -14,7 +14,6 @@ import { Context as AuthContext } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OTP'>;
 
-
 export default function Otp({ navigation, route }: Props) {
 	let [errorText, setErrorText] = useState('');
 	const { state, signin } = useContext(AuthContext);
@@ -47,9 +46,14 @@ export default function Otp({ navigation, route }: Props) {
 					phone_number: phone?.phone_number,
 					device_name: Device.deviceName,
 				};
-				const error ='OTP is incorrect'
+				const error = 'OTP is incorrect';
 				let res = signin(data);
-				console.log(res)
+				console.log(res);
+				if (res === undefined) {
+					setTimeout(() => {
+						setErrorText(error);
+					}, 3000);
+				}
 				// setErrorText(res.catch);
 				// navigation.navigate('Dashboard');
 			}
@@ -71,6 +75,7 @@ export default function Otp({ navigation, route }: Props) {
 		return ({ nativeEvent: { key: value } }) => {
 			// auto focus to previous InputText if value is blank and existing value is also blank
 			if (value === 'Backspace' && otpArray[index] === '') {
+				setErrorText('');
 				if (index === 1) {
 					firstTextInputRef.current.focus();
 				} else if (index === 2) {
@@ -123,7 +128,6 @@ export default function Otp({ navigation, route }: Props) {
 						refCallback={refCallback(textInputRef)}
 					/>
 				))}
-				
 			</View>
 			{errorText != '' ? (
 				<Text style={styles.errorText}>{errorText}</Text>
@@ -207,8 +211,8 @@ const styles = StyleSheet.create({
 		color: '#074A74',
 		fontSize: 18,
 		width: '100%',
-		textAlign:'center',
-		fontWeight: '700'
+		textAlign: 'center',
+		fontWeight: '700',
 	},
 
 	lock: {
