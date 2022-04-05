@@ -50,7 +50,7 @@ const signin = (dispatch) => {
 				
 			})
 			.catch((err) => {
-				return 'OTP is incorrect'
+				return err
 			})
 			.finally(() => {});
 		// Do some API Request here

@@ -223,7 +223,7 @@ export default function History({ navigation, route }: Props) {
                       style={{
                         color: "#000",
                         fontFamily: "Montserrat_700Bold",
-                        width: 240,
+                        width: 230,
                         fontSize: 11,
                       }}
                     >
