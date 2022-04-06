@@ -58,7 +58,7 @@ export default function History({ navigation, route }: Props) {
     if (totalDebt <= 0) {
       return "#074A74";
     }
-    if (totalDebt >= 0 && Today <= expiryDate) {
+    if (totalDebt > 0 && Today <= expiryDate) {
       return "#FDC228";
     } else {
       return "#FF4133";
@@ -105,7 +105,7 @@ export default function History({ navigation, route }: Props) {
 	  if (totalDebt <= 0){
 			return 'Completed'
 	  }
-	  if ((totalDebt >= 0) && (Today <= expiryDate) ){
+	  if ((totalDebt > 0) && (Today <= expiryDate) ){
 		  return 'In Progress'
 	  }else {
 		  return 'Overdue'
