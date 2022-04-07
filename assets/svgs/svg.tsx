@@ -256,3 +256,5 @@ export const ProductLoan = function(){
     </Svg>
   );
 }
+
+
