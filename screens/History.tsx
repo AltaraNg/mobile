@@ -48,17 +48,17 @@ export default function History({ navigation, route }: Props) {
       item?.included?.amortizations.reduce((accumulator, object) => {
         return accumulator + object.actual_amount;
       }, 0);
-    const Today = new Date().setHours(0, 0, 0, 0);
+    const Today = new Date()
     const expiryDate = new Date(
       item?.included?.amortizations.find(
         (item) => item.actual_amount == 0
       )?.expected_payment_date
-    ).setHours(0, 0, 0, 0);
+    )
 
-    if (totalDebt <= 0) {
+    if (totalDebt <= 0 ) {
       return "#074A74";
     }
-    if (totalDebt > 0 && Today <= expiryDate) {
+    if (totalDebt > 0 && Today < expiryDate) {
       return "#FDC228";
     } else {
       return "#FF4133";
@@ -79,6 +79,7 @@ export default function History({ navigation, route }: Props) {
 
       const order = response.data.data[0].included.orders;
       setOrders(order);
+      console.log(order)
     } catch (error: any) {}
   };
   const viewDetail = (item) => {
@@ -95,19 +96,19 @@ export default function History({ navigation, route }: Props) {
 	const totalDebt = props?.item?.attributes?.repayment - props?.item?.included?.amortizations.reduce((accumulator, object) => {
         return accumulator + object.actual_amount;
       }, 0) 
-	  const Today = new Date().setHours(0,0,0,0)
+	  const Today = new Date()
 	  const expiryDate = new Date(
       props?.item?.included?.amortizations.find(
         (item) => item.actual_amount == 0
       )?.expected_payment_date
-    ).setHours(0, 0, 0, 0);
+    )
 	
-	  if (totalDebt <= 0){
-			return 'Completed'
-	  }
-	  if ((totalDebt > 0) && (Today <= expiryDate) ){
+	  if (totalDebt <= 0 ) {
+      return "Completed";
+    }
+	  if ((totalDebt > 0) && (Today < expiryDate) ){
 		  return 'In Progress'
-	  }else {
+	  }else  {
 		  return 'Overdue'
 	  }
 	 

@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "Altara Credit",
     "extra": {
       "URL": "https://altara-customer-play-api.herokuapp.com/api/v1/"
     },
-    "slug": "mobile",
+    "slug": "Altara",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -35,10 +35,10 @@
       "versionCode": 1
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/icon.png"
     },
     "sdkVersion": "44.0.0",
     "description": ""
   },
-  "name": "mobile"
+  "name": "Altara Credit"
 }

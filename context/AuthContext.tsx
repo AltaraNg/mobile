@@ -1,7 +1,7 @@
 import { post } from '../utilities/api';
 import createDataContext from './createDataContext';
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import { Platform  } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 let url = 'auth/login';
 const MY_SECURE_AUTH_STATE_KEY = 'MySecureAuthStateKey';
 
@@ -38,7 +38,7 @@ const signin = (dispatch) => {
 				const storageValue = JSON.stringify(loginInfo);
 
 				if (Platform.OS !== 'web') {
-					SecureStore.setItemAsync(MY_SECURE_AUTH_STATE_KEY, storageValue);
+					AsyncStorage.setItem(MY_SECURE_AUTH_STATE_KEY, storageValue);
 				}
 				dispatch({
 					type: 'signin',
@@ -60,7 +60,7 @@ const signin = (dispatch) => {
 const signout = (dispatch) => {
 	return () => {
 		if (Platform.OS !== 'web') {
-			SecureStore.deleteItemAsync(MY_SECURE_AUTH_STATE_KEY);
+			AsyncStorage.getItem(MY_SECURE_AUTH_STATE_KEY);
 		}
 
 		dispatch({
