@@ -42,9 +42,14 @@ export default function History({ navigation, route }: Props) {
   const [pressedOrder, setPressedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [OrderStatus, setOrderStatus] = useState("")
-  const styleSVG = (item:any) => {
+  const styleSVG = (item: any) => {
     const totalDebt =
-      item?.attributes?.repayment -
+      item?.included?.amortizations.reduce(
+        (accumulator, object) => {
+          return accumulator + object.expected_amount;
+        },
+        0
+      ) -
       item?.included?.amortizations.reduce((accumulator, object) => {
         return accumulator + object.actual_amount;
       }, 0);
@@ -55,15 +60,16 @@ export default function History({ navigation, route }: Props) {
       )?.expected_payment_date
     )
 
-    if (totalDebt <= 0 ) {
+    if (totalDebt <= 0) {
       return "#074A74";
     }
     if (totalDebt > 0 && Today < expiryDate) {
       return "#FDC228";
-    } else {
+    }
+    if (totalDebt > 0 && Today > expiryDate) {
       return "#FF4133";
     }
-   
+
   };
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
@@ -79,44 +85,50 @@ export default function History({ navigation, route }: Props) {
 
       const order = response.data.data[0].included.orders;
       setOrders(order);
-      console.log(order)
-    } catch (error: any) {}
+
+    } catch (error: any) { }
   };
   const viewDetail = (item) => {
     setModalVisible(true);
     setPressedOrder(item);
   };
-  const monthlyRepayment= (props)=>{
+  const monthlyRepayment = (props) => {
 
-	  return props?.item?.included?.amortizations[0].expected_amount
+    return props?.item?.included?.amortizations[0].expected_amount
       .toString()
       .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
-  const orderStatus =(props)=>{
-	const totalDebt = props?.item?.attributes?.repayment - props?.item?.included?.amortizations.reduce((accumulator, object) => {
-        return accumulator + object.actual_amount;
-      }, 0) 
-	  const Today = new Date()
-	  const expiryDate = new Date(
+  const orderStatus = (props) => {
+    const totalDebt = props?.item?.included?.amortizations.reduce(
+      (accumulator, object) => {
+        return accumulator + object.expected_amount;
+      },
+      0
+    ) - props?.item?.included?.amortizations.reduce((accumulator, object) => {
+      return accumulator + object.actual_amount;
+    }, 0)
+    const Today = new Date()
+    const expiryDate = new Date(
       props?.item?.included?.amortizations.find(
         (item) => item.actual_amount == 0
       )?.expected_payment_date
     )
-	
-	  if (totalDebt <= 0 ) {
+
+    if (totalDebt <= 0) {
       return "Completed";
     }
-	  if ((totalDebt > 0) && (Today < expiryDate) ){
-		  return 'In Progress'
-	  }else  {
-		  return 'Overdue'
-	  }
-	 
-     
+    if ((totalDebt > 0) && (Today < expiryDate)) {
+      return 'In Progress'
+    }
+    if ((totalDebt > 0 && Today > expiryDate)) {
+      return 'Overdue'
+    }
+
+
   }
-  const styleStatus= (props)=>{
-	  if (orderStatus(props) == 'Completed'){
-		  return {
+  const styleStatus = (props) => {
+    if (orderStatus(props) == 'Completed') {
+      return {
         backgroundColor: "#d0dce4",
         color: "#074a74",
         paddingHorizontal: 10,
@@ -124,32 +136,32 @@ export default function History({ navigation, route }: Props) {
         borderRadius: 6,
         fontFamily: "Montserrat_700Bold",
       };
-	  }
-	  	  if (orderStatus(props) == "In Progress") {
-          return {
-            backgroundColor: "#fff4d4",
-            color: "#FDC228",
-            paddingHorizontal: 10,
-            paddingVertical: 6,
-            borderRadius: 6,
-            fontFamily: "Montserrat_700Bold",
-          };
-        }
-			  if (orderStatus(props) == "Overdue") {
-          return {
-            backgroundColor: "#ffd4d4",
-            color: "#DB2721",
-            paddingHorizontal: 10,
-            paddingVertical: 6,
-            borderRadius: 6,
-            fontFamily: "Montserrat_700Bold",
-          };
-        }
+    }
+    if (orderStatus(props) == "In Progress") {
+      return {
+        backgroundColor: "#fff4d4",
+        color: "#FDC228",
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 6,
+        fontFamily: "Montserrat_700Bold",
+      };
+    }
+    if (orderStatus(props) == "Overdue") {
+      return {
+        backgroundColor: "#ffd4d4",
+        color: "#DB2721",
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 6,
+        fontFamily: "Montserrat_700Bold",
+      };
+    }
   }
 
-  const nextRepayment =(props:Object)=>{
-	 const nextDate = props?.item?.included?.amortizations.find((item)=>  item.actual_amount == 0)
-	return nextDate?.expected_payment_date || 'Completed'
+  const nextRepayment = (props: Object) => {
+    const nextDate = props?.item?.included?.amortizations.find((item) => item.actual_amount == 0)
+    return nextDate?.expected_payment_date || 'Completed'
   }
 
   const OrderDetails = function (props: any) {
@@ -174,7 +186,7 @@ export default function History({ navigation, route }: Props) {
               borderRadius:
                 Math.round(
                   Dimensions.get("window").width +
-                    Dimensions.get("window").height
+                  Dimensions.get("window").height
                 ) / 2,
               width: Dimensions.get("window").width * 0.13,
               height: Dimensions.get("window").width * 0.13,
@@ -386,12 +398,12 @@ export default function History({ navigation, route }: Props) {
                             },
                             0
                           ) -
-                            props?.item?.included?.amortizations.reduce(
-                              (accumulator, object) => {
-                                return accumulator + object.actual_amount;
-                              },
-                              0
-                            )
+                          props?.item?.included?.amortizations.reduce(
+                            (accumulator, object) => {
+                              return accumulator + object.actual_amount;
+                            },
+                            0
+                          )
                         )
                           .toString()
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -426,12 +438,12 @@ export default function History({ navigation, route }: Props) {
                         ₦
                         {Math.floor(
                           props?.item?.attributes?.down_payment +
-                            props?.item?.included?.amortizations.reduce(
-                              (accumulator, object) => {
-                                return accumulator + object.actual_amount;
-                              },
-                              0
-                            )
+                          props?.item?.included?.amortizations.reduce(
+                            (accumulator, object) => {
+                              return accumulator + object.actual_amount;
+                            },
+                            0
+                          )
                         )
                           .toString()
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -457,7 +469,7 @@ export default function History({ navigation, route }: Props) {
                     >
                       {nextRepayment(props)}
                     </Text>
-                    {}
+                    { }
                   </Text>
                 </View>
               </View>
