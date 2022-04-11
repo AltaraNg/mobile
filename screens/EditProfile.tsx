@@ -42,6 +42,7 @@ export default function Dashboard({ navigation, route }: Props) {
 	const [exitApp, setExitApp] = useState(1);
 	const [isError, setIsError] = useState(false);
 	const [user, setUser] = useState(null);
+	const [onBoarded, setOnBoarded] = useState(null)
 	const [showMenu, setShowMenu] = useState(false);
 	const toggleSideMenu = async () => {
 		navigation.toggleDrawer();
@@ -100,6 +101,7 @@ export default function Dashboard({ navigation, route }: Props) {
 			});
 			const user = response.data.data[0].attributes;
 			setUser(user);
+			setOnBoarded(user.attributes.on_boarded)
 		} catch (error: any) {
 			ToastAndroid.showWithGravity(
 				'Unable to fetch user',
@@ -127,7 +129,7 @@ export default function Dashboard({ navigation, route }: Props) {
         </View>
         {user && (
           <View style={styles.main}>
-            <Text style={styles.title}>Edit Profile</Text>
+						<Text style={styles.title}>{!onBoarded ? "Create" : "Edit"} Profile</Text>
             <View style={styles.data}>
               <Text style={styles.label}>First Name</Text>
               <TextInput

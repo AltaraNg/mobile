@@ -38,21 +38,24 @@ export default function Cards(props: any) {
     }
   }
 	return (
-		<View style={styles.container}>
-			<Leaf style={styles.leaf} />
-			<Text style={styles.header}>{props.title}</Text>
-			<Text style={styles.amount}>{props.amount}</Text>
-			<LinearGradient
-				colors={['#074A77', '#089CA4']}
-				style={styles.buttonContainer}
-				start={{ x: 1, y: 0.5 }}
-				end={{ x: 0, y: 0.5 }}
-			>
-				<Pressable style={[styles.button]} onPress={doSome}>
-					<Text style={styles.buttonText}>Order Now</Text>
-				</Pressable>
-			</LinearGradient>
-		</View>
+			
+			<View style={styles.container}>
+			<View style={{
+				backgroundColor: 'rgba(156, 150, 150, 0.55)', height: props.height, width: props.width, position:'absolute', zIndex:10, }}></View>
+				<Leaf style={styles.leaf} />
+				<Text style={styles.header}>{props.title}</Text>
+				<Text style={styles.amount}>{props.amount}</Text>
+				<LinearGradient
+					colors={['#074A77', '#089CA4']}
+					style={styles.buttonContainer}
+					start={{ x: 1, y: 0.5 }}
+					end={{ x: 0, y: 0.5 }}
+				>
+					<Pressable style={[styles.button]} onPress={doSome} disabled={props.isDisabled}>
+						<Text style={styles.buttonText}>Order Now</Text>
+					</Pressable>
+				</LinearGradient>
+			</View>
 	);
 }
 
