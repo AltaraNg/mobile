@@ -32,9 +32,7 @@ import Login from '../screens/Login';
 import Otp from '../screens/Otp';
 import Dashboard from '../screens/Dashboard';
 import ViewProfile from '../screens/ViewProfile';
-import { Provider as AuthProvider } from '../context/AuthContext';
-import { Context as AuthContext } from '../context/AuthContext';
-import * as SecureStore from 'expo-secure-store';
+import { AuthProvider, useAuth } from '../context/AuthContext';
 import Constants from 'expo-constants';
 
 import axios from 'axios';
@@ -44,7 +42,10 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomSidebarMenu from '../components/CustomeSideBarMenu';
 import EditProfile from '../screens/EditProfile';
 import RequestModal from '../modals/requestModal';
+import { Loading } from '../components/Loading';
 let url = Constants?.manifest?.extra?.URL;
+const {authData, loading} = useAuth();
+
 axios.defaults.baseURL = url;
 
 const MyTheme = {
@@ -55,33 +56,10 @@ const MyTheme = {
 	},
 };
 
-let token = '';
-let isLogin = false;
-let user = {};
 
-async function getValueFor(key) {
-	let result = await SecureStore.getItemAsync(key);
 
-	if (result) {
-		result = JSON.parse(result);
-		try {
-			let res = await axios({
-				method: 'GET',
-				url: '/auth/user',
-				headers: { 'Authorization': `Bearer ${result.token}` },
-			});
 
-			if (res.status === 200) {
-				isLogin = true;
-				token = result.token;
-				user = result.user;
-			} else {
-				isLogin = false;
-			}
-		} catch (error) {}
-	} else {
-	}
-}
+
 function getHeaderTitle(route) {
   // If the focused route is not found, we need to assume it's the initial screen
   // This can happen during if there hasn't been any navigation inside the screen
@@ -120,16 +98,16 @@ export default function Navigation({
  * A root stack navigator is often used for displaying modals on top of all other content.
  * https://reactnavigation.org/docs/modal
  */
-getValueFor('MySecureAuthStateKey');
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function RootNavigator() {
-	let { state } = React.useContext(AuthContext);
-	if (isLogin) {
-		state.token = token;
-		state.user = user;
-	}
 
+function RootNavigator() {
+
+	if (loading){
+		return <Loading />;
+	}
+	
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -137,7 +115,7 @@ function RootNavigator() {
 				headerStyle: { backgroundColor: 'tomato' },
 			}}
 		>
-			{state.token === null ? (
+			{authData !== undefined ? (
 				<Stack.Group>
 					<Stack.Screen
 						options={{ headerShown: false }}

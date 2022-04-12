@@ -10,13 +10,14 @@ import { GenericStyles } from '../styles/GenericStyles';
 import Lock from '../assets/svgs/lock.svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { Context as AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OTP'>;
 
+const auth = useAuth();
+
 export default function Otp({ navigation, route }: Props) {
 	let [errorText, setErrorText] = useState('');
-	const { state, signin } = useContext(AuthContext);
 	const phone = route.params;
 
 	let url = 'auth/login';
@@ -47,7 +48,7 @@ export default function Otp({ navigation, route }: Props) {
 					device_name: Device.deviceName,
 				};
 				const error = 'OTP is incorrect';
-				let res = signin(data);
+				let res = auth.signIn(data.phone_number, data.otp, data.device_name);
 				if (res === undefined) {
 					setTimeout(() => {
 						setErrorText(error);

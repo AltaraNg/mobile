@@ -1,80 +1,95 @@
-import { post } from '../utilities/api';
-import createDataContext from './createDataContext';
-import { Platform  } from 'react-native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-let url = 'auth/login';
-const MY_SECURE_AUTH_STATE_KEY = 'MySecureAuthStateKey';
+import React, {createContext, useState, useContext, useEffect} from 'react';
+import * as SecureStore from 'expo-secure-store';
 
-const authReducer = (state, action) => {
-	switch (action.type) {
-		case 'signout':
-			return { token: null, email: '' };
-		case 'signin':
-			return {
-				token: action.payload.token,
-				user: action.payload.user,
-				id: action.payload.id,
-			};
-		default:
-			return state;
-	}
+import {AuthData, authService} from '../services/authService';
+
+type AuthContextData = {
+  authData?: AuthData;
+  loading: boolean;
+  signIn(phone_number: string, otp: string, device_name: string | null): Promise<void>;
+  signOut(): void;
 };
 
-const signin = (dispatch) => {
-	let token = '';
-	let user = '';
-	return ({ otp, phone_number, device_name }) => {
-		const data = {
-			otp: otp,
-			phone_number: phone_number,
-			device_name: device_name,
-		};
-		post(url, data)
-			.then((res) => {
-				let loginInfo = res.data.data;
-				token = loginInfo.token;
-				user = loginInfo.user;
+//Create the Auth Context with the data type specified
+//and a empty object
+const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-				const storageValue = JSON.stringify(loginInfo);
+const AuthProvider: React.FC = ({children}) => {
+  const [authData, setAuthData] = useState<AuthData>();
 
-				if (Platform.OS !== 'web') {
-					AsyncStorage.setItem(MY_SECURE_AUTH_STATE_KEY, storageValue);
-				}
-				dispatch({
-					type: 'signin',
-					payload: {
-						token: token,
-						user: user,
-					},
-				});
-				
-			})
-			.catch((err) => {
-				return err
-			})
-			.finally(() => {});
-		// Do some API Request here
-	};
+  //the AuthContext start with loading equals true
+  //and stay like this, until the data be load from Async Storage
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    //Every time the App is opened, this provider is rendered
+    //and call de loadStorage function.
+    loadStorageData();
+  }, []);
+
+  async function loadStorageData(): Promise<void> {
+    try {
+      //Try get the data from Async Storage
+      const authDataSerialized = await SecureStore.getItemAsync('@AuthData');
+      if (authDataSerialized) {
+        //If there are data, it's converted to an Object and the state is updated.
+        const _authData: AuthData = JSON.parse(authDataSerialized);
+        setAuthData(_authData);
+      }
+    } catch (error) {
+    } finally {
+      //loading finished
+      setLoading(false);
+    }
+  }
+
+  const signIn = async (phone_number: string, otp: string, device_name: string) => {
+    //call the service passing credential (email and password).
+    //In a real App this data will be provided by the user from some InputText components.
+    const _authData = await authService.signIn(
+      phone_number,
+	  otp,
+	  device_name
+    );
+
+    //Set the data in the context, so the App can be notified
+    //and send the user to the AuthStack
+    setAuthData(_authData);
+
+    //Persist the data in the Async Storage
+    //to be recovered in the next user session.
+    SecureStore.setItemAsync('@AuthData', JSON.stringify(_authData));
+  };
+
+  const signOut = async () => {
+    //Remove data from context, so the App can be notified
+    //and send the user to the AuthStack
+    setAuthData(undefined);
+
+    //Remove the data from Async Storage
+    //to NOT be recoverede in next session.
+    await SecureStore.deleteItemAsync('@AuthData');
+  };
+
+  return (
+    //This component will be used to encapsulate the whole App,
+    //so all components will have access to the Context
+    <AuthContext.Provider value={{authData, loading, signIn, signOut}}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-const signout = (dispatch) => {
-	return () => {
-		if (Platform.OS !== 'web') {
-			AsyncStorage.getItem(MY_SECURE_AUTH_STATE_KEY);
-		}
+//A simple hooks to facilitate the access to the AuthContext
+// and permit components to subscribe to AuthContext updates
+function useAuth(): AuthContextData {
+  const context = useContext(AuthContext);
 
-		dispatch({
-			type: 'signout',
-			payload: {
-				token: null,
-				user: null,
-			},
-		});
-	};
-};
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
 
-export const { Provider, Context } = createDataContext(
-	authReducer,
-	{ signin, signout },
-	{ token: null, user: ''}
-);
+  return context;
+}
+
+export {AuthContext, AuthProvider, useAuth};
