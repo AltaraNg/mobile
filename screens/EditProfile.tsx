@@ -8,6 +8,7 @@ import {
 	Platform,
 	TouchableOpacity,
 	Modal,
+	Image,
 	Alert,
 	Dimensions,
   ScrollView
@@ -42,6 +43,7 @@ export default function Dashboard({ navigation, route }: Props) {
 	const [exitApp, setExitApp] = useState(1);
 	const [isError, setIsError] = useState(false);
 	const [user, setUser] = useState(null);
+	const [loading, setLoading] = useState(false);
 	const [onBoarded, setOnBoarded] = useState(null)
 	const [showMenu, setShowMenu] = useState(false);
 	const toggleSideMenu = async () => {
@@ -70,6 +72,7 @@ export default function Dashboard({ navigation, route }: Props) {
 	};
 
 	const handleUpdate = async () => {
+		setLoading(true);
 		try {
 			let result = await axios({
 				method: 'PATCH',
@@ -77,6 +80,7 @@ export default function Dashboard({ navigation, route }: Props) {
 				headers: { Authorization: `Bearer ${state.token}` },
 				data: user,
 			});
+			setLoading(false);
 			ToastAndroid.showWithGravity(
 				'Profile updated successfully',
 				ToastAndroid.SHORT,
@@ -84,6 +88,7 @@ export default function Dashboard({ navigation, route }: Props) {
 			);
       navigation.navigate('View Profile');
 		} catch (error) {
+			console.log(error, 'error')
 			ToastAndroid.showWithGravity(
 				'Error! Request was not completed',
 				ToastAndroid.SHORT,
@@ -101,7 +106,7 @@ export default function Dashboard({ navigation, route }: Props) {
 			});
 			const user = response.data.data[0].attributes;
 			setUser(user);
-			setOnBoarded(user.attributes.on_boarded)
+			setOnBoarded(user?.attributes?.on_boarded)
 		} catch (error: any) {
 			ToastAndroid.showWithGravity(
 				'Unable to fetch user',
@@ -165,25 +170,36 @@ export default function Dashboard({ navigation, route }: Props) {
                 {user.email_address}
               </TextInput>
             </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#EFF5F9",
-              }}
-            >
-              <LinearGradient
-                colors={["#074A77", "#089CA4"]}
-                style={styles.buttonContainer}
-                start={{ x: 1, y: 0.5 }}
-                end={{ x: 0, y: 0.5 }}
-              >
-                <Pressable style={[styles.button]} onPress={handleUpdate}>
-                  <Text style={styles.buttonText}>Save</Text>
-                </Pressable>
-              </LinearGradient>
-            </View>
+						
+								<View
+								
+									style={{
+										flexDirection: "row",
+										alignItems: "center",
+										justifyContent: "center",
+										backgroundColor: "#EFF5F9",
+									}}
+								>
+									<LinearGradient
+										colors={["#074A77", "#089CA4"]}
+										style={styles.buttonContainer}
+										start={{ x: 1, y: 0.5 }}
+										end={{ x: 0, y: 0.5 }}
+									>
+								<Pressable style={[styles.button]} onPress={handleUpdate}>
+									{loading ? (
+										<Image
+											source={require("../assets/gifs/loader.gif")}
+											style={styles.image}
+										/>
+									) :(
+											<Text style={styles.buttonText}>Save</Text>
+									)}
+										</Pressable>
+									</LinearGradient>
+								</View>
+						
+            
           </View>
         )}
       </View>
@@ -196,6 +212,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		height: '100%',
 		position: 'relative',
+	},
+	image: {
+		width: Dimensions.get("window").height * 0.08,
+		height: Dimensions.get("window").height * 0.08,
+		marginVertical: -15,
 	},
 	buttonContainer: {
 		flexDirection: 'row',

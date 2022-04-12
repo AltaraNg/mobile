@@ -80,7 +80,7 @@ export default function Dashboard({ navigation, route }: Props) {
       });
       const user = response.data.data[0];
       setUser(user);
-      setOnBoarded(user.attributes.on_boarded)
+      setOnBoarded(user?.attributes?.on_boarded)
     } catch (error: any) {
       ToastAndroid.showWithGravity(
         "Unable to fetch user",
