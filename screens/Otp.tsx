@@ -47,13 +47,14 @@ export default function Otp({ navigation, route }: Props) {
 					phone_number: phone?.phone_number,
 					device_name: Device.deviceName,
 				};
-				const error = 'OTP is incorrect';
-				let res = auth.signIn(data.phone_number, data.otp, data.device_name);
-				if (res === undefined) {
+				
+				let res = auth.signIn(data.phone_number, data.otp, data.device_name).then(res => {
+					const error = 'OTP is incorrect';
 					setTimeout(() => {
 						setErrorText(error);
 					}, 3000);
-				}
+				});
+				
 			}
 
 			// auto focus to next InputText if value is not blank

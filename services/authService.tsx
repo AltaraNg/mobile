@@ -24,6 +24,7 @@ let url = 'auth/login';
 				
 			})
 			.catch((err) => {
+        return undefined;
 			})
 			.finally(() => {});
   };

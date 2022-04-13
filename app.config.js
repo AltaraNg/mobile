@@ -1,8 +1,8 @@
-{
-  "expo": {
-    "name": "Altara Credit",
-    "extra": {
-      
+export default {
+    // ...
+    extra: {
+      // Fall back to development URL when not set
+      URL: process.env.API_URL ?? "https://altara-customer-play-api.herokuapp.com/api/v1/",
     },
     "slug": "Altara",
     "version": "1.0.0",
@@ -39,6 +39,6 @@
     },
     "sdkVersion": "44.0.0",
     "description": ""
-  },
-  "name": "Altara Credit"
-}
+  }
+ 
+  
