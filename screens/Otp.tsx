@@ -14,9 +14,9 @@ import { useAuth } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OTP'>;
 
-const auth = useAuth();
-
 export default function Otp({ navigation, route }: Props) {
+	const auth = useAuth();
+
 	let [errorText, setErrorText] = useState('');
 	const phone = route.params;
 

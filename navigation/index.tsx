@@ -110,7 +110,7 @@ function RootNavigator() {
 				headerStyle: { backgroundColor: 'tomato' },
 			}}
 		>
-			{authData !== undefined ? (
+			{authData === undefined? (
 				<Stack.Group>
 					<Stack.Screen
 						options={{ headerShown: false }}

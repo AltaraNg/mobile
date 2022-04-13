@@ -25,7 +25,7 @@ import { RootStackParamList, RootTabParamList } from "../types";
 import Cards from "../components/Cards";
 import SideMenu from "./SideMenu";
 import { ELoan, Rental, ProductLoan } from "../assets/svgs/svg";
-import { Context as AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Constants from "expo-constants";
 import axios from "axios";
@@ -36,7 +36,7 @@ axios.defaults.baseURL = url;
 type Props = NativeStackScreenProps<RootTabParamList, "History">;
 
 export default function History({ navigation, route }: Props) {
-  const { state } = useContext(AuthContext);
+  const { authData } = useContext(AuthContext);
   const [orders, setOrders] = useState(null);
   const [exitApp, setExitApp] = useState(1);
   const [pressedOrder, setPressedOrder] = useState(null);
@@ -79,8 +79,8 @@ export default function History({ navigation, route }: Props) {
     try {
       let response = await axios({
         method: "GET",
-        url: `/customers/${state.user.id}/orders`,
-        headers: { Authorization: `Bearer ${state.token}` },
+        url: `/customers/${authData.user.id}/orders`,
+        headers: { Authorization: `Bearer ${authData.token}` },
       });
 
       const order = response.data.data[0].included.orders;

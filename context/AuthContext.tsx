@@ -30,7 +30,8 @@ const AuthProvider: React.FC = ({children}) => {
   async function loadStorageData(): Promise<void> {
     try {
       //Try get the data from Async Storage
-      const authDataSerialized = await SecureStore.getItemAsync('@AuthData');
+      const authDataSerialized = await SecureStore.getItemAsync('AuthData');  
+      console.log(authDataSerialized);
       if (authDataSerialized) {
         //If there are data, it's converted to an Object and the state is updated.
         const _authData: AuthData = JSON.parse(authDataSerialized);
@@ -47,7 +48,7 @@ const AuthProvider: React.FC = ({children}) => {
     //call the service passing credential (email and password).
     //In a real App this data will be provided by the user from some InputText components.
     const _authData = await authService.signIn(
-      phone_number,
+      phone_number,  
 	  otp,
 	  device_name
     );
@@ -58,7 +59,7 @@ const AuthProvider: React.FC = ({children}) => {
 
     //Persist the data in the Async Storage
     //to be recovered in the next user session.
-    SecureStore.setItemAsync('@AuthData', JSON.stringify(_authData));
+    SecureStore.setItemAsync('AuthData', JSON.stringify(_authData));
   };
 
   const signOut = async () => {
@@ -68,7 +69,7 @@ const AuthProvider: React.FC = ({children}) => {
 
     //Remove the data from Async Storage
     //to NOT be recoverede in next session.
-    await SecureStore.deleteItemAsync('@AuthData');
+    await SecureStore.deleteItemAsync('AuthData');
   };
 
   return (

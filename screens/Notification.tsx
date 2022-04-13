@@ -24,7 +24,7 @@ import SideMenu from './SideMenu';
 import {ZeroState} from '../assets/svgs/svg'
 import Constants from 'expo-constants';
 
-import { Context as AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import axios from 'axios';
 import { Loader } from '../assets/svgs/svg';
@@ -35,7 +35,7 @@ let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
 export default function Notification({ navigation, route }: Props) {
-	const { state } = useContext(AuthContext);
+	const { authData } = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
 	const [showMenu, setShowMenu] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
@@ -49,8 +49,8 @@ export default function Notification({ navigation, route }: Props) {
 		try {
 			let response = await axios({
 				method: 'GET',
-				url: `/customers/${state.user.id}/notifications`,
-				headers: { 'Authorization': `Bearer ${state.token}` },
+				url: `/customers/${authData.user.id}/notifications`,
+				headers: { 'Authorization': `Bearer ${authData.token}` },
 			});
       setShowLoader(false)
 			const notification = response?.data?.data?.notifications?.data;
