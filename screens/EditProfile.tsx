@@ -72,7 +72,7 @@ export default function Dashboard({ navigation, route }: Props) {
 		try {
 			let result = await axios({
 				method: 'PATCH',
-				url: `/customers/${state.user.id}`,
+				url: `/customers/${authData.user.id}`,
 				headers: { Authorization: `Bearer ${authData.token}` },
 				data: user,
 			});
