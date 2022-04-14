@@ -26,7 +26,7 @@ import {
 	RootTabParamList,
 } from '../types';
 import SideMenu from './SideMenu';
-import { Context as AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import axios from 'axios';
@@ -34,7 +34,7 @@ import axios from 'axios';
 type Props = DrawerScreenProps<DrawerParamList, 'View Profile'>;
 
 export default function ViewProfile({ navigation, route }: Props) {
-	const { state } = useContext(AuthContext);
+	const { authData } = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
 	const [showMenu, setShowMenu] = useState(false);
 	const [user, setUser] = useState(null);
@@ -47,7 +47,7 @@ export default function ViewProfile({ navigation, route }: Props) {
 			let response = await axios({
 				method: 'GET',
 				url: `/auth/user`,
-				headers: { 'Authorization': `Bearer ${state.token}` },
+				headers: { 'Authorization': `Bearer ${authData.token}` },
 			});
 			const user = response.data.data[0];
 			setUser(user);
