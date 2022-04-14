@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import { useContext } from 'react';
-import { Context as AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList, RootTabParamList } from '../types';
@@ -16,7 +16,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Modal'>
 export default function Cards(props: any) {
 	let url = Constants?.manifest?.extra?.URL;
 	axios.defaults.baseURL = url;
-	const { state } = useContext(AuthContext);
+	const { authData } = useContext(AuthContext);
 
 
 	async function doSome() {
@@ -27,7 +27,7 @@ export default function Cards(props: any) {
           order_type: props.type
         },
 				url: '/submit/request',
-				headers: { 'Authorization': `Bearer ${state.token}` },
+				headers: { 'Authorization': `Bearer ${authData.token}` },
       })
       if(res.status === 200){
         props.onRequest(res.data, 'success', props.type)

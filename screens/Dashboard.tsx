@@ -23,7 +23,7 @@ import { Text, View } from '../components/Themed';
 import { DrawerParamList, RootStackParamList, RootTabParamList } from '../types';
 import Cards from '../components/Cards';
 import SideMenu from './SideMenu';
-import { Context as AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { DrawerScreenProps } from '@react-navigation/drawer';
@@ -33,7 +33,7 @@ type Props = DrawerScreenProps<DrawerParamList, 'Home'>
 
 
 export default function Dashboard({ navigation, route }: Props) {
-	const { state } = useContext(AuthContext);
+	const {authData} = useContext(AuthContext);
 	const [exitApp, setExitApp] = useState(1);
 	const [isError, setIsError] = useState(false);
 	const [user, setUser] = useState(null);
@@ -76,7 +76,7 @@ export default function Dashboard({ navigation, route }: Props) {
       let response = await axios({
         method: "GET",
         url: `/auth/user`,
-        headers: { Authorization: `Bearer ${state.token}` },
+        headers: { Authorization: `Bearer ${authData.token}` },
       });
       const user = response.data.data[0];
       setUser(user);
@@ -238,7 +238,7 @@ export default function Dashboard({ navigation, route }: Props) {
       </View>
 
       <View style={styles.main}>
-        <Text style={styles.name}>{!onBoarded ? "Hello 😊" : state.user.attributes.first_name},</Text>
+        <Text style={styles.name}>{!onBoarded ? "Hello 😊" : authData.user.attributes.first_name},</Text>
         <Text style={styles.message}>Welcome to your altara dashboard </Text>
           {!onBoarded &&
              <View style={{ alignItems: 'center', backgroundColor:'#EFF5F9', marginBottom:20}}>

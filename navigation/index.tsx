@@ -17,8 +17,8 @@ import { ColorSchemeName, Pressable } from 'react-native';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../modals/ModalScreen';
-import { createStackNavigator } from "@react-navigation/stack";
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+import { createStackNavigator } from '@react-navigation/stack';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import {
 	DrawerParamList,
@@ -32,9 +32,7 @@ import Login from '../screens/Login';
 import Otp from '../screens/Otp';
 import Dashboard from '../screens/Dashboard';
 import ViewProfile from '../screens/ViewProfile';
-import { Provider as AuthProvider } from '../context/AuthContext';
-import { Context as AuthContext } from '../context/AuthContext';
-import * as SecureStore from 'expo-secure-store';
+import { AuthProvider, useAuth } from '../context/AuthContext';
 import Constants from 'expo-constants';
 
 import axios from 'axios';
@@ -44,7 +42,9 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomSidebarMenu from '../components/CustomeSideBarMenu';
 import EditProfile from '../screens/EditProfile';
 import RequestModal from '../modals/requestModal';
+import { Loading } from '../components/Loading';
 let url = Constants?.manifest?.extra?.URL;
+
 axios.defaults.baseURL = url;
 
 const MyTheme = {
@@ -55,55 +55,28 @@ const MyTheme = {
 	},
 };
 
-let token = '';
-let isLogin = false;
-let user = {};
+function getHeaderTitle(route) {
+	// If the focused route is not found, we need to assume it's the initial screen
+	// This can happen during if there hasn't been any navigation inside the screen
+	// In our case, it's "Feed" as that's the first screen inside the navigator
+	const routeName = getFocusedRouteNameFromRoute(route) ?? 'Dashboard';
 
-async function getValueFor(key) {
-	let result = await SecureStore.getItemAsync(key);
-
-	if (result) {
-		result = JSON.parse(result);
-		try {
-			let res = await axios({
-				method: 'GET',
-				url: '/auth/user',
-				headers: { 'Authorization': `Bearer ${result.token}` },
-			});
-
-			if (res.status === 200) {
-				isLogin = true;
-				token = result.token;
-				user = result.user;
-			} else {
-				isLogin = false;
-			}
-		} catch (error) {}
-	} else {
+	switch (routeName) {
+		case 'Dashboard':
+			return 'Dashboard';
+		case 'History':
+			return 'History';
+		case 'Notification':
+			return 'Notification';
 	}
 }
-function getHeaderTitle(route) {
-  // If the focused route is not found, we need to assume it's the initial screen
-  // This can happen during if there hasn't been any navigation inside the screen
-  // In our case, it's "Feed" as that's the first screen inside the navigator
-  const routeName = getFocusedRouteNameFromRoute(route) ?? "Dashboard";
-
-  switch (routeName) {
-    case "Dashboard":
-      return "Dashboard";
-    case "History":
-      return "History";
-    case "Notification":
-      return "Notification";
-  }
-}
-
 
 export default function Navigation({
 	colorScheme,
 }: {
 	colorScheme: ColorSchemeName;
 }) {
+
 	return (
 		<AuthProvider>
 			<NavigationContainer
@@ -120,14 +93,14 @@ export default function Navigation({
  * A root stack navigator is often used for displaying modals on top of all other content.
  * https://reactnavigation.org/docs/modal
  */
-getValueFor('MySecureAuthStateKey');
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
-	let { state } = React.useContext(AuthContext);
-	if (isLogin) {
-		state.token = token;
-		state.user = user;
+	const { authData, loading } = useAuth();
+
+	if (loading) {
+		return <Loading />;
 	}
 
 	return (
@@ -137,7 +110,7 @@ function RootNavigator() {
 				headerStyle: { backgroundColor: 'tomato' },
 			}}
 		>
-			{state.token === null ? (
+			{authData === undefined? (
 				<Stack.Group>
 					<Stack.Screen
 						options={{ headerShown: false }}
@@ -184,65 +157,61 @@ function RootNavigator() {
 	);
 }
 
-
-
-
-
 const DrawerNav = createDrawerNavigator<DrawerParamList>();
 
-function DrawerNavigator({route, navigation}) {
+function DrawerNavigator({ route, navigation }) {
 	const colorScheme = useColorScheme();
 	return (
-    <DrawerNav.Navigator
-      initialRouteName="Home"
-      backBehavior="initialRoute"
-      screenOptions={{
-        drawerStyle: {
-          backgroundColor: "#fff",
-          width: 240,
-        },
-      }}
-      drawerContent={(props) => <CustomSidebarMenu {...props} />}
-    >
-      <DrawerNav.Screen
-        name="Home"
-        component={BottomTabNavigator}
-        options={({ route }) => ({
-          tabBarStyle: {
-            display: getHeaderTitle(Dashboard),
-          },
-          drawerLabelStyle: { color: "#9C9696" },
-          headerShown: false,
-          drawerIcon: ({ color, size }) => (
-            <FontAwesome size={24} color="#9C9696" name="home" />
-          ),
-        })}
-      />
+		<DrawerNav.Navigator
+			initialRouteName="Home"
+			backBehavior="initialRoute"
+			screenOptions={{
+				drawerStyle: {
+					backgroundColor: '#fff',
+					width: 240,
+				},
+			}}
+			drawerContent={(props) => <CustomSidebarMenu {...props} />}
+		>
+			<DrawerNav.Screen
+				name="Home"
+				component={BottomTabNavigator}
+				options={({ route }) => ({
+					tabBarStyle: {
+						display: getHeaderTitle(Dashboard),
+					},
+					drawerLabelStyle: { color: '#9C9696' },
+					headerShown: false,
+					drawerIcon: ({ color, size }) => (
+						<FontAwesome size={24} color="#9C9696" name="home" />
+					),
+				})}
+			/>
 
-      <DrawerNav.Screen
-        name="View Profile"
-        component={ViewProfile}
-        options={{
-          drawerLabelStyle: { color: "#9C9696" },
-          headerShown: false,
-          drawerIcon: ({ color, size }) => (
-            <EvilIcons name="user" size={24} color="#9C9696" />
-          ),
-        }}
-      />
-      <DrawerNav.Screen
-        name="Edit Profile"
-        component={EditProfile}
-        options={{
-          drawerLabelStyle: { color: "#9C9696" },
-          headerShown: false,
-          drawerIcon: ({ color, size }) => (
-            <AntDesign name="edit" size={24} color="#9C9696" />
-          ),
-        }}
-      />
-    </DrawerNav.Navigator>
-  );
+			<DrawerNav.Screen
+				name="View Profile"
+				component={ViewProfile}
+				options={{
+					drawerLabelStyle: { color: '#9C9696' },
+					headerShown: false,
+					drawerIcon: ({ color, size }) => (
+						<EvilIcons name="user" size={24} color="#9C9696" />
+					),
+				}}
+			/>
+			<DrawerNav.Screen
+				name="Edit Profile"
+				component={EditProfile}
+				options={{
+					drawerLabelStyle: { color: '#9C9696' },
+					headerShown: false,
+					drawerIcon: ({ color, size }) => (
+						<AntDesign name="edit" size={24} color="#9C9696" />
+					),
+				}}
+			/>
+		</DrawerNav.Navigator>
+	);
 }
 
 /**

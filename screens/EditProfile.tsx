@@ -29,7 +29,7 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import Cards from "../components/Cards";
 import SideMenu from "./SideMenu";
-import { Context as AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { UserInterfaceIdiom } from "expo-constants";
 import axios from "axios";
@@ -42,7 +42,7 @@ let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { state } = useContext(AuthContext);
+  const { authData } = useContext(AuthContext);
   const [exitApp, setExitApp] = useState(1);
   const [isError, setIsError] = useState(false);
   const [user, setUser] = useState(null);
@@ -55,8 +55,6 @@ export default function Dashboard({ navigation, route }: Props) {
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
   };
-  let successMessage = "You have successfully applied for  an E-loan";
-  let errorMessage = "Sorry! Your Order is unsuccessful";
 
   const backAction = () => {
     if (Platform.OS === "ios") return;
@@ -73,54 +71,51 @@ export default function Dashboard({ navigation, route }: Props) {
     } else {
       BackHandler.exitApp();
     }
-
-    return true;
-  };
-
-  const handleUpdate = async () => {
+  }
+	const handleUpdate = async () => {
     setLoading(true);
-    try {
-      let result = await axios({
-        method: "PATCH",
-        url: `/customers/${state.user.id}`,
-        headers: { Authorization: `Bearer ${state.token}` },
-        data: user,
-      });
+		try {
+			let result = await axios({
+				method: 'PATCH',
+				url: `/customers/${authData.user.id}`,
+				headers: { Authorization: `Bearer ${authData.token}` },
+				data: user,
+			});
       setLoading(false);
-      ToastAndroid.showWithGravity(
-        "Profile updated successfully",
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
-      navigation.navigate("View Profile");
-    } catch (error) {
-      ToastAndroid.showWithGravity(
-        "Error! Request was not completed, Complete all fields",
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
+			ToastAndroid.showWithGravity(
+				'Profile updated successfully',
+				ToastAndroid.SHORT,
+				ToastAndroid.CENTER
+			);
+      navigation.navigate('View Profile');
+		} catch (error) {
+			ToastAndroid.showWithGravity(
+				'Error! Request was not completed',
+				ToastAndroid.SHORT,
+				ToastAndroid.CENTER
+			);
       setLoading(false);
-    }
-  };
+		}
+	};
 
-  const fetchUser = async () => {
-    try {
-      let response = await axios({
-        method: "GET",
-        url: `/auth/user`,
-        headers: { Authorization: `Bearer ${state.token}` },
-      });
-      const user = response.data.data[0].attributes;
-      setUser(user);
+	const fetchUser = async () => {
+		try {
+			let response = await axios({
+				method: 'GET',
+				url: `/auth/user`,
+				headers: { 'Authorization': `Bearer ${authData.token}` },
+			});
+			const user = response.data.data[0].attributes;
+			setUser(user);
       setOnBoarded(user?.on_boarded);
-    } catch (error: any) {
-      ToastAndroid.showWithGravity(
-        "Unable to fetch user",
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
-    }
-  };
+		} catch (error: any) {
+			ToastAndroid.showWithGravity(
+				'Unable to fetch user',
+				ToastAndroid.SHORT,
+				ToastAndroid.CENTER
+			);
+		}
+	};
    
   const prefilledData = (data) => {
     return data == "N/A" ? "" : data;
@@ -199,127 +194,134 @@ export default function Dashboard({ navigation, route }: Props) {
                 {prefilledData(user.phone_number)}
               </TextInput>
             </View>
-            <View style={styles.row}>
-              <View style={styles.data}>
-                <Text style={styles.label}> Gender </Text>
-                <RadioForm
-                  radio_props={gender}
-                  initial={-1}
-                  formHorizontal={true}
-                  labelHorizontal={true}
-                  buttonColor={"#074A77"}
-                  animation={true}
-                  onPress={(txt) => setUser({ ...user, gender: txt })}
-                />
-              </View>
-              <View style={styles.data}>
-                <View style={styles.container2}>
-                  <Text style={styles.label}>City</Text>
-                  <Dropdown
-                    style={[styles.input2, isFocus && { borderColor: "blue" }]}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    inputSearchStyle={styles.inputSearchStyle}
-                    data={city}
-                    search
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={!isFocus ? "Select item" : "..."}
-                    searchPlaceholder="Search..."
-                    value={user.city}
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={(txt) => {
-                      setUser({ ...user, city: txt.value });
-                      setIsFocus(false);
-                    }}
-                  />
-                </View>
-              </View>
-            </View>
 
-            <View style={styles.data}>
-              <Text style={styles.label}> Street Name </Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(txt) => setUser({ ...user, add_street: txt })}
-              >
-                {prefilledData(user.add_street)}
-              </TextInput>
-            </View>
-            <View style={styles.data}>
-              <Text style={styles.label}> State </Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(txt) => setUser({ ...user, state: txt })}
-              >
-                {prefilledData(user.state)}
-              </TextInput>
-            </View>
-            <View style={styles.data}>
-              <Text style={styles.label}> Date of Birth </Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(txt) => setUser({ ...user, date_of_birth: txt })}
-              >
-                {prefilledData(user.date_of_birth)}
-              </TextInput>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.data}>
-                <View style={styles.container2}>
-                  <Text style={styles.label}>Employment Status</Text>
-                  <Dropdown
-                    style={[styles.input2, isFocus && { borderColor: "blue" }]}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    inputSearchStyle={styles.inputSearchStyle}
-                    data={employment_status}
-                    search
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    value={user.employment_status}
-                    placeholder={!isFocus ? "Select item" : "..."}
-                    searchPlaceholder="Search..."
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={(txt) => {
-                      setUser({ ...user, employment_status: txt.value });
-                      setIsFocus(false);
-                    }}
-                  />
+            {!onBoarded && (
+              <View style={{ backgroundColor: "#EFF5F9" }}>
+                <View style={styles.row}>
+                  <View style={styles.data}>
+                    <Text style={styles.label}> Gender </Text>
+                    <RadioForm
+                      radio_props={gender}
+                      initial={-1}
+                      formHorizontal={true}
+                      labelHorizontal={true}
+                      buttonColor={"#074A77"}
+                      animation={true}
+                      onPress={(txt) => setUser({ ...user, gender: txt })}
+                    />
+                  </View>
+                  <View style={styles.data}>
+                    <View style={styles.container2}>
+                      <Text style={styles.label}>City</Text>
+                      <Dropdown
+                        style={[
+                          styles.input2,
+                          isFocus && { borderColor: "blue" },
+                        ]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        data={city}
+                        search
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={!isFocus ? "Select item" : "..."}
+                        searchPlaceholder="Search..."
+                        value={user.city}
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={(txt) => {
+                          setUser({ ...user, city: txt.value });
+                          setIsFocus(false);
+                        }}
+                      />
+                    </View>
+                  </View>
                 </View>
-              </View>
-              <View style={styles.data}>
-                <View style={styles.container2}>
-                  <Text style={styles.label}>Civil Status</Text>
-                  <Dropdown
-                    style={[styles.input2, isFocus && { borderColor: "blue" }]}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    inputSearchStyle={styles.inputSearchStyle}
-                    data={civil_status}
-                    search
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={!isFocus ? "Select item" : "..."}
-                    searchPlaceholder="Search..."
-                    value={user.civil_status}
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={(txt) => {
-                      setUser({ ...user, civil_status: txt.value });
-                      setIsFocus(false);
-                    }}
-                  />
-                </View>
-              </View>
-            </View>
 
-            {!onBoarded && <View style={{ backgroundColor: "#EFF5F9" }}></View>}
+                <View style={styles.data}>
+                  <Text style={styles.label}> Street Name </Text>
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={(txt) =>
+                      setUser({ ...user, add_street: txt })
+                    }
+                  >
+                    {prefilledData(user.add_street)}
+                  </TextInput>
+                </View>
+                <View style={styles.data}>
+                  <Text style={styles.label}> Date of Birth </Text>
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={(txt) =>
+                      setUser({ ...user, date_of_birth: txt })
+                    }
+                  >
+                    {prefilledData(user.date_of_birth)}
+                  </TextInput>
+                </View>
+                <View style={styles.row}>
+                  <View style={styles.data}>
+                    <View style={styles.container2}>
+                      <Text style={styles.label}>Employment Status</Text>
+                      <Dropdown
+                        style={[
+                          styles.input2,
+                          isFocus && { borderColor: "blue" },
+                        ]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        data={employment_status}
+                        search
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        value={user.employment_status}
+                        placeholder={!isFocus ? "Select item" : "..."}
+                        searchPlaceholder="Search..."
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={(txt) => {
+                          setUser({ ...user, employment_status: txt.value });
+                          setIsFocus(false);
+                        }}
+                      />
+                    </View>
+                  </View>
+                  <View style={styles.data}>
+                    <View style={styles.container2}>
+                      <Text style={styles.label}>Civil Status</Text>
+                      <Dropdown
+                        style={[
+                          styles.input2,
+                          isFocus && { borderColor: "blue" },
+                        ]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        data={civil_status}
+                        search
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={!isFocus ? "Select item" : "..."}
+                        searchPlaceholder="Search..."
+                        value={user.civil_status}
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={(txt) => {
+                          setUser({ ...user, civil_status: txt.value });
+                          setIsFocus(false);
+                        }}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+            )}
             <View
               style={{
                 flexDirection: "row",
@@ -353,6 +355,7 @@ export default function Dashboard({ navigation, route }: Props) {
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

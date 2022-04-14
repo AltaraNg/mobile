@@ -14,13 +14,15 @@ import {
 	DrawerItem,
 } from '@react-navigation/drawer';
 import SVGImage from '../assets/svgs/splash.svg';
-import { Context as AuthContext } from '../context/AuthContext';
+import { AuthContext, useAuth } from '../context/AuthContext';
 
 import { Feather } from '@expo/vector-icons';
 
 
 const CustomSidebarMenu = (props: any) => {
-const { state, signout } = useContext(AuthContext);
+const { authData } = useContext(AuthContext);
+const auth = useAuth();
+
 
 	return (
 		<SafeAreaView
@@ -33,7 +35,7 @@ const { state, signout } = useContext(AuthContext);
 				<DrawerItem
 					label={() => <Text style={{ color: '#9C9696' }}>Log Out</Text>}
 					icon={() => <Feather name="log-out" size={24} color="#9C9696" />}
-					onPress={() => signout()}
+					onPress={() => auth.signOut()}
 					style={{ paddingVertical: 10 }}
 				/>
 			</DrawerContentScrollView>
