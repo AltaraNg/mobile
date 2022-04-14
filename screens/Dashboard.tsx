@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Button, Overlay, Icon } from "react-native-elements";
 import { LinearGradient } from 'expo-linear-gradient';
-import { SuccessSvg, FailSvg, LogOut } from '../assets/svgs/svg';
+import { SuccessSvg, FailSvg, LogOut, User } from '../assets/svgs/svg';
 
 import Header from '../components/Header';
 import React, { useState, createRef, useEffect, useContext } from 'react';
@@ -40,6 +40,7 @@ export default function Dashboard({ navigation, route }: Props) {
 	const [modalResponse, setModalResponse] = useState(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [showMenu, setShowMenu] = useState(false);
+  const [onBoarded, setOnBoarded] = useState(null)
   const [type, setType] = useState("")
 	const toggleSideMenu = async () => {
 		navigation.toggleDrawer();
@@ -79,6 +80,7 @@ export default function Dashboard({ navigation, route }: Props) {
       });
       const user = response.data.data[0];
       setUser(user);
+      setOnBoarded(user?.attributes?.on_boarded)
     } catch (error: any) {
       ToastAndroid.showWithGravity(
         "Unable to fetch user",
@@ -236,14 +238,34 @@ export default function Dashboard({ navigation, route }: Props) {
       </View>
 
       <View style={styles.main}>
-        <Text style={styles.name}>{authData.user.attributes.first_name},</Text>
+        <Text style={styles.name}>{!onBoarded ? "Hello 😊" : authData.user.attributes.first_name},</Text>
         <Text style={styles.message}>Welcome to your altara dashboard </Text>
+          {!onBoarded &&
+             <View style={{ alignItems: 'center', backgroundColor:'#EFF5F9', marginBottom:20}}>
+            <View style={styles.activate}>
+              <View style={{backgroundColor:'white', flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
+                <User/>
+                <Text style={{ color:'#474A57', fontSize:13}}>To fully activate your account, please complete your profile</Text>
+              </View>
+              <View style={{
+                height: 1, width: 250, backgroundColor: '#DADADA', marginVertical:8, alignSelf:'center'}}></View>
+              <Pressable onPress={() => navigation.navigate('Edit Profile', { user: state.user })}>
+                <Text style={{ color: '#074A74', fontFamily: 'Montserrat_700Bold' }}>Complete your profile</Text>
+                </Pressable>
+              
+            </View>
+          </View>
+          }
+       
         <View style={styles.cards}>
           <Cards
             title="Get a Loan Now!!!"
             amount="Up to ₦500,000"
             type="an E-Loan"
             onRequest={handleRequest}
+            isDisabled={!onBoarded}
+            width={!onBoarded ? 300 : 0}
+            height={!onBoarded ? 150 : 0}
           />
 
           <Cards
@@ -251,6 +273,9 @@ export default function Dashboard({ navigation, route }: Props) {
             amount="Up to ₦500,000"
             type="a Product"
             onRequest={handleRequest}
+            isDisabled={!onBoarded}
+            width={!onBoarded ? 300 : 0}
+            height={!onBoarded ? 150 : 0}
           />
         </View>
       </View>
@@ -263,6 +288,17 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     position: "relative",
+    
+  },
+  activate: {
+    backgroundColor: 'white', borderRadius: 10, shadowColor: 'rgba(7, 74, 116, 0.9)',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+    width:300,
+    height:90,
+    padding:15
   },
   hamburger: {
     marginTop: 80,
@@ -282,6 +318,7 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#EFF5F9",
+    
   },
   name: {
     marginHorizontal: 30,
@@ -295,7 +332,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
     fontSize: 12,
     color: "#72788D",
-    paddingBottom: 30,
+    paddingBottom: 20,
   },
   menu: {
     position: "absolute",

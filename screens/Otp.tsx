@@ -4,7 +4,7 @@ import * as Device from 'expo-device';
 import Header from '../components/Header';
 import { Text, View } from '../components/Themed';
 import { RootStackParamList, RootTabScreenProps } from '../types';
-import { useContext, useRef, useState } from 'react';
+import { useContext, useRef, useState, useEffect } from 'react';
 import CustomTextInput from '../lib/CustomTextInput';
 import { GenericStyles } from '../styles/GenericStyles';
 import Lock from '../assets/svgs/lock.svg';
@@ -96,6 +96,12 @@ export default function Otp({ navigation, route }: Props) {
 			}
 		};
 	};
+	useEffect(() => {
+		
+		return () => {
+			setErrorText('') // This worked for me
+		};
+	}, []);
 	return (
 		<View style={styles.container}>
 			<Header></Header>
