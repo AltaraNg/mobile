@@ -134,10 +134,14 @@ export default function ViewProfile({ navigation, route }: Props) {
 						</View>
 					</View>
 					<View style={styles.row}>
-						<View style={styles.address}>
-							<Text style={styles.label}>Email Address:</Text>
-							<Text style={styles.email}>{user.attributes.email_address}</Text>
-						</View>
+						<View style={styles.item}>
+							<Text style={styles.label}>Date of Birth:</Text>
+							<Text style={styles.input}>{user.attributes.date_of_birth}</Text>
+					</View>
+					<View style={styles.item}>
+						<Text style={styles.label}>Gender:</Text>
+						<Text style={styles.input}>{user.attributes.gender}</Text>
+					</View>
 					</View>
 				</View>
 			)}
