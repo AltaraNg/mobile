@@ -12,8 +12,9 @@ import {
   Alert,
   Dimensions,
   ScrollView,
+  Button
 } from "react-native";
-
+import DatePicker from "react-native-date-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import { SuccessSvg, FailSvg, LogOut } from "../assets/svgs/svg";
 import Header from "../components/Header";
@@ -49,8 +50,10 @@ export default function Dashboard({ navigation, route }: Props) {
   const [loading, setLoading] = useState(false);
   const [onBoarded, setOnBoarded] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
-   const [value, setValue] = useState(null);
-   const [isFocus, setIsFocus] = useState(false);
+  const [value, setValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
+  const [date, setDate] = useState(new Date());
+  const [open, setOpen] = useState(false);
 
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();

@@ -10,6 +10,7 @@ import {
 	Modal,
 	TouchableHighlight,
 	Alert,
+  Image,
 	Dimensions,
 } from 'react-native';
 import { Button, Overlay, Icon } from "react-native-elements";
@@ -41,6 +42,7 @@ export default function Dashboard({ navigation, route }: Props) {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [showMenu, setShowMenu] = useState(false);
   const [onBoarded, setOnBoarded] = useState(null)
+  const [showLoader, setShowLoader] = useState(false);
   const [type, setType] = useState("")
 	const toggleSideMenu = async () => {
 		navigation.toggleDrawer();
@@ -72,12 +74,14 @@ export default function Dashboard({ navigation, route }: Props) {
 		setModalVisible(true);
 	}
 	const fetchUser = async () => {
+    setShowLoader(true);
     try {
       let response = await axios({
         method: "GET",
         url: `/auth/user`,
         headers: { Authorization: `Bearer ${authData.token}` },
       });
+      setShowLoader(false);
       const user = response.data.data[0];
       setUser(user);
       setOnBoarded(user?.attributes?.on_boarded)
@@ -94,11 +98,6 @@ export default function Dashboard({ navigation, route }: Props) {
     fetchUser();
   }, []);
 
-	
-
-	
-
-	
 	return (
     <View style={styles.container}>
       <Overlay
@@ -237,48 +236,90 @@ export default function Dashboard({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.main}>
-        <Text style={styles.name}>{!onBoarded ? "Hello 😊" : authData.user.attributes.first_name},</Text>
-        <Text style={styles.message}>Welcome to your altara dashboard </Text>
-          {!onBoarded &&
-             <View style={{ alignItems: 'center', backgroundColor:'#EFF5F9', marginBottom:20}}>
-            <View style={styles.activate}>
-              <View style={{backgroundColor:'white', flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
-                <User/>
-                <Text style={{ color:'#474A57', fontSize:13}}>To fully activate your account, please complete your profile</Text>
-              </View>
-              <View style={{
-                height: 1, width: 250, backgroundColor: '#DADADA', marginVertical:8, alignSelf:'center'}}></View>
-              <Pressable onPress={() => navigation.navigate('Edit Profile', { user: state.user })}>
-                <Text style={{ color: '#074A74', fontFamily: 'Montserrat_700Bold' }}>Complete your profile</Text>
+      {showLoader ? (
+        <Image
+          source={require("../assets/gifs/loader.gif")}
+          style={styles.image}
+        />
+      ) : (
+        <View style={styles.main}>
+          <Text style={styles.name}>
+            {!onBoarded ? "Hello 😊" : authData.user.attributes.first_name},
+          </Text>
+          <Text style={styles.message}>Welcome to your altara dashboard </Text>
+          {!onBoarded && (
+            <View
+              style={{
+                alignItems: "center",
+                backgroundColor: "#EFF5F9",
+                marginBottom: 20,
+              }}
+            >
+              <View style={styles.activate}>
+                <View
+                  style={{
+                    backgroundColor: "white",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <User />
+                  <Text style={{ color: "#474A57", fontSize: 13 }}>
+                    To fully activate your account, please complete your profile
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    height: 1,
+                    width: 250,
+                    backgroundColor: "#DADADA",
+                    marginVertical: 8,
+                    alignSelf: "center",
+                  }}
+                ></View>
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate("Create Profile", { user: authData.user })
+                  }
+                >
+                  <Text
+                    style={{
+                      color: "#074A74",
+                      fontFamily: "Montserrat_700Bold",
+                      fontSize:12
+                    }}
+                  >
+                    Complete your profile
+                  </Text>
                 </Pressable>
-              
+              </View>
             </View>
-          </View>
-          }
-       
-        <View style={styles.cards}>
-          <Cards
-            title="Get a Loan Now!!!"
-            amount="Up to ₦500,000"
-            type="an E-Loan"
-            onRequest={handleRequest}
-            isDisabled={!onBoarded}
-            width={!onBoarded ? 300 : 0}
-            height={!onBoarded ? 150 : 0}
-          />
+          )}
 
-          <Cards
-            title="Order a Product Now!!!"
-            amount="Up to ₦500,000"
-            type="a Product"
-            onRequest={handleRequest}
-            isDisabled={!onBoarded}
-            width={!onBoarded ? 300 : 0}
-            height={!onBoarded ? 150 : 0}
-          />
+          <View style={styles.cards}>
+            <Cards
+              title="Get a Loan Now!!!"
+              amount="Up to ₦500,000"
+              type="an E-Loan"
+              onRequest={handleRequest}
+              isDisabled={!onBoarded}
+              width={!onBoarded ? 300 : 0}
+              height={!onBoarded ? 150 : 0}
+            />
+
+            <Cards
+              title="Order a Product Now!!!"
+              amount="Up to ₦500,000"
+              type="a Product"
+              onRequest={handleRequest}
+              isDisabled={!onBoarded}
+              width={!onBoarded ? 300 : 0}
+              height={!onBoarded ? 150 : 0}
+            />
+          </View>
         </View>
-      </View>
+      )}
     </View>
   );
 }
@@ -288,17 +329,25 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     position: "relative",
-    
   },
   activate: {
-    backgroundColor: 'white', borderRadius: 10, shadowColor: 'rgba(7, 74, 116, 0.9)',
+    backgroundColor: "white",
+    borderRadius: 10,
+    shadowColor: "rgba(7, 74, 116, 0.9)",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
-    width:300,
-    height:90,
-    padding:15
+    width: 300,
+    height: 95,
+    padding: 15,
+  },
+  image: {
+    width: Dimensions.get("window").height * 0.46,
+    height: Dimensions.get("window").height * 0.46,
+    backgroundColor: "#EFF5F9",
+    position:'absolute',
+    marginTop:250
   },
   hamburger: {
     marginTop: 80,
@@ -318,7 +367,6 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#EFF5F9",
-    
   },
   name: {
     marginHorizontal: 30,
@@ -376,6 +424,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 15,
     textAlign: "center",
-	color:'#000'
+    color: "#000",
   },
 });
