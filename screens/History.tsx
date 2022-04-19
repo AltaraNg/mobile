@@ -12,6 +12,7 @@ import {
   Modal,
   TouchableHighlight,
   Alert,
+  Image,
   Dimensions,
 } from "react-native";
 import { Button, Overlay, Icon } from "react-native-elements";
@@ -42,6 +43,7 @@ export default function History({ navigation, route }: Props) {
   const [pressedOrder, setPressedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [OrderStatus, setOrderStatus] = useState("")
+  const [showLoader, setShowLoader] = useState(false);
   const styleSVG = (item: any) => {
     const totalDebt =
       item?.included?.amortizations.reduce(
@@ -76,13 +78,14 @@ export default function History({ navigation, route }: Props) {
   };
 
   const fetchOrder = async () => {
+    setShowLoader(true);
     try {
       let response = await axios({
         method: "GET",
         url: `/customers/${authData.user.id}/orders`,
         headers: { Authorization: `Bearer ${authData.token}` },
       });
-
+      setShowLoader(false);
       const order = response.data.data[0].included.orders;
       setOrders(order);
 
@@ -504,42 +507,71 @@ export default function History({ navigation, route }: Props) {
 
       <View style={styles.main}>
         <Text style={styles.name}>{"History"}</Text>
-        {orders && (
-          <FlatList
-            scrollEnabled={true}
-            data={orders}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={{ backgroundColor: "#EFF5F9" }}>
-                <Pressable onPress={() => viewDetail(item)}>
-                  <View style={styles.order}>
-                    <View style={styles.details}>
-                      <ELoan color={styleSVG(item)} />
-                      <View style={styles.title}>
-                        <Text
-                          style={{
-                            color: "#074A74",
-                            fontFamily: "Montserrat_700Bold",
-                          }}
-                          numberOfLines={1}
-                          ellipsizeMode={"tail"}
-                        >
-                          {item.included.product.name}{" "}
-                        </Text>
-                        <Text style={{ color: "#000", fontSize: 12 }}>
-                          Order ID: {item?.attributes?.order_number}
+        {showLoader ? (
+          <Image
+            source={require("../assets/gifs/loader.gif")}
+            style={styles.image}
+          />
+        ) : (
+          <View
+            style={{
+              backgroundColor: "#EFF5F9",
+              marginBottom: 60,
+            }}
+          >
+            {orders?.length > 0 ? (
+              <FlatList
+                scrollEnabled={true}
+                data={orders}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <View style={{ backgroundColor: "#EFF5F9" }}>
+                    <Pressable onPress={() => viewDetail(item)}>
+                      <View style={styles.order}>
+                        <View style={styles.details}>
+                          <ELoan color={styleSVG(item)} />
+                          <View style={styles.title}>
+                            <Text
+                              style={{
+                                color: "#074A74",
+                                fontFamily: "Montserrat_700Bold",
+                              }}
+                              numberOfLines={1}
+                              ellipsizeMode={"tail"}
+                            >
+                              {item.included.product.name}{" "}
+                            </Text>
+                            <Text style={{ color: "#000", fontSize: 12 }}>
+                              Order ID: {item?.attributes?.order_number}
+                            </Text>
+                          </View>
+                        </View>
+                        <Text style={{ color: "#000", fontSize: 13 }}>
+                          {item?.attributes?.order_date}
                         </Text>
                       </View>
-                    </View>
-                    <Text style={{ color: "#000", fontSize: 13 }}>
-                      {item?.attributes?.order_date}
-                    </Text>
+                    </Pressable>
+                    <OrderDetails item={pressedOrder} />
                   </View>
-                </Pressable>
-                <OrderDetails item={pressedOrder} />
+                )}
+              />
+            ) : (
+              <View
+                style={{
+                  backgroundColor: "#EFF5F9",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Image
+                  source={require("../assets/images/zeroNotifications.png")}
+                  style={styles.image}
+                />
+                <Text style={{ color: "black" }}>No History</Text>
               </View>
             )}
-          />
+          </View>
         )}
       </View>
     </View>
@@ -551,6 +583,10 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     position: "relative",
+  },
+  image: {
+    width: Dimensions.get("window").height * 0.46,
+    height: Dimensions.get("window").height * 0.46,
   },
   hamburger: {
     marginTop: 80,
