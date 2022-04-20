@@ -14,14 +14,14 @@ import {
   ScrollView,
   Button
 } from "react-native";
-import DatePicker from "react-native-date-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { LinearGradient } from "expo-linear-gradient";
-import { SuccessSvg, FailSvg, LogOut } from "../assets/svgs/svg";
+import { SuccessSvg, FailSvg, LogOut, Calender } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import React, { useState, createRef, useEffect, useContext } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
-import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel}  from "react-native-simple-radio-button";
+import {CheckBox} from "react-native-elements"
 import {
   DrawerParamList,
   RootStackParamList,
@@ -34,7 +34,7 @@ import { AuthContext } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { UserInterfaceIdiom } from "expo-constants";
 import axios from "axios";
-
+import RadioButton from "../components/RadioButton";
 type Props = NativeStackScreenProps<RootTabParamList, "Dashboard">;
 import Constants from "expo-constants";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -50,11 +50,25 @@ export default function Dashboard({ navigation, route }: Props) {
   const [loading, setLoading] = useState(false);
   const [onBoarded, setOnBoarded] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
-  const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const [date, setDate] = useState(new Date());
-  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState('date');
+  const [show, setShow] = useState(false);
+  const [text, setText] = useState("Enter Date");
+  const onChange= (event, selectedDate)=>{
+    const currentDate = selectedDate|| date;
+    setShow(Platform.OS == 'ios')
+    setDate(currentDate)
+    let tempDate = new Date(currentDate)
+    let fDate = tempDate.getDate() + '/' + (tempDate.getMonth() + 1) + '/' + tempDate.getFullYear();
+    setText(fDate);
+    setUser({ ...user, date_of_birth: selectedDate });
 
+  }
+  const showMode = (currentMode) => {
+    setShow(true);
+    setMode(currentMode);
+  };
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
   };
@@ -90,10 +104,11 @@ export default function Dashboard({ navigation, route }: Props) {
 				ToastAndroid.SHORT,
 				ToastAndroid.CENTER
 			);
-      navigation.navigate('View Profile');
+      console.log(user)
+      navigation.navigate("Upload Document");
 		} catch (error) {
 			ToastAndroid.showWithGravity(
-				'Error! Request was not completed',
+				'Error! Request was not completed, Please complete all fields',
 				ToastAndroid.SHORT,
 				ToastAndroid.CENTER
 			);
@@ -150,6 +165,7 @@ export default function Dashboard({ navigation, route }: Props) {
      { label: "Employed", value: "Employed" },
      { label: "Self Employed", value: "Self_employed" },
    ];
+   
   useEffect(() => {
     fetchUser();
   }, []);
@@ -167,51 +183,109 @@ export default function Dashboard({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
       {user && (
-        <ScrollView style={{ backgroundColor: "#EFF5F9" }}>
+        <ScrollView
+          style={{
+            backgroundColor: "#fff",
+          }}
+        >
           <View style={styles.main}>
             <Text style={styles.title}>
               {!onBoarded ? "Create" : "Edit"} Profile
             </Text>
-            <View style={styles.data}>
-              <Text style={styles.label}> First Name </Text>
-              <TextInput
-                style={styles.input}
-                value={prefilledData(user.first_name)}
-                onChangeText={(txt) => setUser({ ...user, first_name: txt })}
-              ></TextInput>
-            </View>
-            <View style={styles.data}>
-              <Text style={styles.label}> Last Name </Text>
-              <TextInput
-                style={styles.input}
-                value={prefilledData(user.last_name)}
-                onChangeText={(txt) => setUser({ ...user, last_name: txt })}
-              ></TextInput>
-            </View>
-            <View style={styles.data}>
-              <Text style={styles.label}> Phone Number </Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(txt) => setUser({ ...user, phone_number: txt })}
+            <View style={{ backgroundColor: "white", paddingHorizontal: 15 }}>
+              <View
+                style={[
+                  styles.row,
+                  {
+                    width: Dimensions.get("window").width,
+                  },
+                ]}
               >
-                {prefilledData(user.phone_number)}
-              </TextInput>
+                <View style={styles.data}>
+                  <Text
+                    style={[
+                      styles.label,
+                      { width: Dimensions.get("window").width * 0.46 },
+                    ]}
+                  >
+                    {" "}
+                    First Name{" "}
+                  </Text>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      { width: Dimensions.get("window").width * 0.46 },
+                    ]}
+                    value={prefilledData(user.first_name)}
+                    onChangeText={(txt) =>
+                      setUser({ ...user, first_name: txt })
+                    }
+                  ></TextInput>
+                </View>
+                <View style={styles.data}>
+                  <Text
+                    style={[
+                      styles.label,
+                      { width: Dimensions.get("window").width * 0.46 },
+                    ]}
+                  >
+                    {" "}
+                    Last Name{" "}
+                  </Text>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      { width: Dimensions.get("window").width * 0.46 },
+                    ]}
+                    value={prefilledData(user.last_name)}
+                    onChangeText={(txt) => setUser({ ...user, last_name: txt })}
+                  ></TextInput>
+                </View>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.label}> Phone Number </Text>
+                <TextInput
+                  style={[
+                    styles.input,
+                    { width: Dimensions.get("window").width * 0.92 },
+                  ]}
+                  onChangeText={(txt) =>
+                    setUser({ ...user, phone_number: txt })
+                  }
+                >
+                  {prefilledData(user.phone_number)}
+                </TextInput>
+              </View>
             </View>
 
             {!onBoarded && (
-              <View style={{ backgroundColor: "#EFF5F9" }}>
-                <View style={styles.row}>
-                  <View style={styles.data}>
+              <View
+                style={{
+                  backgroundColor: "#fff",
+                  width: Dimensions.get("window").width,
+                  paddingHorizontal: 15,
+                }}
+              >
+                <View
+                  style={[
+                    styles.row,
+                    {
+                      width: Dimensions.get("window").width * 0.92,
+                      justifyContent: "space-between",
+                    },
+                  ]}
+                >
+                  <View style={[styles.data]}>
                     <Text style={styles.label}> Gender </Text>
-                    <RadioForm
-                      radio_props={gender}
-                      initial={-1}
-                      formHorizontal={true}
-                      labelHorizontal={true}
-                      buttonColor={"#074A77"}
-                      animation={true}
-                      onPress={(txt) => setUser({ ...user, gender: txt })}
-                    />
+
+                    <View style={{ backgroundColor: "white" }}>
+                      <RadioButton
+                        data={gender}
+                        onSelect={(txt: any) =>
+                          setUser({ ...user, gender: txt })
+                        }
+                      />
+                    </View>
                   </View>
                   <View style={styles.data}>
                     <View style={styles.container2}>
@@ -242,36 +316,86 @@ export default function Dashboard({ navigation, route }: Props) {
                     </View>
                   </View>
                 </View>
-
-                <View style={styles.data}>
-                  <Text style={styles.label}> Street Name </Text>
-                  <TextInput
-                    style={styles.input}
-                    onChangeText={(txt) =>
-                      setUser({ ...user, add_street: txt })
-                    }
-                  >
-                    {prefilledData(user.add_street)}
-                  </TextInput>
-                </View>
-                <View style={styles.data}>
-                  <Text style={styles.label}> Date of Birth </Text>
-                  <TextInput
-                    style={styles.input}
-                    onChangeText={(txt) =>
-                      setUser({ ...user, date_of_birth: txt })
-                    }
-                  >
-                    {prefilledData(user.date_of_birth)}
-                  </TextInput>
+                <View
+                  style={[
+                    styles.row,
+                    {
+                      width: Dimensions.get("window").width,
+                    },
+                  ]}
+                >
+                  <View style={styles.data}>
+                    <Text
+                      style={[
+                        styles.label,
+                        { width: Dimensions.get("window").width * 0.46 },
+                      ]}
+                    >
+                      {" "}
+                      Street Name{" "}
+                    </Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        { width: Dimensions.get("window").width * 0.46 },
+                      ]}
+                      onChangeText={(txt) =>
+                        setUser({ ...user, add_street: txt })
+                      }
+                    >
+                      {prefilledData(user.add_street)}
+                    </TextInput>
+                  </View>
+                  <View style={styles.data}>
+                    <Text
+                      style={[
+                        styles.label,
+                        { width: Dimensions.get("window").width * 0.46 },
+                      ]}
+                    >
+                      {" "}
+                      Date of Birth{" "}
+                    </Text>
+                    <View
+                      style={[
+                        styles.input,
+                        {
+                          width: Dimensions.get("window").width * 0.46,
+                          height: 45,
+                          paddingTop: 10,
+                        },
+                      ]}
+                    >
+                      <TouchableOpacity style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}} onPress={() => showMode("date")}>
+                        <Text style={{color:'#444'}}>{text}</Text>
+                        <Calender/>
+                      </TouchableOpacity>
+                    </View>
+                    {show && (
+                      <DateTimePicker
+                        testID="dateTimePicker"
+                        value={date}
+                        mode="date"
+                        is24Hour={true}
+                        display="default"
+                        onChange={onChange}
+                      />
+                    )}
+                  </View>
                 </View>
                 <View style={styles.row}>
-                  <View style={styles.data}>
+                  <View
+                    style={[
+                      styles.data,
+                      { width: Dimensions.get("window").width * 0.46 },
+                    ]}
+                  >
                     <View style={styles.container2}>
                       <Text style={styles.label}>Employment Status</Text>
                       <Dropdown
                         style={[
                           styles.input2,
+                          { width: Dimensions.get("window").width * 0.46 },
                           isFocus && { borderColor: "blue" },
                         ]}
                         placeholderStyle={styles.placeholderStyle}
@@ -294,12 +418,18 @@ export default function Dashboard({ navigation, route }: Props) {
                       />
                     </View>
                   </View>
-                  <View style={styles.data}>
+                  <View
+                    style={[
+                      styles.data,
+                      { width: Dimensions.get("window").width * 0.46 },
+                    ]}
+                  >
                     <View style={styles.container2}>
                       <Text style={styles.label}>Civil Status</Text>
                       <Dropdown
                         style={[
                           styles.input2,
+                          { width: Dimensions.get("window").width * 0.46 },
                           isFocus && { borderColor: "blue" },
                         ]}
                         placeholderStyle={styles.placeholderStyle}
@@ -330,7 +460,7 @@ export default function Dashboard({ navigation, route }: Props) {
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: "#EFF5F9",
+                backgroundColor: "#fff",
                 marginBottom: 15,
               }}
             >
@@ -364,15 +494,13 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     position: "relative",
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
   },
   row: {
     flexDirection: "row",
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     marginBottom: 10,
-    justifyContent: "space-between",
     alignItems: "center",
-    marginRight: 30,
   },
   image: {
     width: Dimensions.get("window").height * 0.08,
@@ -401,10 +529,10 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: "#E8EBF7",
     color: "#72788D",
-    marginRight: 25,
-    paddingVertical: 5,
-    borderColor: "#222",
-    borderRadius: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderRadius: 2,
+    borderColor: "#aaa",
     paddingHorizontal: 10,
     fontSize: 15,
     fontFamily: "Montserrat_600SemiBold",
@@ -414,8 +542,9 @@ const styles = StyleSheet.create({
     color: "#72788D",
     marginRight: 25,
     paddingVertical: 5,
-    borderColor: "#222",
-    borderRadius: 10,
+    borderWidth: 0.5,
+    borderRadius: 2,
+    borderColor: "#aaa",
     paddingHorizontal: 10,
     width: 140,
     fontSize: 15,
@@ -428,8 +557,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   data: {
-    backgroundColor: "#EFF5F9",
-    paddingLeft: 30,
+    backgroundColor: "#fff",
     marginBottom: 20,
   },
   hamburger: {
@@ -437,7 +565,7 @@ const styles = StyleSheet.create({
     marginRight: 24,
   },
   cards: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     flexDirection: "column",
     alignItems: "center",
   },
@@ -445,26 +573,26 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
   },
   main: {
     flex: 3,
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
   },
   title: {
-    marginHorizontal: 30,
+    marginHorizontal: 15,
     fontSize: 25,
     color: "#074A74",
     fontFamily: "Montserrat_700Bold",
     marginBottom: 20,
-    marginTop: 40,
+    marginTop: 30,
   },
   menu: {
     position: "absolute",
     right: 0,
   },
   container2: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     width: 140,
   },
   dropdown: {

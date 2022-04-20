@@ -39,7 +39,8 @@ export type DrawerParamList = {
   Home: undefined;
 	"View Profile": { user: object };
 	"Edit Profile": { user: object };
-	"Create Profile" :{user: object}
+	"Create Profile" :{user: object};
+	"Upload Document" : {user: object}
 
 
 }

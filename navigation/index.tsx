@@ -42,6 +42,7 @@ import History from '../screens/History';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomSidebarMenu from '../components/CustomeSideBarMenu';
 import EditProfile from '../screens/EditProfile';
+import UploadDocument from "../screens/UploadDocument";
 import RequestModal from '../modals/requestModal';
 import { Loading } from '../components/Loading';
 let url = Constants?.manifest?.extra?.URL;
@@ -243,6 +244,17 @@ function DrawerNavigator({ route, navigation }) {
           }}
         />
       )}
+	  <DrawerNav.Screen
+          name="Upload Document"
+          component={UploadDocument}
+          options={{
+            drawerLabelStyle: { color: "#9C9696" },
+            headerShown: false,
+            drawerIcon: ({ color, size }) => (
+              <AntDesign name="edit" size={24} color="#9C9696" />
+            ),
+          }}
+        />
     </DrawerNav.Navigator>
   );
 }
