@@ -26,7 +26,7 @@ const selectHandler = (value) => {
                   ]}
                 ></View>
               </View>
-              <Text style={{ paddingRight: 25 }}> {item.value}</Text>
+              <Text style={{ paddingRight: 25 }} key={item}> {item.value}</Text>
             </Pressable>
           </View>
         );

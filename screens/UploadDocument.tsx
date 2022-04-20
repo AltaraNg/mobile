@@ -91,7 +91,6 @@ export default function Dashboard({ navigation, route }: Props) {
         ToastAndroid.SHORT,
         ToastAndroid.CENTER
       );
-      console.log(user);
       navigation.navigate("View Profile");
     } catch (error) {
       ToastAndroid.showWithGravity(
@@ -168,33 +167,7 @@ export default function Dashboard({ navigation, route }: Props) {
               />
             </View>
 
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#fff",
-                marginVertical: 15,
-              }}
-            >
-              <LinearGradient
-                colors={["#074A77", "#089CA4"]}
-                style={styles.buttonContainer}
-                start={{ x: 1, y: 0.5 }}
-                end={{ x: 0, y: 0.5 }}
-              >
-                <Pressable style={[styles.button]} onPress={handleUpdate}>
-                  {loading ? (
-                    <Image
-                      source={require("../assets/gifs/loader.gif")}
-                      style={styles.image}
-                    />
-                  ) : (
-                    <Text style={styles.buttonText}> Save </Text>
-                  )}
-                </Pressable>
-              </LinearGradient>
-            </View>
+            
           </View>
         </ScrollView>
       )}

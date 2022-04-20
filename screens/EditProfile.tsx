@@ -104,8 +104,7 @@ export default function Dashboard({ navigation, route }: Props) {
 				ToastAndroid.SHORT,
 				ToastAndroid.CENTER
 			);
-      console.log(user)
-      navigation.navigate("Upload Document");
+      !onBoarded ? navigation.navigate("Upload Document") : navigation.navigate("View Profile");
 		} catch (error) {
 			ToastAndroid.showWithGravity(
 				'Error! Request was not completed, Please complete all fields',
