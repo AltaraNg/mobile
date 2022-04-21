@@ -10,11 +10,11 @@ import {
 	DefaultTheme,
 	DarkTheme,
 } from '@react-navigation/native';
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { ColorSchemeName, Pressable } from 'react-native';
-import { AuthContext } from "../context/AuthContext";;
+import { AuthContext } from '../context/AuthContext';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../modals/ModalScreen';
@@ -44,6 +44,7 @@ import CustomSidebarMenu from '../components/CustomeSideBarMenu';
 import EditProfile from '../screens/EditProfile';
 import RequestModal from '../modals/requestModal';
 import { Loading } from '../components/Loading';
+import { FlagsProvider } from 'flagged';
 let url = Constants?.manifest?.extra?.URL;
 
 axios.defaults.baseURL = url;
@@ -77,15 +78,16 @@ export default function Navigation({
 }: {
 	colorScheme: ColorSchemeName;
 }) {
-
 	return (
 		<AuthProvider>
-			<NavigationContainer
-				linking={LinkingConfiguration}
-				theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-			>
-				<RootNavigator />
-			</NavigationContainer>
+			<FlagsProvider features={{ admin: false }}>
+				<NavigationContainer
+					linking={LinkingConfiguration}
+					theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+				>
+					<RootNavigator />
+				</NavigationContainer>
+			</FlagsProvider>
 		</AuthProvider>
 	);
 }
@@ -98,11 +100,10 @@ export default function Navigation({
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
-	const {authData, loading } = useAuth();
+	const { authData, loading } = useAuth();
 	if (loading) {
 		return <Loading />;
 	}
-	
 
 	return (
 		<Stack.Navigator
@@ -111,7 +112,7 @@ function RootNavigator() {
 				headerStyle: { backgroundColor: 'tomato' },
 			}}
 		>
-			{authData === undefined? (
+			{authData === undefined ? (
 				<Stack.Group>
 					<Stack.Screen
 						options={{ headerShown: false }}
@@ -165,86 +166,85 @@ function DrawerNavigator({ route, navigation }) {
 	const { authData } = useContext(AuthContext);
 	const [user, setUser] = useState(null);
 	const fetchUser = async () => {
-    try {
-      let response = await axios({
-        method: "GET",
-        url: `/auth/user`,
-        headers: { Authorization: `Bearer ${authData?.token}` },
-      });
-      const user = response.data.data[0];
-      setUser(user);
-    } catch (error: any) {
-    }
-  };
+		try {
+			let response = await axios({
+				method: 'GET',
+				url: `/auth/user`,
+				headers: { Authorization: `Bearer ${authData?.token}` },
+			});
+			const user = response.data.data[0];
+			setUser(user);
+		} catch (error: any) {}
+	};
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
+	useEffect(() => {
+		fetchUser();
+	}, []);
 	return (
-    <DrawerNav.Navigator
-      initialRouteName="Home"
-      backBehavior="initialRoute"
-      screenOptions={{
-        drawerStyle: {
-          backgroundColor: "#fff",
-          width: 240,
-        },
-      }}
-      drawerContent={(props) => <CustomSidebarMenu {...props} />}
-    >
-      <DrawerNav.Screen
-        name="Home"
-        component={BottomTabNavigator}
-        options={({ route }) => ({
-          tabBarStyle: {
-            display: getHeaderTitle(Dashboard),
-          },
-          drawerLabelStyle: { color: "#9C9696" },
-          headerShown: false,
-          drawerIcon: ({ color, size }) => (
-            <FontAwesome size={24} color="#9C9696" name="home" />
-          ),
-        })}
-      />
+		<DrawerNav.Navigator
+			initialRouteName="Home"
+			backBehavior="initialRoute"
+			screenOptions={{
+				drawerStyle: {
+					backgroundColor: '#fff',
+					width: 240,
+				},
+			}}
+			drawerContent={(props) => <CustomSidebarMenu {...props} />}
+		>
+			<DrawerNav.Screen
+				name="Home"
+				component={BottomTabNavigator}
+				options={({ route }) => ({
+					tabBarStyle: {
+						display: getHeaderTitle(Dashboard),
+					},
+					drawerLabelStyle: { color: '#9C9696' },
+					headerShown: false,
+					drawerIcon: ({ color, size }) => (
+						<FontAwesome size={24} color="#9C9696" name="home" />
+					),
+				})}
+			/>
 
-      <DrawerNav.Screen
-        name="View Profile"
-        component={ViewProfile}
-        options={{
-          drawerLabelStyle: { color: "#9C9696" },
-          headerShown: false,
-          drawerIcon: ({ color, size }) => (
-            <EvilIcons name="user" size={24} color="#9C9696" />
-          ),
-        }}
-      />
-      {user?.attributes?.on_boarded ? (
-        <DrawerNav.Screen
-          name="Edit Profile"
-          component={EditProfile}
-          options={{
-            drawerLabelStyle: { color: "#9C9696" },
-            headerShown: false,
-            drawerIcon: ({ color, size }) => (
-              <AntDesign name="edit" size={24} color="#9C9696" />
-            ),
-          }}
-        />
-      ) : (
-        <DrawerNav.Screen
-          name="Create Profile"
-          component={EditProfile}
-          options={{
-            drawerLabelStyle: { color: "#9C9696" },
-            headerShown: false,
-            drawerIcon: ({ color, size }) => (
-              <AntDesign name="edit" size={24} color="#9C9696" />
-            ),
-          }}
-        />
-      )}
-    </DrawerNav.Navigator>
-  );
+			<DrawerNav.Screen
+				name="View Profile"
+				component={ViewProfile}
+				options={{
+					drawerLabelStyle: { color: '#9C9696' },
+					headerShown: false,
+					drawerIcon: ({ color, size }) => (
+						<EvilIcons name="user" size={24} color="#9C9696" />
+					),
+				}}
+			/>
+			{user?.attributes?.on_boarded ? (
+				<DrawerNav.Screen
+					name="Edit Profile"
+					component={EditProfile}
+					options={{
+						drawerLabelStyle: { color: '#9C9696' },
+						headerShown: false,
+						drawerIcon: ({ color, size }) => (
+							<AntDesign name="edit" size={24} color="#9C9696" />
+						),
+					}}
+				/>
+			) : (
+				<DrawerNav.Screen
+					name="Create Profile"
+					component={EditProfile}
+					options={{
+						drawerLabelStyle: { color: '#9C9696' },
+						headerShown: false,
+						drawerIcon: ({ color, size }) => (
+							<AntDesign name="edit" size={24} color="#9C9696" />
+						),
+					}}
+				/>
+			)}
+		</DrawerNav.Navigator>
+	);
 }
 
 /**
