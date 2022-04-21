@@ -27,9 +27,6 @@ import {
   RootStackParamList,
   RootTabParamList,
 } from "../types";
-import { Dropdown } from "react-native-element-dropdown";
-import Cards from "../components/Cards";
-import * as ImagePicker from "expo-image-picker";
 import SideMenu from "./SideMenu";
 import { AuthContext } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -50,25 +47,9 @@ export default function Dashboard({ navigation, route }: Props) {
   const [loading, setLoading] = useState(false);
   const [onBoarded, setOnBoarded] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
-  const [image, setImage] = useState(null);
 
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
-  };
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.cancelled) {
-      setImage(result.uri);
-    }
   };
 
   const backAction = () => {

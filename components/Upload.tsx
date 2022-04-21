@@ -16,8 +16,6 @@ export default function Upload({ document, }) {
          quality: 1,
        });
 
-       console.log(result);
-
        if (!result.cancelled) {
          setImage(result.uri)
        }

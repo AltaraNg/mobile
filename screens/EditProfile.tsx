@@ -459,7 +459,7 @@ export default function Dashboard({ navigation, route }: Props) {
                   alignItems: "center",
                   justifyContent: "center",
                   backgroundColor: "#fff",
-                  marginBottom: 15,
+                  marginBottom: 60,
                 }}
               >
                 <LinearGradient
