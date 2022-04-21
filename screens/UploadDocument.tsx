@@ -29,6 +29,7 @@ import {
 } from "../types";
 import { Dropdown } from "react-native-element-dropdown";
 import Cards from "../components/Cards";
+import * as ImagePicker from "expo-image-picker";
 import SideMenu from "./SideMenu";
 import { AuthContext } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -38,26 +39,36 @@ import RadioButton from "../components/RadioButton";
 type Props = NativeStackScreenProps<RootTabParamList, "Dashboard">;
 import Constants from "expo-constants";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Upload from '../components/Upload'
+import Upload from "../components/Upload";
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
 export default function Dashboard({ navigation, route }: Props) {
   const { authData } = useContext(AuthContext);
   const [exitApp, setExitApp] = useState(1);
-  const [isError, setIsError] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [onBoarded, setOnBoarded] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
-  const [isFocus, setIsFocus] = useState(false);
-  const [date, setDate] = useState(new Date());
-  const [mode, setMode] = useState("date");
-  const [show, setShow] = useState(false);
-  const [text, setText] = useState("Enter Date");
- 
+  const [image, setImage] = useState(null);
+
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
+  };
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
   };
 
   const backAction = () => {
@@ -121,7 +132,6 @@ export default function Dashboard({ navigation, route }: Props) {
     }
   };
 
-
   useEffect(() => {
     fetchUser();
   }, []);
@@ -145,29 +155,30 @@ export default function Dashboard({ navigation, route }: Props) {
         >
           <View style={styles.main}>
             <Text style={styles.title}>Upload Document</Text>
+            <Text style={styles.simple}>Hurray! This is the last step👍</Text>
             <View
               style={{
                 alignItems: "center",
                 justifyContent: "space-evenly",
                 backgroundColor: "white",
+                flexDirection: "row",
+                marginTop: 20,
               }}
             >
-              <Upload color="rgba(118, 104, 251, 0.13)" document="Passport" />
-              <Upload
-                color="rgba(246, 69, 97, 0.13)"
-                document="Work Guarantor"
-              />
-              <Upload
-                color="rgba(156, 197, 118, 0.13)"
-                document="Proof Of Income"
-              />
-              <Upload
-                color="rgba(253, 194, 40, 0.13)"
-                document="Processing Fee"
-              />
+              <Upload document="Passport" />
+              <Upload document="ID Card" />
             </View>
-
-            
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "space-evenly",
+                backgroundColor: "white",
+                flexDirection: "row",
+              }}
+            >
+              <Upload document="Guarantor's ID" />
+              <Upload document="Proof of Income" />
+            </View>
           </View>
         </ScrollView>
       )}
@@ -198,7 +209,7 @@ const styles = StyleSheet.create({
     borderColor: "#074A74",
     borderWidth: 1,
     borderRadius: 3,
-    width: Dimensions.get("window").width *0.9,
+    width: Dimensions.get("window").width * 0.9,
     paddingVertical: 20,
   },
   button: {
@@ -232,12 +243,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   title: {
-    marginHorizontal: 15,
+    marginHorizontal: 30,
     fontSize: 25,
     color: "#074A74",
     fontFamily: "Montserrat_700Bold",
-    marginBottom: 20,
-    marginTop: 30,
+    marginBottom: 8,
+    marginTop: 40,
   },
   menu: {
     position: "absolute",
@@ -284,6 +295,12 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 13,
     fontFamily: "Montserrat_600SemiBold",
+    color: "#72788D",
+  },
+  simple: {
+    fontFamily: "Montserrat_400Regular",
+    marginHorizontal: 30,
+    fontSize: 14,
     color: "#72788D",
   },
 });
