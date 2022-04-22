@@ -29,6 +29,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import axios from "axios";
+import { useFeatures } from 'flagged';
 
 type Props = DrawerScreenProps<DrawerParamList, 'Home'>
 
@@ -47,6 +48,9 @@ export default function Dashboard({ navigation, route }: Props) {
 	const toggleSideMenu = async () => {
 		navigation.toggleDrawer();
 	};
+
+
+  const features = useFeatures();
 
 	const backAction = () => {
 		if (Platform.OS === 'ios') return;
