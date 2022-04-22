@@ -11,6 +11,7 @@ import {
   Image,
   Alert,
   Dimensions,
+  FlatList,
   ScrollView,
   Button
 } from "react-native";
@@ -171,7 +172,7 @@ export default function Dashboard({ navigation, route }: Props) {
   
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       {showMenu && <SideMenu Logout="Logout" />}
       <View style={styles.header}>
         <Header></Header>
@@ -182,29 +183,23 @@ export default function Dashboard({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
       {user && (
-        <ScrollView
-          style={{
-            backgroundColor: "#fff",
-          }}
-        >
+    
           <View style={styles.main}>
             <Text style={styles.title}>
               {!onBoarded ? "Create" : "Edit"} Profile
             </Text>
-            <View style={{ backgroundColor: "white", paddingHorizontal: 15 }}>
-              <View
-                style={[
-                  styles.row,
-                  {
-                    width: Dimensions.get("window").width,
-                  },
-                ]}
-              >
+            {!onBoarded && (
+              <Text style={styles.simple}>We want to know you better</Text>
+            )}
+            <ScrollView
+              style={{ backgroundColor: "white", overflow: "scroll", paddingTop:10 }}
+            >
+              <View style={{ backgroundColor: "white", paddingHorizontal: 15 }}>
                 <View style={styles.data}>
                   <Text
                     style={[
                       styles.label,
-                      { width: Dimensions.get("window").width * 0.46 },
+                      { width: Dimensions.get("window").width * 0.92 },
                     ]}
                   >
                     {" "}
@@ -213,7 +208,7 @@ export default function Dashboard({ navigation, route }: Props) {
                   <TextInput
                     style={[
                       styles.input,
-                      { width: Dimensions.get("window").width * 0.46 },
+                      { width: Dimensions.get("window").width * 0.92 },
                     ]}
                     value={prefilledData(user.first_name)}
                     onChangeText={(txt) =>
@@ -225,7 +220,7 @@ export default function Dashboard({ navigation, route }: Props) {
                   <Text
                     style={[
                       styles.label,
-                      { width: Dimensions.get("window").width * 0.46 },
+                      { width: Dimensions.get("window").width * 0.92 },
                     ]}
                   >
                     {" "}
@@ -234,64 +229,135 @@ export default function Dashboard({ navigation, route }: Props) {
                   <TextInput
                     style={[
                       styles.input,
-                      { width: Dimensions.get("window").width * 0.46 },
+                      { width: Dimensions.get("window").width * 0.92 },
                     ]}
                     value={prefilledData(user.last_name)}
                     onChangeText={(txt) => setUser({ ...user, last_name: txt })}
                   ></TextInput>
                 </View>
+                <View style={styles.data}>
+                  <Text style={styles.label}> Phone Number </Text>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      { width: Dimensions.get("window").width * 0.92 },
+                    ]}
+                    onChangeText={(txt) =>
+                      setUser({ ...user, phone_number: txt })
+                    }
+                  >
+                    {prefilledData(user.phone_number)}
+                  </TextInput>
+                </View>
               </View>
-              <View style={styles.data}>
-                <Text style={styles.label}> Phone Number </Text>
-                <TextInput
-                  style={[
-                    styles.input,
-                    { width: Dimensions.get("window").width * 0.92 },
-                  ]}
-                  onChangeText={(txt) =>
-                    setUser({ ...user, phone_number: txt })
-                  }
-                >
-                  {prefilledData(user.phone_number)}
-                </TextInput>
-              </View>
-            </View>
 
-            {!onBoarded && (
-              <View
-                style={{
-                  backgroundColor: "#fff",
-                  width: Dimensions.get("window").width,
-                  paddingHorizontal: 15,
-                }}
-              >
+              {!onBoarded && (
                 <View
-                  style={[
-                    styles.row,
-                    {
-                      width: Dimensions.get("window").width * 0.92,
-                      justifyContent: "space-between",
-                    },
-                  ]}
+                  style={{
+                    backgroundColor: "#fff",
+                    width: Dimensions.get("window").width,
+                    paddingHorizontal: 15,
+                  }}
                 >
-                  <View style={[styles.data]}>
-                    <Text style={styles.label}> Gender </Text>
+                  <View
+                    style={[
+                      styles.row,
+                      {
+                        width: Dimensions.get("window").width * 0.92,
+                        justifyContent: "space-between",
+                      },
+                    ]}
+                  >
+                    <View style={[styles.data]}>
+                      <Text style={styles.label}> Gender </Text>
 
-                    <View style={{ backgroundColor: "white" }}>
-                      <RadioButton
-                        data={gender}
-                        onSelect={(txt: any) =>
-                          setUser({ ...user, gender: txt })
-                        }
-                      />
+                      <View style={{ backgroundColor: "white" }}>
+                        <RadioButton
+                          data={gender}
+                          onSelect={(txt: any) =>
+                            setUser({ ...user, gender: txt })
+                          }
+                        />
+                      </View>
+                    </View>
+                    <View style={styles.data}>
+                      <Text
+                        style={[
+                          styles.label,
+                          { width: Dimensions.get("window").width * 0.42 },
+                        ]}
+                      >
+                        {" "}
+                        Date of Birth{" "}
+                      </Text>
+                      <View
+                        style={[
+                          styles.input,
+                          {
+                            width: Dimensions.get("window").width * 0.42,
+                            height: 45,
+                            paddingTop: 10,
+                          },
+                        ]}
+                      >
+                        <TouchableOpacity
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                          onPress={() => showMode("date")}
+                        >
+                          <Text style={{ color: "#444" }}>{text}</Text>
+                          <Calender />
+                        </TouchableOpacity>
+                      </View>
+                      {show && (
+                        <DateTimePicker
+                          testID="dateTimePicker"
+                          value={date}
+                          mode="date"
+                          is24Hour={true}
+                          display="default"
+                          onChange={onChange}
+                        />
+                      )}
                     </View>
                   </View>
+
                   <View style={styles.data}>
-                    <View style={styles.container2}>
+                    <Text
+                      style={[
+                        styles.label,
+                        { width: Dimensions.get("window").width * 0.92 },
+                      ]}
+                    >
+                      {" "}
+                      Street Name{" "}
+                    </Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        { width: Dimensions.get("window").width * 0.92 },
+                      ]}
+                      onChangeText={(txt) =>
+                        setUser({ ...user, add_street: txt })
+                      }
+                    >
+                      {prefilledData(user.add_street)}
+                    </TextInput>
+                  </View>
+                  <View style={styles.data}>
+                    <View
+                      style={{
+                        backgroundColor: "#fff",
+                        width: Dimensions.get("window").width * 0.92,
+                      }}
+                    >
                       <Text style={styles.label}>City</Text>
                       <Dropdown
                         style={[
-                          styles.input2,
+                          styles.input,
                           isFocus && { borderColor: "blue" },
                         ]}
                         placeholderStyle={styles.placeholderStyle}
@@ -314,184 +380,117 @@ export default function Dashboard({ navigation, route }: Props) {
                       />
                     </View>
                   </View>
-                </View>
-                <View
-                  style={[
-                    styles.row,
-                    {
-                      width: Dimensions.get("window").width,
-                    },
-                  ]}
-                >
-                  <View style={styles.data}>
-                    <Text
-                      style={[
-                        styles.label,
-                        { width: Dimensions.get("window").width * 0.46 },
-                      ]}
-                    >
-                      {" "}
-                      Street Name{" "}
-                    </Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        { width: Dimensions.get("window").width * 0.46 },
-                      ]}
-                      onChangeText={(txt) =>
-                        setUser({ ...user, add_street: txt })
-                      }
-                    >
-                      {prefilledData(user.add_street)}
-                    </TextInput>
-                  </View>
-                  <View style={styles.data}>
-                    <Text
-                      style={[
-                        styles.label,
-                        { width: Dimensions.get("window").width * 0.46 },
-                      ]}
-                    >
-                      {" "}
-                      Date of Birth{" "}
-                    </Text>
+
+                  <View style={styles.row}>
                     <View
                       style={[
-                        styles.input,
-                        {
-                          width: Dimensions.get("window").width * 0.46,
-                          height: 45,
-                          paddingTop: 10,
-                        },
+                        styles.data,
+                        { width: Dimensions.get("window").width * 0.46 },
                       ]}
                     >
-                      <TouchableOpacity style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}} onPress={() => showMode("date")}>
-                        <Text style={{color:'#444'}}>{text}</Text>
-                        <Calender/>
-                      </TouchableOpacity>
+                      <View style={styles.container2}>
+                        <Text style={styles.label}>Employment Status</Text>
+                        <Dropdown
+                          style={[
+                            styles.input2,
+                            { width: Dimensions.get("window").width * 0.46 },
+                            isFocus && { borderColor: "blue" },
+                          ]}
+                          placeholderStyle={styles.placeholderStyle}
+                          selectedTextStyle={styles.selectedTextStyle}
+                          inputSearchStyle={styles.inputSearchStyle}
+                          data={employment_status}
+                          search
+                          maxHeight={300}
+                          labelField="label"
+                          valueField="value"
+                          value={user.employment_status}
+                          placeholder={!isFocus ? "Select item" : "..."}
+                          searchPlaceholder="Search..."
+                          onFocus={() => setIsFocus(true)}
+                          onBlur={() => setIsFocus(false)}
+                          onChange={(txt) => {
+                            setUser({ ...user, employment_status: txt.value });
+                            setIsFocus(false);
+                          }}
+                        />
+                      </View>
                     </View>
-                    {show && (
-                      <DateTimePicker
-                        testID="dateTimePicker"
-                        value={date}
-                        mode="date"
-                        is24Hour={true}
-                        display="default"
-                        onChange={onChange}
-                      />
-                    )}
-                  </View>
-                </View>
-                <View style={styles.row}>
-                  <View
-                    style={[
-                      styles.data,
-                      { width: Dimensions.get("window").width * 0.46 },
-                    ]}
-                  >
-                    <View style={styles.container2}>
-                      <Text style={styles.label}>Employment Status</Text>
-                      <Dropdown
-                        style={[
-                          styles.input2,
-                          { width: Dimensions.get("window").width * 0.46 },
-                          isFocus && { borderColor: "blue" },
-                        ]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={employment_status}
-                        search
-                        maxHeight={300}
-                        labelField="label"
-                        valueField="value"
-                        value={user.employment_status}
-                        placeholder={!isFocus ? "Select item" : "..."}
-                        searchPlaceholder="Search..."
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={(txt) => {
-                          setUser({ ...user, employment_status: txt.value });
-                          setIsFocus(false);
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <View
-                    style={[
-                      styles.data,
-                      { width: Dimensions.get("window").width * 0.46 },
-                    ]}
-                  >
-                    <View style={styles.container2}>
-                      <Text style={styles.label}>Civil Status</Text>
-                      <Dropdown
-                        style={[
-                          styles.input2,
-                          { width: Dimensions.get("window").width * 0.46 },
-                          isFocus && { borderColor: "blue" },
-                        ]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={civil_status}
-                        search
-                        maxHeight={300}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={!isFocus ? "Select item" : "..."}
-                        searchPlaceholder="Search..."
-                        value={user.civil_status}
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={(txt) => {
-                          setUser({ ...user, civil_status: txt.value });
-                          setIsFocus(false);
-                        }}
-                      />
+                    <View
+                      style={[
+                        styles.data,
+                        { width: Dimensions.get("window").width * 0.46 },
+                      ]}
+                    >
+                      <View style={styles.container2}>
+                        <Text style={styles.label}>Civil Status</Text>
+                        <Dropdown
+                          style={[
+                            styles.input2,
+                            { width: Dimensions.get("window").width * 0.46 },
+                            isFocus && { borderColor: "blue" },
+                          ]}
+                          placeholderStyle={styles.placeholderStyle}
+                          selectedTextStyle={styles.selectedTextStyle}
+                          inputSearchStyle={styles.inputSearchStyle}
+                          data={civil_status}
+                          search
+                          maxHeight={300}
+                          labelField="label"
+                          valueField="value"
+                          placeholder={!isFocus ? "Select item" : "..."}
+                          searchPlaceholder="Search..."
+                          value={user.civil_status}
+                          onFocus={() => setIsFocus(true)}
+                          onBlur={() => setIsFocus(false)}
+                          onChange={(txt) => {
+                            setUser({ ...user, civil_status: txt.value });
+                            setIsFocus(false);
+                          }}
+                        />
+                      </View>
                     </View>
                   </View>
                 </View>
-              </View>
-            )}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#fff",
-                marginBottom: 15,
-              }}
-            >
-              <LinearGradient
-                colors={["#074A77", "#089CA4"]}
-                style={styles.buttonContainer}
-                start={{ x: 1, y: 0.5 }}
-                end={{ x: 0, y: 0.5 }}
+              )}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#fff",
+                  marginBottom: 60,
+                }}
               >
-                <Pressable style={[styles.button]} onPress={handleUpdate}>
-                  {loading ? (
-                    <Image
-                      source={require("../assets/gifs/loader.gif")}
-                      style={styles.image}
-                    />
-                  ) : (
-                    <Text style={styles.buttonText}> Save </Text>
-                  )}
-                </Pressable>
-              </LinearGradient>
-            </View>
+                <LinearGradient
+                  colors={["#074A77", "#089CA4"]}
+                  style={styles.buttonContainer}
+                  start={{ x: 1, y: 0.5 }}
+                  end={{ x: 0, y: 0.5 }}
+                >
+                  <Pressable style={[styles.button]} onPress={handleUpdate}>
+                    {loading ? (
+                      <Image
+                        source={require("../assets/gifs/loader.gif")}
+                        style={styles.image}
+                      />
+                    ) : (
+                      <Text style={styles.buttonText}> Save </Text>
+                    )}
+                  </Pressable>
+                </LinearGradient>
+              </View>
+            </ScrollView>
           </View>
-        </ScrollView>
+        
       )}
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: "100%",
     position: "relative",
     backgroundColor: "#fff",
   },
@@ -510,14 +509,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderColor: "#074A74",
     borderWidth: 1,
-    borderRadius: 10,
-    width: 250,
+    borderRadius: 3,
+    width: Dimensions.get("window").width * 0.92,
     paddingVertical: 10,
   },
   button: {
     flex: 1,
     alignItems: "center",
-    borderRadius: 4,
+    borderRadius: 3,
   },
   buttonText: {
     color: "#ffffff",
@@ -575,7 +574,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   main: {
-    flex: 3,
+    flex: 4,
     backgroundColor: "#fff",
   },
   title: {
@@ -583,12 +582,19 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: "#074A74",
     fontFamily: "Montserrat_700Bold",
-    marginBottom: 20,
-    marginTop: 30,
+    marginBottom: 5,
+    marginTop: 2,
   },
   menu: {
     position: "absolute",
     right: 0,
+  },
+  simple: {
+    fontFamily: "Montserrat_400Regular",
+    marginHorizontal: 20,
+    fontSize: 14,
+    color: "#72788D",
+    marginBottom:20,
   },
   container2: {
     backgroundColor: "#fff",

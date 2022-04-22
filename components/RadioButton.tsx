@@ -11,7 +11,7 @@ const selectHandler = (value) => {
     <View style={{ flexDirection: "row" }}>
       {data.map((item) => {
         return (
-          <View style={{ flexDirection: "row" }}>
+          <View style={{ flexDirection: "row" }} key={item.label}>
             <Pressable
               style={{ flexDirection: "row" }}
               onPress={() => selectHandler(item.value)}
@@ -26,7 +26,10 @@ const selectHandler = (value) => {
                   ]}
                 ></View>
               </View>
-              <Text style={{ paddingRight: 25 }} key={item}> {item.value}</Text>
+              <Text style={{ paddingRight: 25 }} key={item.label}>
+                {" "}
+                {item.value}
+              </Text>
             </Pressable>
           </View>
         );
