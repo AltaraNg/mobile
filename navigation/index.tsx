@@ -80,14 +80,12 @@ export default function Navigation({
 }) {
 	return (
 		<AuthProvider>
-			<FlagsProvider features={{ admin: false }}>
-				<NavigationContainer
-					linking={LinkingConfiguration}
-					theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-				>
-					<RootNavigator />
-				</NavigationContainer>
-			</FlagsProvider>
+			<NavigationContainer
+				linking={LinkingConfiguration}
+				theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+			>
+				<RootNavigator />
+			</NavigationContainer>
 		</AuthProvider>
 	);
 }
@@ -100,62 +98,64 @@ export default function Navigation({
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
-	const { authData, loading } = useAuth();
+	const { authData, loading, isAdmin } = useAuth();
 	if (loading) {
 		return <Loading />;
 	}
 
 	return (
-		<Stack.Navigator
-			screenOptions={{
-				headerTintColor: 'green',
-				headerStyle: { backgroundColor: 'tomato' },
-			}}
-		>
-			{authData === undefined ? (
-				<Stack.Group>
-					<Stack.Screen
-						options={{ headerShown: false }}
-						name="Intro"
-						component={Intro}
-					/>
-					<Stack.Screen
-						options={{ headerShown: false }}
-						name="Login"
-						component={Login}
-					/>
-					<Stack.Screen
-						options={{ headerShown: false }}
-						name="OTP"
-						component={Otp}
-					/>
-				</Stack.Group>
-			) : (
-				<Stack.Group>
-					<Stack.Screen
-						name="Main"
-						component={DrawerNavigator}
-						options={{ headerShown: false }}
-					/>
-				</Stack.Group>
-			)}
-
-			<Stack.Screen
-				name="NotFound"
-				component={NotFoundScreen}
-				options={{ title: 'Oops!' }}
-			/>
-			<Stack.Group
+		<FlagsProvider features={{ 'admin': isAdmin }}>
+			<Stack.Navigator
 				screenOptions={{
-					presentation: 'transparentModal',
-					headerShown: true,
-					animation: 'fade_from_bottom',
+					headerTintColor: 'green',
+					headerStyle: { backgroundColor: 'tomato' },
 				}}
 			>
-				<Stack.Screen name="Modal" component={ModalScreen} />
-				<Stack.Screen name="RequestModal" component={RequestModal} />
-			</Stack.Group>
-		</Stack.Navigator>
+				{authData === undefined ? (
+					<Stack.Group>
+						<Stack.Screen
+							options={{ headerShown: false }}
+							name="Intro"
+							component={Intro}
+						/>
+						<Stack.Screen
+							options={{ headerShown: false }}
+							name="Login"
+							component={Login}
+						/>
+						<Stack.Screen
+							options={{ headerShown: false }}
+							name="OTP"
+							component={Otp}
+						/>
+					</Stack.Group>
+				) : (
+					<Stack.Group>
+						<Stack.Screen
+							name="Main"
+							component={DrawerNavigator}
+							options={{ headerShown: false }}
+						/>
+					</Stack.Group>
+				)}
+
+				<Stack.Screen
+					name="NotFound"
+					component={NotFoundScreen}
+					options={{ title: 'Oops!' }}
+				/>
+				<Stack.Group
+					screenOptions={{
+						presentation: 'transparentModal',
+						headerShown: true,
+						animation: 'fade_from_bottom',
+					}}
+				>
+					<Stack.Screen name="Modal" component={ModalScreen} />
+					<Stack.Screen name="RequestModal" component={RequestModal} />
+				</Stack.Group>
+			</Stack.Navigator>
+		</FlagsProvider>
 	);
 }
 

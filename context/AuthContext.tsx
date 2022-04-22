@@ -1,9 +1,11 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
+import { useFeatures } from 'flagged';
 
 import { AuthData, authService } from '../services/authService';
 
 type AuthContextData = {
+	isAdmin: boolean,
 	authData?: AuthData;
 	loading: boolean;
 	signIn(
@@ -24,6 +26,7 @@ const AuthProvider: React.FC = ({ children }) => {
 	//the AuthContext start with loading equals true
 	//and stay like this, until the data be load from Async Storage
 	const [loading, setLoading] = useState(true);
+	const [isAdmin, setIsAdmin] = useState(false);
 
 	useEffect(() => {
 		//Every time the App is opened, this provider is rendered
@@ -39,6 +42,9 @@ const AuthProvider: React.FC = ({ children }) => {
 				//If there are data, it's converted to an Object and the state is updated.
 				const _authData: AuthData = JSON.parse(authDataSerialized);
 				setAuthData(_authData);
+				if(_authData.user.attributes.staff_id === 1){
+					setIsAdmin(true);
+				}
 			}
 		} catch (error) {
 		} finally {
@@ -61,6 +67,10 @@ const AuthProvider: React.FC = ({ children }) => {
 		if (_authData !== undefined) {
 			setAuthData(_authData);
 			SecureStore.setItemAsync('AuthData', JSON.stringify(_authData));
+			if(_authData.user.attributes.staff_id === 1){
+				setIsAdmin(true);
+			}
+
 		}
 
 		//Persist the data in the Async Storage
@@ -80,7 +90,7 @@ const AuthProvider: React.FC = ({ children }) => {
 	return (
 		//This component will be used to encapsulate the whole App,
 		//so all components will have access to the Context
-		<AuthContext.Provider value={{ authData, loading, signIn, signOut }}>
+		<AuthContext.Provider value={{ authData, loading, signIn, signOut, isAdmin }}>
 			{children}
 		</AuthContext.Provider>
 	);

@@ -29,6 +29,7 @@ import {
   Montserrat_900Black_Italic,
 } from "@expo-google-fonts/montserrat";
 
+
 export default function App() {
   let [fontsLoaded] = useFonts({
     Montserrat_100Thin,
