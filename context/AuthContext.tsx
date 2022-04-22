@@ -41,8 +41,9 @@ const AuthProvider: React.FC = ({ children }) => {
 			if (authDataSerialized) {
 				//If there are data, it's converted to an Object and the state is updated.
 				const _authData: AuthData = JSON.parse(authDataSerialized);
+
 				setAuthData(_authData);
-				if(_authData.user.attributes.staff_id === 1){
+				if(_authData.user.attributes.staff_id === 999999){
 					setIsAdmin(true);
 				}
 			}
@@ -67,7 +68,7 @@ const AuthProvider: React.FC = ({ children }) => {
 		if (_authData !== undefined) {
 			setAuthData(_authData);
 			SecureStore.setItemAsync('AuthData', JSON.stringify(_authData));
-			if(_authData.user.attributes.staff_id === 1){
+			if(_authData.user.attributes.staff_id === 999999){
 				setIsAdmin(true);
 			}
 

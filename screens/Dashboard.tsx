@@ -51,7 +51,6 @@ export default function Dashboard({ navigation, route }: Props) {
 
 
   const features = useFeatures();
-  console.log(features.admin);
 
 	const backAction = () => {
 		if (Platform.OS === 'ios') return;
