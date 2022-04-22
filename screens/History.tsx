@@ -565,7 +565,7 @@ export default function History({ navigation, route }: Props) {
                 }}
               >
                 <Image
-                  source={require("../assets/images/zeroNotifications.png")}
+                  source={require("../assets/images/zerostate2.png")}
                   style={styles.image}
                 />
                 <Text style={{ color: "black" }}>No History</Text>

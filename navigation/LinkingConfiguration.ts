@@ -18,7 +18,8 @@ const linking: LinkingOptions<RootStackParamList> = {
           Home: {},
           "View Profile" : {},
           "Edit Profile" : {},
-          "Create Profile" :{}
+          "Create Profile" :{},
+          "Upload Document":{}
         },
       },
       Intro: {},

@@ -42,6 +42,7 @@ import History from '../screens/History';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomSidebarMenu from '../components/CustomeSideBarMenu';
 import EditProfile from '../screens/EditProfile';
+import UploadDocument from "../screens/UploadDocument";
 import RequestModal from '../modals/requestModal';
 import { Loading } from '../components/Loading';
 import { FlagsProvider } from 'flagged';
@@ -207,44 +208,55 @@ function DrawerNavigator({ route, navigation }) {
 				})}
 			/>
 
-			<DrawerNav.Screen
-				name="View Profile"
-				component={ViewProfile}
-				options={{
-					drawerLabelStyle: { color: '#9C9696' },
-					headerShown: false,
-					drawerIcon: ({ color, size }) => (
-						<EvilIcons name="user" size={24} color="#9C9696" />
-					),
-				}}
-			/>
-			{user?.attributes?.on_boarded ? (
-				<DrawerNav.Screen
-					name="Edit Profile"
-					component={EditProfile}
-					options={{
-						drawerLabelStyle: { color: '#9C9696' },
-						headerShown: false,
-						drawerIcon: ({ color, size }) => (
-							<AntDesign name="edit" size={24} color="#9C9696" />
-						),
-					}}
-				/>
-			) : (
-				<DrawerNav.Screen
-					name="Create Profile"
-					component={EditProfile}
-					options={{
-						drawerLabelStyle: { color: '#9C9696' },
-						headerShown: false,
-						drawerIcon: ({ color, size }) => (
-							<AntDesign name="edit" size={24} color="#9C9696" />
-						),
-					}}
-				/>
-			)}
-		</DrawerNav.Navigator>
-	);
+      <DrawerNav.Screen
+        name="View Profile"
+        component={ViewProfile}
+        options={{
+          drawerLabelStyle: { color: "#9C9696" },
+          headerShown: false,
+          drawerIcon: ({ color, size }) => (
+            <EvilIcons name="user" size={24} color="#9C9696" />
+          ),
+        }}
+      />
+      {user?.attributes?.on_boarded ? (
+        <DrawerNav.Screen
+          name="Edit Profile"
+          component={EditProfile}
+          options={{
+            drawerLabelStyle: { color: "#9C9696" },
+            headerShown: false,
+            drawerIcon: ({ color, size }) => (
+              <AntDesign name="edit" size={24} color="#9C9696" />
+            ),
+          }}
+        />
+      ) : (
+        <DrawerNav.Screen
+          name="Create Profile"
+          component={EditProfile}
+          options={{
+            drawerLabelStyle: { color: "#9C9696" },
+            headerShown: false,
+            drawerIcon: ({ color, size }) => (
+              <AntDesign name="edit" size={24} color="#9C9696" />
+            ),
+          }}
+        />
+      )}
+	  <DrawerNav.Screen
+          name="Upload Document"
+          component={UploadDocument}
+          options={{
+            drawerLabelStyle: { color: "#9C9696" },
+            headerShown: false,
+            drawerIcon: ({ color, size }) => (
+              <AntDesign name="edit" size={24} color="#9C9696" />
+            ),
+          }}
+        />
+    </DrawerNav.Navigator>
+  );
 }
 
 /**
