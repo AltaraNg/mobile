@@ -33,6 +33,7 @@
     "expo-dev-client": "~0.8.4",
     "expo-device": "~4.1.0",
     "expo-font": "~10.0.4",
+    "expo-image-picker": "~12.0.1",
     "expo-linear-gradient": "~11.0.3",
     "expo-linking": "~3.0.0",
     "expo-secure-store": "~11.1.0",
@@ -49,14 +50,14 @@
     "react-native-element-dropdown": "^1.8.7",
     "react-native-elements": "^3.4.2",
     "react-native-gesture-handler": "~2.1.0",
+    "react-native-image-picker": "^4.7.3",
     "react-native-reanimated": "~2.3.1",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
     "react-native-simple-radio-button": "^2.7.4",
     "react-native-svg": "^12.1.1",
     "react-native-svg-transformer": "^1.0.0",
-    "react-native-web": "0.17.1",
-    "expo-image-picker": "~12.0.1"
+    "react-native-web": "0.17.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

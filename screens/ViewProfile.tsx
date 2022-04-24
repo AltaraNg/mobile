@@ -50,7 +50,7 @@ export default function ViewProfile({ navigation, route }: Props) {
 				headers: { 'Authorization': `Bearer ${authData.token}` },
 			});
 			const user = response.data.data[0];
-			setUser(user);
+			setUser(user);		
 		} catch (error: any) {
 			ToastAndroid.showWithGravity(
 				'Unable to fetch user',

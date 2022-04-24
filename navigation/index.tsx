@@ -244,17 +244,17 @@ function DrawerNavigator({ route, navigation }) {
           }}
         />
       )}
-	  <DrawerNav.Screen
+	  {!user?.attributes?.on_boarded && <DrawerNav.Screen
           name="Upload Document"
           component={UploadDocument}
           options={{
             drawerLabelStyle: { color: "#9C9696" },
             headerShown: false,
             drawerIcon: ({ color, size }) => (
-              <AntDesign name="edit" size={24} color="#9C9696" />
+              <AntDesign name="addfile" size={24} color="#9C9696" />
             ),
           }}
-        />
+        />}
     </DrawerNav.Navigator>
   );
 }

@@ -1,31 +1,96 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Dimensions, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Image,
+  ToastAndroid,
+} from "react-native";
 import { Pressable } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import {ArrowUp} from "../assets/svgs/svg"
+import {ArrowUp} from "../assets/svgs/svg";
 import * as ImagePicker from "expo-image-picker";
-export default function Upload({ document, }) {
-    const [image, setImage] = useState(null);
+import axios from "axios";
+import Constants from "expo-constants";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+export default function Upload(props) {
+  let url = Constants?.manifest?.extra?.URL;
+  axios.defaults.baseURL = url;
+  const { authData } = useContext(AuthContext);
+  const [showLoader, setShowLoader] = useState(false);
+  const [image, setImage] = useState(null);
 
-     const pickImage = async () => {
-       // No permissions request is necessary for launching the image library
-       let result = await ImagePicker.launchImageLibraryAsync({
-         mediaTypes: ImagePicker.MediaTypeOptions.All,
-         allowsEditing: true,
-         aspect: [4, 3],
-         quality: 1,
-       });
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      setShowLoader(true)
+    // ImagePicker saves the taken photo to disk and returns a local URI to it
+    let localUri = result.uri;
+    let filename = localUri.split("/").pop();
+    // Infer the type of the image
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
 
-       if (!result.cancelled) {
-         setImage(result.uri)
-       }
-     };
+    // Upload the image using the fetch and FormData APIs
+    let formData = new FormData();
+    formData.append("document", { uri: localUri, type:type, name: filename });
+    formData.append("type", props.type)
+      let res = await fetch(
+        "https://altara-customer-play-api.herokuapp.com/api/v1/document/upload",
+        {
+          method: "post",
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${authData.token}`,
+            "Content-Type": "multipart/form-data; ",
+          },
+        }
+      );
+      let responseJson = await res.json();
+      console.log(responseJson)
+      if (responseJson.status =='success') {
+         setShowLoader(false);
+         setImage(result.uri);
+        ToastAndroid.showWithGravity(
+          responseJson.message,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER
+        );
+      }else {
+        setImage(null);
+        setShowLoader(false);
+        ToastAndroid.showWithGravity(
+          "The document failed to upload",
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER
+        );
+      }
+    } 
+      
+  };
   return (
     <TouchableOpacity onPress={pickImage}>
-      <View style={[styles.container, image && { display: "none" }]}>
-        <View style={[styles.triangle]}>
+      <View
+        style={[styles.container, (image || showLoader) && { display: "none" }]}
+      >
+        <View
+          style={[
+            styles.triangle,
+            (image || showLoader) && { display: "none" },
+          ]}
+        >
           <View
-            style={[styles.triangleCorner, image && { display: "none" }]}
+            style={[
+              styles.triangleCorner,
+              showLoader && {display:'none'}
+            ]}
           ></View>
         </View>
         <ArrowUp />
@@ -37,15 +102,25 @@ export default function Upload({ document, }) {
           }}
         >
           <Text style={{ fontFamily: "Montserrat_700Bold", fontSize: 12 }}>
-            {document}
+            {props.document}
           </Text>
           <Text style={{ color: "#888", textAlign: "center", fontSize: 10 }}>
             Click here to upload file
           </Text>
         </View>
       </View>
-      {image && (
-        <Image source={{ uri: image }} style={{ width: 120, height: 150, zIndex:10 }} />
+      {showLoader ? (
+        <Image
+          source={require("../assets/gifs/loader.gif")}
+          style={{ width: 60, height: 60 }}
+        />
+      ) : (
+        image && (
+          <Image
+            source={{ uri: image }}
+            style={{ width: 120, height: 150, zIndex: 10 }}
+          />
+        )
       )}
     </TouchableOpacity>
   );

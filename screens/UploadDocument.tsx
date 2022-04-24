@@ -68,31 +68,6 @@ export default function Dashboard({ navigation, route }: Props) {
       BackHandler.exitApp();
     }
   };
-  const handleUpdate = async () => {
-    setLoading(true);
-    try {
-      let result = await axios({
-        method: "PATCH",
-        url: `/customers/${authData.user.id}`,
-        headers: { Authorization: `Bearer ${authData.token}` },
-        data: user,
-      });
-      setLoading(false);
-      ToastAndroid.showWithGravity(
-        "Profile updated successfully",
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
-      navigation.navigate("View Profile");
-    } catch (error) {
-      ToastAndroid.showWithGravity(
-        "Error! Request was not completed",
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
-      setLoading(false);
-    }
-  };
 
   const fetchUser = async () => {
     try {
@@ -146,8 +121,8 @@ export default function Dashboard({ navigation, route }: Props) {
                 marginTop: 20,
               }}
             >
-              <Upload document="Passport" />
-              <Upload document="ID Card" />
+              <Upload document="Passport" type="passport" />
+              <Upload document="ID Card" type="id_card" />
             </View>
             <View
               style={{
@@ -157,8 +132,8 @@ export default function Dashboard({ navigation, route }: Props) {
                 flexDirection: "row",
               }}
             >
-              <Upload document="Guarantor's ID" />
-              <Upload document="Proof of Income" />
+              <Upload document="Guarantor's ID" type="guarantor_id" />
+              <Upload document="Proof of Income" type="proof_of_income" />
             </View>
           </View>
         </ScrollView>
