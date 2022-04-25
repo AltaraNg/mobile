@@ -97,6 +97,11 @@ export default function Dashboard({ navigation, route }: Props) {
       );
     }
   };
+  const navigating = (first_choice, second_choice)=>{
+    return !onBoarded && authData.user.attributes.first_name == "N/A"
+      ? first_choice
+      : second_choice;
+  }
 
   useEffect(() => {
     fetchUser();
@@ -248,7 +253,7 @@ export default function Dashboard({ navigation, route }: Props) {
       ) : (
         <View style={styles.main}>
           <Text style={styles.name}>
-            {!onBoarded ? "Hello 😊" : user.attributes.first_name},
+            {navigating("Hello", authData.user.attributes.first_name)},
           </Text>
           <Text style={styles.message}>Welcome to your altara dashboard </Text>
           {!onBoarded && (
@@ -269,8 +274,12 @@ export default function Dashboard({ navigation, route }: Props) {
                   }}
                 >
                   <User />
-                  <Text style={{ color: "#474A57", fontSize: 13 }}>
-                    To fully activate your account, please complete your profile
+                  <Text style={{ color: "#474A57", fontSize: 14 }}>
+                    To fully activate your account please{" "}
+                    {navigating(
+                      " complete your profile",
+                      "upload your document"
+                    )}
                   </Text>
                 </View>
                 <View
@@ -284,17 +293,27 @@ export default function Dashboard({ navigation, route }: Props) {
                 ></View>
                 <Pressable
                   onPress={() =>
-                    navigation.navigate("Create Profile", { user: authData.user })
+                    navigating(
+                      navigation.navigate("Create Profile", {
+                        user: authData.user,
+                      }),
+                      navigation.navigate("Upload Document", {
+                        user: authData.user,
+                      })
+                    )
                   }
                 >
                   <Text
                     style={{
                       color: "#074A74",
                       fontFamily: "Montserrat_700Bold",
-                      fontSize:12
+                      fontSize: 12,
                     }}
                   >
-                    Complete your profile
+                    {navigating(
+                      "Complete your profile",
+                      "Upload your document"
+                    )}
                   </Text>
                 </Pressable>
               </View>
