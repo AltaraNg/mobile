@@ -253,7 +253,7 @@ export default function Dashboard({ navigation, route }: Props) {
       ) : (
         <View style={styles.main}>
           <Text style={styles.name}>
-            {navigating("Hello", authData.user.attributes.first_name)},
+            {navigating("Hello ☺️", authData.user.attributes.first_name)},
           </Text>
           <Text style={styles.message}>Welcome to your altara dashboard </Text>
           {!onBoarded && (
