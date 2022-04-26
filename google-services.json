@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "964993873114",
+    "project_id": "altara-mobile",
+    "storage_bucket": "altara-mobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964993873114:android:658179cbd6d7a358de61e3",
+        "android_client_info": {
+          "package_name": "com.altara.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "964993873114-8vc0916nugjptmjdtdas97387052p5d2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgGhSzdZK7TukbD0H6-_-8ukyhjht-AIU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "964993873114-8vc0916nugjptmjdtdas97387052p5d2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

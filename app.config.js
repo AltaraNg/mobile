@@ -3,6 +3,7 @@ export default {
     extra: {
       // Fall back to development URL when not set
       URL: process.env.API_URL ?? "https://altara-customer-play-api.herokuapp.com/api/v1/",
+      BEAMS_INSTANCE: 'f7b96c9d-c657-414a-afd9-8dc713ff294e'
     },
     "slug": "Altara",
     "version": "1.0.0",
@@ -32,7 +33,8 @@ export default {
         "backgroundColor": "#ffffff"
       },
       "package": "com.altara.mobile",
-      "versionCode": 1
+      "versionCode": 1,
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/images/icon.png"
