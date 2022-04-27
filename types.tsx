@@ -30,13 +30,14 @@ export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
 	NativeStackScreenProps<RootStackParamList, Screen>;
 
 export type RootTabParamList = {
-	Dashboard: undefined;
+	Dashboard: {user:object};
 	History: undefined;
 	Notification: undefined;
 };
 
 export type DrawerParamList = {
-  Home: undefined;
+  Home: {user:object};
+	
 	"View Profile": { user: object };
 	"Edit Profile": { user: object };
 	"Create Profile" :{user: object};

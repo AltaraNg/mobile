@@ -54,9 +54,9 @@ export default function Upload(props) {
         }
       );
       let responseJson = await res.json();
-      console.log(responseJson)
       if (responseJson.status =='success') {
-         setShowLoader(false);
+         setShowLoader(false); 
+         props.onRequest()
          setImage(result.uri);
         ToastAndroid.showWithGravity(
           responseJson.message,
@@ -65,6 +65,7 @@ export default function Upload(props) {
         );
       }else {
         setImage(null);
+        props.onRequest()
         setShowLoader(false);
         ToastAndroid.showWithGravity(
           "The document failed to upload",

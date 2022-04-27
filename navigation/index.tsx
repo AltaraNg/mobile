@@ -166,6 +166,7 @@ function DrawerNavigator({ route, navigation }) {
 	const colorScheme = useColorScheme();
 	const { authData } = useContext(AuthContext);
 	const [user, setUser] = useState(null);
+	const [uploaded, setUploaded] = useState(null)
 	const fetchUser = async () => {
 		try {
 			let response = await axios({
@@ -175,38 +176,41 @@ function DrawerNavigator({ route, navigation }) {
 			});
 			const user = response.data.data[0];
 			setUser(user);
+			 const upload = Object.values(user?.included?.verification || {}).every(val => val === true);
+	   setUploaded(upload)
 		} catch (error: any) {}
 	};
+	 
 
 	useEffect(() => {
 		fetchUser();
-	}, []);
+	}, [user]);
 	return (
-		<DrawerNav.Navigator
-			initialRouteName="Home"
-			backBehavior="initialRoute"
-			screenOptions={{
-				drawerStyle: {
-					backgroundColor: '#fff',
-					width: 240,
-				},
-			}}
-			drawerContent={(props) => <CustomSidebarMenu {...props} />}
-		>
-			<DrawerNav.Screen
-				name="Home"
-				component={BottomTabNavigator}
-				options={({ route }) => ({
-					tabBarStyle: {
-						display: getHeaderTitle(Dashboard),
-					},
-					drawerLabelStyle: { color: '#9C9696' },
-					headerShown: false,
-					drawerIcon: ({ color, size }) => (
-						<FontAwesome size={24} color="#9C9696" name="home" />
-					),
-				})}
-			/>
+    <DrawerNav.Navigator
+      initialRouteName="Home"
+      backBehavior="initialRoute"
+      screenOptions={{
+        drawerStyle: {
+          backgroundColor: "#fff",
+          width: 240,
+        },
+      }}
+      drawerContent={(props) => <CustomSidebarMenu {...props} />}
+    >
+      <DrawerNav.Screen
+        name="Home"
+        component={BottomTabNavigator}
+        options={({ route }) => ({
+          tabBarStyle: {
+            display: getHeaderTitle(Dashboard),
+          },
+          drawerLabelStyle: { color: "#9C9696" },
+          headerShown: false,
+          drawerIcon: ({ color, size }) => (
+            <FontAwesome size={24} color="#9C9696" name="home" />
+          ),
+        })}
+      />
 
       <DrawerNav.Screen
         name="View Profile"
@@ -244,7 +248,8 @@ function DrawerNavigator({ route, navigation }) {
           }}
         />
       )}
-	  {!user?.attributes?.on_boarded && <DrawerNav.Screen
+      {!uploaded && (
+        <DrawerNav.Screen
           name="Upload Document"
           component={UploadDocument}
           options={{
@@ -254,7 +259,8 @@ function DrawerNavigator({ route, navigation }) {
               <AntDesign name="addfile" size={24} color="#9C9696" />
             ),
           }}
-        />}
+        />
+      )}
     </DrawerNav.Navigator>
   );
 }

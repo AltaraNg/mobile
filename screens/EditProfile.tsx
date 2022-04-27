@@ -56,6 +56,7 @@ export default function Dashboard({ navigation, route }: Props) {
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
   const [text, setText] = useState("Enter Date");
+  const [uploaded, setUploaded] = useState(null);
   const onChange= (event, selectedDate)=>{
     const currentDate = selectedDate|| date;
     setShow(Platform.OS == 'ios')
@@ -105,7 +106,15 @@ export default function Dashboard({ navigation, route }: Props) {
 				ToastAndroid.SHORT,
 				ToastAndroid.CENTER
 			);
-      !onBoarded ? navigation.navigate("Upload Document") : navigation.navigate("View Profile");
+      const res = result.data.data[0];
+      setUser(res.attributes);
+      setOnBoarded(res?.attributes?.on_boarded);
+       const upload = Object.values(res?.included?.verification || {}).every(
+         (val) => val === true
+       );
+       setUploaded(upload);
+      uploaded && navigation.navigate("View Profile", {user:user})
+      !uploaded && navigation.navigate("Upload Document", {user:user});
 		} catch (error) {
 			ToastAndroid.showWithGravity(
 				'Error! Request was not completed, Please complete all fields',
