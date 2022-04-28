@@ -43,7 +43,7 @@ export default function Upload(props) {
     formData.append("document", { uri: localUri, type:type, name: filename });
     formData.append("type", props.type)
       let res = await fetch(
-        "https://altara-customer-play-api.herokuapp.com/api/v1/document/upload",
+        `${url}/document/upload`,
         {
           method: "post",
           body: formData,
