@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Pressable } from "react-native";
-export default function RadioButton({ data, onSelect }) {
+export default function RadioButton({ data, onSelect, value }) {
 const [userOption, setUserOption] = useState(null);
 const selectHandler = (value) => {
   onSelect(value);
@@ -20,7 +20,7 @@ const selectHandler = (value) => {
                 <View
                   style={[
                     styles.circle2,
-                    item.value === userOption
+                    (item.value === userOption || item.value== value)
                       ? { backgroundColor: "#aaa" }
                       : { backgroundColor: "#fff" },
                   ]}
