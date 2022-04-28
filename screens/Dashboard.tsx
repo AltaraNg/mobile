@@ -95,7 +95,7 @@ export default function Dashboard({ navigation, route }: Props) {
       setUser(user);
       setOnBoarded(user?.attributes.on_boarded);
       const upload = Object.values(user.included.verification).every(
-        (val) => val === true
+        (val) => val 
       );
       setUploaded(upload);
     } catch (error: any) {

@@ -110,7 +110,7 @@ export default function Dashboard({ navigation, route }: Props) {
       setUser(res.attributes);
       setOnBoarded(res?.attributes?.on_boarded);
        const upload = Object.values(res?.included?.verification || {}).every(
-         (val) => val === true
+         (val) => val 
        );
        setUploaded(upload);
       uploaded && navigation.navigate("View Profile", {user:user})

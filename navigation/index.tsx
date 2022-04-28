@@ -176,7 +176,7 @@ function DrawerNavigator({ route, navigation }) {
 			});
 			const user = response.data.data[0];
 			setUser(user);
-			 const upload = Object.values(user?.included?.verification || {}).every(val => val === true);
+			 const upload = Object.values(user?.included?.verification || {}).every(val => val );
 	   setUploaded(upload)
 		} catch (error: any) {}
 	};
