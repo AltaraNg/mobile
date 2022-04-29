@@ -89,7 +89,7 @@ export default function Navigation({
         linking={LinkingConfiguration}
         ref={navigationRef}
         onReady={() => {
-          routeNameRef.current = navigationRef.getCurrentRoute().name;
+          routeNameRef.current = navigationRef.getCurrentRoute()?.name;
           //when you switch routes set the name of the current screen to the name of the screen
         }}
         onStateChange={async () => {
