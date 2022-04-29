@@ -6,6 +6,8 @@ import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
 import Navigation from "./navigation";
 import AppLoading from "expo-app-loading";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 import {
   useFonts,
@@ -29,8 +31,15 @@ import {
   Montserrat_900Black_Italic,
 } from "@expo-google-fonts/montserrat";
 
-
 export default function App() {
+  useEffect(() => {
+    axios.post(`https://app.nativenotify.com/api/analytics`, {
+      app_id: 2563,
+      app_token: "hS20mbLOoRoTYfdiaYby1p",
+      screenName: "Home",
+    });
+  });
+
   let [fontsLoaded] = useFonts({
     Montserrat_100Thin,
     Montserrat_100Thin_Italic,
