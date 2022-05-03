@@ -8,6 +8,7 @@ import Navigation from "./navigation";
 import AppLoading from "expo-app-loading";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Constants from "expo-constants";
 
 import {
   useFonts,
@@ -31,11 +32,13 @@ import {
   Montserrat_900Black_Italic,
 } from "@expo-google-fonts/montserrat";
 
+let app_id = Constants?.manifest?.extra?.APP_ID;
+let app_token = Constants?.manifest?.extra?.APP_TOKEN;
 export default function App() {
   useEffect(() => {
     axios.post(`https://app.nativenotify.com/api/analytics`, {
-      app_id: 2563,
-      app_token: "hS20mbLOoRoTYfdiaYby1p",
+      app_id: app_id,
+      app_token: app_token,
       screenName: "Home",
     });
   });

@@ -36,7 +36,6 @@ import Dashboard from '../screens/Dashboard';
 import ViewProfile from '../screens/ViewProfile';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import Constants from 'expo-constants';
-
 import axios from 'axios';
 import Notification from '../screens/Notification';
 import History from '../screens/History';
@@ -82,7 +81,8 @@ export default function Navigation({
 }) {
 	 const navigationRef = useNavigationContainerRef();
    const routeNameRef = useRef<string | null>(null);
-
+	let app_id = Constants?.manifest?.extra?.APP_ID;
+  let app_token = Constants?.manifest?.extra?.APP_TOKEN;
 	return (
     <AuthProvider>
       <NavigationContainer
@@ -94,12 +94,12 @@ export default function Navigation({
         }}
         onStateChange={async () => {
           const previousRouteName = routeNameRef.current;
-          const currentRouteName = navigationRef.getCurrentRoute().name;
+          const currentRouteName = navigationRef.getCurrentRoute()?.name;
 
           if (previousRouteName !== currentRouteName) {
            axios.post(`https://app.nativenotify.com/api/analytics`, {
-             app_id: 2563,
-             app_token: "hS20mbLOoRoTYfdiaYby1p",
+             app_id: app_id,
+             app_token: app_token,
              screenName: currentRouteName,
            });
           }
