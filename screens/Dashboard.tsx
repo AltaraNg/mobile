@@ -182,80 +182,80 @@ export default function Dashboard({ navigation, route }: Props) {
                   for {type}
                 </Text>
 
-                {modalResponse && (
-                  <Text
-                    style={{
-                      color: "#474A57",
-                      fontFamily: "Montserrat_500Medium",
-                      marginTop: 30,
-                      marginHorizontal: 30,
-                      fontSize: 12,
-                      textAlign: "center",
-                    }}
-                  >
-                    {modalResponse.message}
-                  </Text>
-                )}
-              </View>
-            </View>
-          </View>
-        ) : (
-          <View style={styles.modalContainer}>
-            <TouchableOpacity
-              style={{ alignItems: "center" }}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={styles.modalHeaderCloseText}>X</Text>
-            </TouchableOpacity>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <TouchableHighlight
-                  style={{
-                    borderRadius:
-                      Math.round(
-                        Dimensions.get("window").width +
-                          Dimensions.get("window").height
-                      ) / 2,
-                    width: Dimensions.get("window").width * 0.3,
-                    height: Dimensions.get("window").width * 0.3,
-                    backgroundColor: "#DB2721",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                  underlayColor="#ccc"
-                >
-                  <Text
-                    style={{
-                      fontSize: 68,
-                      color: "#fff",
-                      fontFamily: "Montserrat_900Black",
-                    }}
-                  >
-                    &#x2715;
-                  </Text>
-                </TouchableHighlight>
-                <Text style={styles.modalHeading}>
-                  Sorry! Your Order is{" "}
-                  <Text style={{ color: "red" }}>unsuccessful</Text>
-                </Text>
-                {modalResponse && (
-                  <Text style={styles.errText}>
-                    {modalResponse.error_message}
-                  </Text>
-                )}
-              </View>
-            </View>
-          </View>
-        )}
-      </Modal>
-      <View style={styles.header}>
-        <Header></Header>
-        <TouchableOpacity>
-          <Pressable onPress={toggleSideMenu}>
-            <Hamburger style={styles.hamburger} />
-          </Pressable>
-        </TouchableOpacity>
-      </View>
+								{modalResponse && (
+									<Text
+										style={{
+											color: '#474A57',
+											fontFamily: 'Montserrat_500Medium',
+											marginTop: 30,
+											marginHorizontal: 30,
+											fontSize: 12,
+											textAlign: 'center',
+										}}
+									>
+										{modalResponse.message}
+									</Text>
+								)}
+							</View>
+						</View>
+					</View>
+				) : (
+					<View style={styles.modalContainer}>
+						<TouchableOpacity
+							style={{ alignItems: 'center' }}
+							onPress={() => setModalVisible(!modalVisible)}
+						>
+							<Text style={styles.modalHeaderCloseText}>X</Text>
+						</TouchableOpacity>
+						<View style={styles.modalContainer}>
+							<View style={styles.modalContent}>
+								<TouchableHighlight
+									style={{
+										borderRadius:
+											Math.round(
+												Dimensions.get('window').width +
+													Dimensions.get('window').height
+											) / 2,
+										width: Dimensions.get('window').width * 0.3,
+										height: Dimensions.get('window').width * 0.3,
+										backgroundColor: '#DB2721',
+										justifyContent: 'center',
+										alignItems: 'center',
+									}}
+									underlayColor="#ccc"
+								>
+									<Text
+										style={{
+											fontSize: 68,
+											color: '#fff',
+											fontFamily: 'Montserrat_900Black',
+										}}
+									>
+										&#x2715;
+									</Text>
+								</TouchableHighlight>
+								<Text style={styles.modalHeading}>
+									Sorry! Your Order is{' '}
+									<Text style={{ color: 'red' }}>unsuccessful</Text>
+								</Text>
+								{modalResponse && (
+									<Text style={styles.errText}>
+										{modalResponse.error_message}
+									</Text>
+								)}
+							</View>
+						</View>
+					</View>
+				)}
+			</Modal>
+			<View style={styles.header}>
+				<Header></Header>
+				<TouchableOpacity>
+					<Pressable onPress={toggleSideMenu}>
+						<Hamburger style={styles.hamburger} />
+					</Pressable>
+				</TouchableOpacity>
+			</View>
 
       {showLoader ? (
         <Image
@@ -345,31 +345,31 @@ export default function Dashboard({ navigation, route }: Props) {
             </View>
           )}
 
-          <View style={styles.cards}>
-            <Cards
-              title="Get a Loan Now!!!"
-              amount="Up to ₦500,000"
-              type="an E-Loan"
-              onRequest={handleRequest}
-              isDisabled={!onBoarded}
-              width={!onBoarded ? 300 : 0}
-              height={!onBoarded ? 150 : 0}
-            />
+					<View style={styles.cards}>
+						<Cards
+							title="Get a Loan Now!!!"
+							amount="Up to ₦500,000"
+							type="an E-Loan"
+							onRequest={handleRequest}
+							isDisabled={!onBoarded}
+							width={!onBoarded ? 300 : 0}
+							height={!onBoarded ? 150 : 0}
+						/>
 
-            <Cards
-              title="Order a Product Now!!!"
-              amount="Up to ₦500,000"
-              type="a Product"
-              onRequest={handleRequest}
-              isDisabled={!onBoarded}
-              width={!onBoarded ? 300 : 0}
-              height={!onBoarded ? 150 : 0}
-            />
-          </View>
-        </View>
-      )}
-    </View>
-  );
+						<Cards
+							title="Order a Product Now!!!"
+							amount="Up to ₦500,000"
+							type="a Product"
+							onRequest={handleRequest}
+							isDisabled={!onBoarded}
+							width={!onBoarded ? 300 : 0}
+							height={!onBoarded ? 150 : 0}
+						/>
+					</View>
+				</View>
+			)}
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({
@@ -436,43 +436,43 @@ const styles = StyleSheet.create({
     right: 0,
   },
 
-  modalContainer: {
-    height: Dimensions.get("screen").height / 2.1,
-    alignItems: "center",
-    marginTop: "auto",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    backgroundColor: "white",
-  },
-  modalContent: {
-    paddingVertical: 20,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    alignItems: "center",
-    backgroundColor: "white",
-  },
-  modalHeading: {
-    fontFamily: "Montserrat_700Bold",
-    fontSize: 30,
-    textAlign: "center",
-    color: "black",
-    marginTop: 20,
-  },
-  modalHeaderCloseText: {
-    backgroundColor: "white",
-    textAlign: "center",
-    paddingLeft: 5,
-    paddingRight: 5,
-    width: 30,
-    fontSize: 15,
-    borderRadius: 50,
-  },
+	modalContainer: {
+		height: Dimensions.get('screen').height / 2.1,
+		alignItems: 'center',
+		marginTop: 'auto',
+		borderTopLeftRadius: 30,
+		borderTopRightRadius: 30,
+		backgroundColor: 'white',
+	},
+	modalContent: {
+		paddingVertical: 20,
+		borderTopLeftRadius: 30,
+		borderTopRightRadius: 30,
+		alignItems: 'center',
+		backgroundColor: 'white',
+	},
+	modalHeading: {
+		fontFamily: 'Montserrat_700Bold',
+		fontSize: 30,
+		textAlign: 'center',
+		color: 'black',
+		marginTop: 20,
+	},
+	modalHeaderCloseText: {
+		backgroundColor: 'white',
+		textAlign: 'center',
+		paddingLeft: 5,
+		paddingRight: 5,
+		width: 30,
+		fontSize: 15,
+		borderRadius: 50,
+	},
 
-  errText: {
-    fontSize: 15,
-    marginTop: 20,
-    paddingHorizontal: 15,
-    textAlign: "center",
-    color: "#000",
-  },
+	errText: {
+		fontSize: 15,
+		marginTop: 20,
+		paddingHorizontal: 15,
+		textAlign: 'center',
+		color: '#000',
+	},
 });
