@@ -44,9 +44,10 @@ export default function Dashboard({ navigation, route }: Props) {
   const { authData } = useContext(AuthContext);
   const [exitApp, setExitApp] = useState(1);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(null);
   const [onBoarded, setOnBoarded] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [uploaded, setUploaded] = useState(null)
 
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
@@ -68,31 +69,14 @@ export default function Dashboard({ navigation, route }: Props) {
       BackHandler.exitApp();
     }
   };
-  const handleUpdate = async () => {
-    setLoading(true);
-    try {
-      let result = await axios({
-        method: "PATCH",
-        url: `/customers/${authData.user.id}`,
-        headers: { Authorization: `Bearer ${authData.token}` },
-        data: user,
-      });
-      setLoading(false);
-      ToastAndroid.showWithGravity(
-        "Profile updated successfully",
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
-      navigation.navigate("View Profile");
-    } catch (error) {
-      ToastAndroid.showWithGravity(
-        "Error! Request was not completed",
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
-      setLoading(false);
+    
+    const completeRegistration =()=>{
+      setLoading(true)
+      if(!uploaded){
+        alert("Please upload all documents")
+      }else navigation.navigate("Dashboard", {user:user})
+      setLoading(false)
     }
-  };
 
   const fetchUser = async () => {
     try {
@@ -101,9 +85,12 @@ export default function Dashboard({ navigation, route }: Props) {
         url: `/auth/user`,
         headers: { Authorization: `Bearer ${authData.token}` },
       });
-      const user = response.data.data[0].attributes;
-      setUser(user);
-      setOnBoarded(user?.on_boarded);
+      const user = response.data.data[0];
+      setUser(user.attributes);
+      const upload = Object.values(user.included.verification).every(
+        (val) => val
+      );
+      setUploaded(upload)
     } catch (error: any) {
       ToastAndroid.showWithGravity(
         "Unable to fetch user",
@@ -112,6 +99,9 @@ export default function Dashboard({ navigation, route }: Props) {
       );
     }
   };
+  function handleRequest(){
+    fetchUser()
+  }
 
   useEffect(() => {
     fetchUser();
@@ -146,8 +136,8 @@ export default function Dashboard({ navigation, route }: Props) {
                 marginTop: 20,
               }}
             >
-              <Upload document="Passport" />
-              <Upload document="ID Card" />
+              <Upload onRequest ={handleRequest} document="Passport" type="passport" />
+              <Upload onRequest ={handleRequest} document="ID Card" type="id_card" />
             </View>
             <View
               style={{
@@ -157,8 +147,43 @@ export default function Dashboard({ navigation, route }: Props) {
                 flexDirection: "row",
               }}
             >
-              <Upload document="Guarantor's ID" />
-              <Upload document="Proof of Income" />
+              <Upload onRequest ={handleRequest} document="Guarantor's ID" type="guarantor_id" />
+              <Upload onRequest ={handleRequest} document="Proof of Income" type="proof_of_income" />
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#fff",
+                marginBottom: 60,
+              }}
+            >
+              <LinearGradient
+                colors={["#074A77", "#089CA4"]}
+                style={
+                  !uploaded
+                    ? [styles.buttonContainer, { opacity: 0.5 }]
+                    : styles.buttonContainer
+                }
+                start={{ x: 1, y: 0.5 }}
+                end={{ x: 0, y: 0.5 }}
+              >
+                <Pressable
+                  style={[styles.button]}
+                  disabled={!uploaded}
+                  onPress={completeRegistration}
+                >
+                  {loading ? (
+                    <Image
+                      source={require("../assets/gifs/loader.gif")}
+                      style={styles.image}
+                    />
+                  ) : (
+                    <Text style={styles.buttonText}> Save </Text>
+                  )}
+                </Pressable>
+              </LinearGradient>
             </View>
           </View>
         </ScrollView>
@@ -180,6 +205,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignItems: "center",
   },
+ 
   image: {
     width: Dimensions.get("window").height * 0.08,
     height: Dimensions.get("window").height * 0.08,
@@ -190,8 +216,9 @@ const styles = StyleSheet.create({
     borderColor: "#074A74",
     borderWidth: 1,
     borderRadius: 3,
-    width: Dimensions.get("window").width * 0.9,
-    paddingVertical: 20,
+    width: Dimensions.get("window").width * 0.8,
+    paddingVertical: 17,
+    marginTop:30
   },
   button: {
     flex: 1,
