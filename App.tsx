@@ -8,6 +8,8 @@ import Navigation from "./navigation";
 import AppLoading from "expo-app-loading";
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import axios from "axios";
+import Constants from "expo-constants";
 
 import {
   useFonts,
@@ -44,7 +46,8 @@ Notifications.setNotificationHandler({
 
 
 
-
+let app_id = Constants?.manifest?.extra?.APP_ID;
+let app_token = Constants?.manifest?.extra?.APP_TOKEN;
 export default function App() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
@@ -73,6 +76,11 @@ export default function App() {
   });
 
   useEffect(() => {
+    axios.post(`https://app.nativenotify.com/api/analytics`, {
+      app_id: app_id,
+      app_token: app_token,
+      screenName: "Home",
+    }).then;
     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
