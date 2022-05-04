@@ -5,12 +5,7 @@
  */
 import { AntDesign, EvilIcons, FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {
-	NavigationContainer,
-	DefaultTheme,
-	DarkTheme,
-} from '@react-navigation/native';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from "react";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { ColorSchemeName, Pressable } from 'react-native';
@@ -19,7 +14,13 @@ import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../modals/ModalScreen';
 import { createStackNavigator } from '@react-navigation/stack';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import {
+  getFocusedRouteNameFromRoute,
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+  useNavigationContainerRef,
+} from "@react-navigation/native";
 import NotFoundScreen from '../screens/NotFoundScreen';
 import {
 	DrawerParamList,
@@ -35,7 +36,6 @@ import Dashboard from '../screens/Dashboard';
 import ViewProfile from '../screens/ViewProfile';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import Constants from 'expo-constants';
-
 import axios from 'axios';
 import Notification from '../screens/Notification';
 import History from '../screens/History';
@@ -79,16 +79,40 @@ export default function Navigation({
 }: {
 	colorScheme: ColorSchemeName;
 }) {
+	 const navigationRef = useNavigationContainerRef();
+   const routeNameRef = useRef<string | null>(null);
+	let app_id = Constants?.manifest?.extra?.APP_ID;
+  let app_token = Constants?.manifest?.extra?.APP_TOKEN;
 	return (
-		<AuthProvider>
-			<NavigationContainer
-				linking={LinkingConfiguration}
-				theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-			>
-				<RootNavigator />
-			</NavigationContainer>
-		</AuthProvider>
-	);
+    <AuthProvider>
+      <NavigationContainer
+        linking={LinkingConfiguration}
+        ref={navigationRef}
+        onReady={() => {
+          routeNameRef.current = navigationRef.getCurrentRoute()?.name;
+          //when you switch routes set the name of the current screen to the name of the screen
+        }}
+        onStateChange={async () => {
+          const previousRouteName = routeNameRef.current;
+          const currentRouteName = navigationRef.getCurrentRoute()?.name;
+
+          if (previousRouteName !== currentRouteName) {
+           axios.post(`https://app.nativenotify.com/api/analytics`, {
+             app_id: app_id,
+             app_token: app_token,
+             screenName: currentRouteName,
+           });
+          }
+
+          // Save the current route name for later comparison
+          routeNameRef.current = currentRouteName;
+        }}
+        theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+      >
+        <RootNavigator />
+      </NavigationContainer>
+    </AuthProvider>
+  );
 }
 
 /**
@@ -281,65 +305,65 @@ const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
 function BottomTabNavigator() {
 	const colorScheme = useColorScheme();
-
 	return (
-		<BottomTab.Navigator
-			initialRouteName="Dashboard"
-			screenOptions={{
-				tabBarActiveTintColor: '#074A74',
-				tabBarStyle: { backgroundColor: '#EFF5F9' },
-			}}
-		>
-			<BottomTab.Screen
-				name="Dashboard"
-				component={Dashboard}
-				options={{
-					headerShown: false,
-					tabBarLabel: '',
-					tabBarIcon: ({ color, size }) => (
-						<FontAwesome
-							size={size}
-							color={color}
-							name="home"
-							style={{ marginBottom: -16 }}
-						/>
-					),
-				}}
-			/>
-			<BottomTab.Screen
-				name="History"
-				component={History}
-				options={{
-					headerShown: false,
-					tabBarLabel: '',
-					tabBarIcon: ({ color, size }) => (
-						<FontAwesome
-							size={size}
-							color={color}
-							name="folder-open"
-							style={{ marginBottom: -16 }}
-						/>
-					),
-				}}
-			/>
-			<BottomTab.Screen
-				name="Notification"
-				component={Notification}
-				options={{
-					headerShown: false,
-					tabBarLabel: '',
-					tabBarIcon: ({ color, size }) => (
-						<FontAwesome
-							size={size}
-							color={color}
-							name="bell"
-							style={{ marginBottom: -16 }}
-						/>
-					),
-				}}
-			/>
-		</BottomTab.Navigator>
-	);
+    <BottomTab.Navigator
+      
+      initialRouteName="Dashboard"
+      screenOptions={{
+        tabBarActiveTintColor: "#074A74",
+        tabBarStyle: { backgroundColor: "#EFF5F9" },
+      }}
+    >
+      <BottomTab.Screen
+        name="Dashboard"
+        component={Dashboard}
+        options={{
+          headerShown: false,
+          tabBarLabel: "",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome
+              size={size}
+              color={color}
+              name="home"
+              style={{ marginBottom: -16 }}
+            />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="History"
+        component={History}
+        options={{
+          headerShown: false,
+          tabBarLabel: "",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome
+              size={size}
+              color={color}
+              name="folder-open"
+              style={{ marginBottom: -16 }}
+            />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="Notification"
+        component={Notification}
+        options={{
+          headerShown: false,
+          tabBarLabel: "",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome
+              size={size}
+              color={color}
+              name="bell"
+              style={{ marginBottom: -16 }}
+            />
+          ),
+        }}
+      />
+    </BottomTab.Navigator>
+  );
 }
 
 /**

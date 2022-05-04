@@ -17,7 +17,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 export default function Upload(props) {
   let url = Constants?.manifest?.extra?.URL;
-  axios.defaults.baseURL = url;
+  // axios.defaults.baseURL = url;
   const { authData } = useContext(AuthContext);
   const [showLoader, setShowLoader] = useState(false);
   const [image, setImage] = useState(null);
@@ -43,7 +43,7 @@ export default function Upload(props) {
     formData.append("document", { uri: localUri, type:type, name: filename });
     formData.append("type", props.type)
       let res = await fetch(
-        `${url}/document/upload`,
+        `${url}document/upload`,
         {
           method: "post",
           body: formData,
@@ -76,6 +76,7 @@ export default function Upload(props) {
     } 
       
   };
+
   return (
     <TouchableOpacity onPress={pickImage}>
       <View
