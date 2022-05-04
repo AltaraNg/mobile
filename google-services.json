@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "964993873114",
-    "project_id": "altara-mobile",
-    "storage_bucket": "altara-mobile.appspot.com"
+    "project_number": "795165933100",
+    "project_id": "altara-a24f7",
+    "storage_bucket": "altara-a24f7.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:964993873114:android:658179cbd6d7a358de61e3",
+        "mobilesdk_app_id": "1:795165933100:android:d9f615f27c391e7e3f9b89",
         "android_client_info": {
           "package_name": "com.altara.mobile"
         }
       },
       "oauth_client": [
         {
-          "client_id": "964993873114-8vc0916nugjptmjdtdas97387052p5d2.apps.googleusercontent.com",
+          "client_id": "795165933100-t3budtlt6n53cf5v1be0buf5a6sda66b.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAgGhSzdZK7TukbD0H6-_-8ukyhjht-AIU"
+          "current_key": "AIzaSyBgewLXsCMLiVkiWGllEqig4VECT5fTaVo"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "964993873114-8vc0916nugjptmjdtdas97387052p5d2.apps.googleusercontent.com",
+              "client_id": "795165933100-t3budtlt6n53cf5v1be0buf5a6sda66b.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
