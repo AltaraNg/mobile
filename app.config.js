@@ -45,6 +45,7 @@ export default {
 		},
 		'package': 'com.altara.mobile',
 		'versionCode': 1,
+		"googleServicesFile": "./google-services.json"
 	},
 	'web': {
 		'favicon': './assets/images/icon.png',
