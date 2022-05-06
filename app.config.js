@@ -25,10 +25,7 @@ export default {
 			{
 				'icon': './assets/images/icon.png',
 				'color': '#ffffff',
-				'sounds': [
-					'./local/assets/notification-sound.wav',
-					'./local/assets/notification-sound-other.wav',
-				],
+				
 			},
 		],
 	],
