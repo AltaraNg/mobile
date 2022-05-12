@@ -1,0 +1,31 @@
+{
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "production": {
+      "android": {
+        "buildType": "apk"
+      },
+      "releaseChannel": "production",
+      "env": {
+        "API_URL": "https://altara-customer-prod-api.herokuapp.com/api/v1/",
+        "APP_ID": "2568",
+        "APP_TOKEN": "b7ROwPuwXVosJa5x1ctOw9"
+      }
+    }
+  },
+  "cli": {
+    "version": ">= 0.47.0"
+  }
+}
