@@ -91,9 +91,10 @@ export default function History({ navigation, route }: Props) {
 
     } catch (error: any) { }
   };
-  const viewDetail = (item) => {
-    setModalVisible(true);
-    setPressedOrder(item);
+  const viewDetail = (order) => {
+    // setModalVisible(true);
+    // setPressedOrder(item);
+    navigation.navigate('OrderDetails', order);
   };
   const monthlyRepayment = (props) => {
 

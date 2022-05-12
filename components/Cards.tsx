@@ -10,52 +10,59 @@ import { AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList, RootTabParamList } from '../types';
 
-
-type Props = NativeStackScreenProps<RootStackParamList, 'Modal'>
+type Props = NativeStackScreenProps<RootStackParamList, 'Modal'>;
 
 export default function Cards(props: any) {
 	let url = Constants?.manifest?.extra?.URL;
 	axios.defaults.baseURL = url;
 	const { authData } = useContext(AuthContext);
 
-
 	async function doSome() {
-    try {
-      let res = await axios({
-        method: 'POST',
-        data: {
-          order_type: props.type
-        },
+		try {
+			let res = await axios({
+				method: 'POST',
+				data: {
+					order_type: props.type,
+				},
 				url: '/submit/request',
 				headers: { 'Authorization': `Bearer ${authData.token}` },
-      })
-      if(res.status === 200){
-        props.onRequest(res.data, 'success', props.type)
-      }
-    } catch (error) {
-      props.onRequest(error.response.data, 'failed', props.type)
-	  
-    }
-  }
+			});
+			if (res.status === 200) {
+				props.onRequest(res.data, 'success', props.type);
+			}
+		} catch (error) {
+			props.onRequest(error.response.data, 'failed', props.type);
+		}
+	}
 	return (
-			
-			<View style={styles.container}>
-			<View style={{
-				backgroundColor: 'rgba(156, 150, 150, 0.55)', height: props.height, width: props.width, position:'absolute', zIndex:10, }}></View>
-				<Leaf style={styles.leaf} />
-				<Text style={styles.header}>{props.title}</Text>
-				<Text style={styles.amount}>{props.amount}</Text>
-				<LinearGradient
-					colors={['#074A77', '#089CA4']}
-					style={styles.buttonContainer}
-					start={{ x: 1, y: 0.5 }}
-					end={{ x: 0, y: 0.5 }}
+		<View style={styles.container}>
+			<View
+				style={{
+					backgroundColor: 'rgba(156, 150, 150, 0.55)',
+					height: props.height,
+					width: props.width,
+					position: 'absolute',
+					zIndex: 10,
+				}}
+			></View>
+			<Leaf style={styles.leaf} />
+			<Text style={styles.header}>{props.title}</Text>
+			<Text style={styles.amount}>{props.amount}</Text>
+			<LinearGradient
+				colors={['#074A77', '#089CA4']}
+				style={styles.buttonContainer}
+				start={{ x: 1, y: 0.5 }}
+				end={{ x: 0, y: 0.5 }}
+			>
+				<Pressable
+					style={[styles.button]}
+					onPress={doSome}
+					disabled={props.isDisabled}
 				>
-					<Pressable style={[styles.button]} onPress={doSome} disabled={props.isDisabled}>
-						<Text style={styles.buttonText}>Order Now</Text>
-					</Pressable>
-				</LinearGradient>
-			</View>
+					<Text style={styles.buttonText}>Order Now</Text>
+				</Pressable>
+			</LinearGradient>
+		</View>
 	);
 }
 
