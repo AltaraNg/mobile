@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Pressable } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import {ArrowUp} from "../assets/svgs/svg";
+import { ArrowUp } from "../assets/svgs/svg";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import Constants from "expo-constants";
@@ -17,8 +17,8 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 export default function Upload(props) {
   let url = Constants?.manifest?.extra?.URL;
-  // axios.defaults.baseURL = url;
-  const { authData } = useContext(AuthContext);
+  axios.defaults.baseURL = url;
+  const { authData, setAuthData } = useContext(AuthContext);
   const [showLoader, setShowLoader] = useState(false);
   const [image, setImage] = useState(null);
 
@@ -30,42 +30,49 @@ export default function Upload(props) {
       quality: 1,
     });
     if (!result.cancelled) {
-      setShowLoader(true)
-    // ImagePicker saves the taken photo to disk and returns a local URI to it
-    let localUri = result.uri;
-    let filename = localUri.split("/").pop();
-    // Infer the type of the image
-    let match = /\.(\w+)$/.exec(filename);
-    let type = match ? `image/${match[1]}` : `image`;
+      setShowLoader(true);
+      // ImagePicker saves the taken photo to disk and returns a local URI to it
+      let localUri = result.uri;
+      let filename = localUri.split("/").pop();
+      // Infer the type of the image
+      let match = /\.(\w+)$/.exec(filename);
+      let type = match ? `image/${match[1]}` : `image`;
 
-    // Upload the image using the fetch and FormData APIs
-    let formData = new FormData();
-    formData.append("document", { uri: localUri, type:type, name: filename });
-    formData.append("type", props.type)
-      let res = await fetch(
-        `${url}document/upload`,
-        {
-          method: "post",
-          body: formData,
-          headers: {
-            Authorization: `Bearer ${authData.token}`,
-            "Content-Type": "multipart/form-data; ",
-          },
-        }
-      );
+      // Upload the image using the fetch and FormData APIs
+      let formData = new FormData();
+      formData.append("document", {
+        uri: localUri,
+        type: type,
+        name: filename,
+      });
+      formData.append("type", props.type);
+      let res = await fetch(`${url}document/upload`, {
+        method: "post",
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${authData.token}`,
+          "Content-Type": "multipart/form-data; ",
+        },
+      });
       let responseJson = await res.json();
-      if (responseJson.status =='success') {
-         setShowLoader(false); 
-         props.onRequest()
-         setImage(result.uri);
+
+      if (responseJson.status == "success") {
+        setShowLoader(false);
+        props.onRequest();
+        setImage(result.uri);
+        const res = responseJson.data.user
+        setAuthData((prevState: object) => {
+          return {
+            ...prevState, user:{...res}}
+        });
         ToastAndroid.showWithGravity(
           responseJson.message,
           ToastAndroid.SHORT,
           ToastAndroid.CENTER
         );
-      }else {
+      } else {
         setImage(null);
-        props.onRequest()
+        props.onRequest();
         setShowLoader(false);
         ToastAndroid.showWithGravity(
           "The document failed to upload",
@@ -73,8 +80,7 @@ export default function Upload(props) {
           ToastAndroid.CENTER
         );
       }
-    } 
-      
+    }
   };
 
   return (
@@ -89,10 +95,7 @@ export default function Upload(props) {
           ]}
         >
           <View
-            style={[
-              styles.triangleCorner,
-              showLoader && {display:'none'}
-            ]}
+            style={[styles.triangleCorner, showLoader && { display: "none" }]}
           ></View>
         </View>
         <ArrowUp />

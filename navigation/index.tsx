@@ -192,23 +192,14 @@ function DrawerNavigator({ route, navigation }) {
 	const [user, setUser] = useState(null);
 	const [uploaded, setUploaded] = useState(null)
 	const fetchUser = async () => {
-		try {
-			let response = await axios({
-				method: 'GET',
-				url: `/auth/user`,
-				headers: { Authorization: `Bearer ${authData?.token}` },
-			});
-			const user = response.data.data[0];
-			setUser(user);
-			 const upload = Object.values(user?.included?.verification || {}).every(val => val );
+			setUser(authData.user);
+			 const upload = Object.values(authData.user?.included?.verification || {}).every(val => val );
 	   setUploaded(upload)
-		} catch (error: any) {}
-	};
-	 
 
+	};
 	useEffect(() => {
 		fetchUser();
-	}, [user]);
+	}, [authData]);
 	return (
     <DrawerNav.Navigator
       initialRouteName="Home"

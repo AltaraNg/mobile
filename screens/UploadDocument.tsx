@@ -79,33 +79,20 @@ export default function Dashboard({ navigation, route }: Props) {
     }
 
   const fetchUser = async () => {
-    try {
-      let response = await axios({
-        method: "GET",
-        url: `/auth/user`,
-        headers: { Authorization: `Bearer ${authData.token}` },
-      });
-      const user = response.data.data[0];
-      setUser(user.attributes);
-      const upload = Object.values(user.included.verification).every(
+      setUser(authData.user.attributes);
+      const upload = Object.values(authData.user.included.verification).every(
         (val) => val
       );
       setUploaded(upload)
-    } catch (error: any) {
-      ToastAndroid.showWithGravity(
-        "Unable to fetch user",
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
-    }
+ 
   };
   function handleRequest(){
-    fetchUser()
+    // fetchUser()
   }
 
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, [authData]);
 
   return (
     <ScrollView style={styles.container}>
