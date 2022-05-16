@@ -44,7 +44,7 @@ let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { authData } = useContext(AuthContext);
+  const { authData, setAuthData } = useContext(AuthContext);
   const [exitApp, setExitApp] = useState(1);
   const [isError, setIsError] = useState(false);
   const [user, setUser] = useState(null);
@@ -106,10 +106,12 @@ export default function Dashboard({ navigation, route }: Props) {
 				ToastAndroid.SHORT,
 				ToastAndroid.CENTER
 			);
-      const res = result.data.data[0];
-      setUser(res.attributes);
-      setOnBoarded(res?.attributes?.on_boarded);
-       const upload = Object.values(res?.included?.verification || {}).every(
+      const res = result.data.data[0]; 
+      
+      setAuthData(prevState => { return {...prevState, user:{...res}}});
+      setUser(authData.user.attributes);
+      setOnBoarded(authData.user?.attributes?.on_boarded);
+       const upload = Object.values(authData.user?.included?.verification || {}).every(
          (val) => val 
        );
        setUploaded(upload);
@@ -133,6 +135,7 @@ export default function Dashboard({ navigation, route }: Props) {
 				headers: { 'Authorization': `Bearer ${authData.token}` },
 			});
 			const user = response.data.data[0].attributes;
+      
 			setUser(user);
       setOnBoarded(user?.on_boarded);
 		} catch (error: any) {
@@ -184,7 +187,7 @@ export default function Dashboard({ navigation, route }: Props) {
    
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, [authData]);
   
 
   return (

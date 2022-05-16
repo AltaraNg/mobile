@@ -42,22 +42,8 @@ export default function ViewProfile({ navigation, route }: Props) {
 		navigation.toggleDrawer();
 	};
 
-	const fetchUser = async () => {
-		try {
-			let response = await axios({
-				method: 'GET',
-				url: `/auth/user`,
-				headers: { 'Authorization': `Bearer ${authData.token}` },
-			});
-			const user = response.data.data[0];
-			setUser(user);
-		} catch (error: any) {
-			ToastAndroid.showWithGravity(
-				'Unable to fetch user',
-				ToastAndroid.SHORT,
-				ToastAndroid.CENTER
-			);
-		}
+	const fetchUser = async () => {	
+			setUser(authData.user);
 	};
 	const displayDate = (user) => {
     if (user !== "N/A") {
@@ -68,7 +54,7 @@ export default function ViewProfile({ navigation, route }: Props) {
 
 	useEffect(() => {
 		fetchUser();
-	}, []);
+	}, [authData]);
 
 	return (
     <View style={styles.container}>

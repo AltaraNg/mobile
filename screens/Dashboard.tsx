@@ -39,7 +39,7 @@ import Upload from "../components/Upload";
 type Props = DrawerScreenProps<DrawerParamList, "Home">;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { authData } = useContext(AuthContext);
+  const { authData , setAuthData} = useContext(AuthContext);
   const [exitApp, setExitApp] = useState(1);
   const [isError, setIsError] = useState(false);
   const [user, setUser] = useState(null);
@@ -51,7 +51,6 @@ export default function Dashboard({ navigation, route }: Props) {
   const [type, setType] = useState("");
   const [uploaded, setUploaded] = useState(null);
   const toggleSideMenu = async () => {
-    fetchUser()
     navigation.toggleDrawer();
   };
 
@@ -80,31 +79,17 @@ export default function Dashboard({ navigation, route }: Props) {
     status === "success" ? setIsError(false) : setIsError(true);
     setModalResponse(res);
     setType(type);
+    
     setModalVisible(true);
   }
   const fetchUser = async () => {
-    setShowLoader(true);
-    try {
-      let response = await axios({
-        method: "GET",
-        url: `/auth/user`,
-        headers: { Authorization: `Bearer ${authData.token}` },
-      });
-      setShowLoader(false);
-      const user = response.data.data[0];
-      setUser(user);
-      setOnBoarded(user?.attributes.on_boarded);
-      const upload = Object.values(user.included.verification).every(
-        (val) => val 
-      );
-      setUploaded(upload);
-    } catch (error: any) {
-      ToastAndroid.showWithGravity(
-        "Unable to fetch user",
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
-    }
+    //setShowLoader(true);
+    setUser(authData?.user);
+    setOnBoarded(authData?.user?.attributes?.on_boarded);
+    const upload = Object.values(authData.user?.included?.verification).every(
+      (val) => val
+    );
+    setUploaded(upload);
   };
   const navigating = (first_choice, second_choice) => {
     if (!onBoarded) {
@@ -117,8 +102,8 @@ export default function Dashboard({ navigation, route }: Props) {
 
   useEffect(() => {
     fetchUser();
-  }, [uploaded, ]);
-
+  }, [authData]);
+  
   return (
     <View style={styles.container}>
       <Overlay
@@ -265,7 +250,7 @@ export default function Dashboard({ navigation, route }: Props) {
       ) : (
         <View style={styles.main}>
           <Text style={styles.name}>
-            {navigating("Hello ☺️", user?.attributes.first_name)},
+            {navigating("Hello ☺️", user?.attributes?.first_name)},
           </Text>
           <Text style={styles.message}>Welcome to your altara dashboard </Text>
           {!uploaded && (

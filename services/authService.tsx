@@ -4,6 +4,8 @@ export type AuthData = {
     token: string;
     phone: string;
     name: string;
+    included;
+    user;
   };
 let url = 'auth/login';
 

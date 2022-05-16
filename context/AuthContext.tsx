@@ -5,15 +5,16 @@ import { useFeatures } from 'flagged';
 import { AuthData, authService } from '../services/authService';
 
 type AuthContextData = {
-	isAdmin: boolean,
-	authData?: AuthData;
-	loading: boolean;
-	signIn(
-		phone_number: string,
-		otp: string,
-		device_name: string | null
-	): Promise<void>;
-	signOut(): void;
+  setAuthData;
+  isAdmin: boolean;
+  authData?: AuthData;
+  loading: boolean;
+  signIn(
+    phone_number: string,
+    otp: string,
+    device_name: string | null
+  ): Promise<void>;
+  signOut(): void;
 };
 
 //Create the Auth Context with the data type specified
@@ -91,7 +92,7 @@ const AuthProvider: React.FC = ({ children }) => {
 	return (
 		//This component will be used to encapsulate the whole App,
 		//so all components will have access to the Context
-		<AuthContext.Provider value={{ authData, loading, signIn, signOut, isAdmin }}>
+		<AuthContext.Provider value={{ authData, setAuthData, loading, signIn, signOut, isAdmin }}>
 			{children}
 		</AuthContext.Provider>
 	);
