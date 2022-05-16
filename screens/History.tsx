@@ -89,7 +89,8 @@ export default function History({ navigation, route }: Props) {
       const order = response.data.data[0].included.orders;
       setOrders(order);
 
-    } catch (error: any) { }
+    } catch (error: any) {
+     }
   };
   const viewDetail = (order) => {
     // setModalVisible(true);
