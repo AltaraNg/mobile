@@ -37,10 +37,11 @@ export default function OrderDetails({ navigation, route }: Props) {
 	let newArray = amortization.map((item: { actual_amount: number }) => {
 		return item.actual_amount;
 	});
-	totalPaid = newArray.reduce((total, item) => {
-		return total + item;
-	});
-	totalDebt = order.attributes.repayment - totalPaid;
+	totalPaid =
+		newArray.reduce((total, item) => {
+			return total + item;
+		}) + order.attributes.down_payment;
+	totalDebt = order.attributes.product_price - totalPaid;
 
 	const checkValid = (amor: object) => {
 		let answer: boolean;
@@ -132,7 +133,7 @@ export default function OrderDetails({ navigation, route }: Props) {
 	};
 	const goBack = () => {
 		navigation.goBack();
-	}
+	};
 
 	return (
 		<View style={styles.container}>
@@ -141,12 +142,11 @@ export default function OrderDetails({ navigation, route }: Props) {
 					style={{
 						backgroundColor: '#074A74',
 						alignSelf: 'center',
-						// marginLeft: 
-						
+						// marginLeft:
 					}}
 				>
 					<Pressable onPress={goBack}>
-					<BackButton />
+						<BackButton />
 					</Pressable>
 				</View>
 				<Text style={styles.headerText}>Order Details</Text>
@@ -156,7 +156,11 @@ export default function OrderDetails({ navigation, route }: Props) {
 					<Text style={{ fontFamily: 'Montserrat_400Regular' }}>
 						Order ID: {order.attributes.order_number}
 					</Text>
-					<Text style={{ fontFamily: 'Montserrat_400Regular' }}>
+					<Text
+						numberOfLines={1}
+						ellipsizeMode={'tail'}
+						style={{ fontFamily: 'Montserrat_700Bold', fontSize: 16 }}
+					>
 						{order.included.product.name}
 					</Text>
 				</View>
@@ -173,12 +177,22 @@ export default function OrderDetails({ navigation, route }: Props) {
 					}}
 				></View>
 				<Leaf style={styles.leaf} />
-
+				
+				<View style={{
+					backgroundColor: 'transparent',
+					position: 'absolute',
+					right: 0,
+					width: '50%',
+					marginVertical: 8,
+					paddingHorizontal: 9,
+					
+				}}>
 				<Text
 					style={{
 						color: 'white',
 						fontFamily: 'Montserrat_400Regular',
-						textAlign: 'right',
+						textAlign: 'left',
+						alignSelf:'auto',
 						textTransform: 'capitalize',
 						fontSize: 12,
 					}}
@@ -189,18 +203,21 @@ export default function OrderDetails({ navigation, route }: Props) {
 					style={{
 						color: 'white',
 						fontFamily: 'Montserrat_500Medium',
-						textAlign: 'right',
+						textAlign: 'left',
 						textTransform: 'capitalize',
 						fontSize: 14,
-						marginRight: 30,
+						alignSelf:'auto',
+
 					}}
 				>
 					{nextRepayment(order)}
 				</Text>
+				</View>
 				<Text
 					style={{
 						color: 'white',
 						fontFamily: 'Montserrat_400Regular',
+						marginVertical: 20
 					}}
 				>
 					Product Price
@@ -323,13 +340,13 @@ const styles = StyleSheet.create({
 		padding: 20,
 		flexDirection: 'row',
 		justifyContent: 'flex-start',
-		alignItems: 'center'
+		alignItems: 'center',
 	},
 	headerText: {
 		color: 'white',
 		textTransform: 'uppercase',
 		fontFamily: 'Montserrat_700Bold',
-		marginLeft: 90
+		marginLeft: 90,
 	},
 	orderSummary: {
 		flexDirection: 'row',
