@@ -115,8 +115,8 @@ export default function Dashboard({ navigation, route }: Props) {
          (val) => val 
        );
        setUploaded(upload);
-      uploaded && navigation.navigate("View Profile", {user:user})
-      !uploaded && navigation.navigate("Upload Document", {user:user});
+      uploaded && navigation.navigate("ViewProfile", {user:user})
+      !uploaded && navigation.navigate("UploadDocument", {user:user});
 		} catch (error) {
 			ToastAndroid.showWithGravity(
 				'Error! Request was not completed, Please complete all fields',

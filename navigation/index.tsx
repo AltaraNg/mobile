@@ -13,6 +13,7 @@ import { AuthContext } from '../context/AuthContext';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../modals/ModalScreen';
+import Cards from '../components/Cards'
 import { createStackNavigator } from '@react-navigation/stack';
 import {
 	getFocusedRouteNameFromRoute,
@@ -33,6 +34,7 @@ import { Intro } from '../screens/Intro';
 import Login from '../screens/Login';
 import Otp from '../screens/Otp';
 import Dashboard from '../screens/Dashboard';
+import OrderRequest from '../screens/OrderRequest'
 import ViewProfile from '../screens/ViewProfile';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import Constants from 'expo-constants';
@@ -130,64 +132,69 @@ function RootNavigator() {
 	}
 
 	return (
-		<FlagsProvider features={{ 'admin': isAdmin }}>
-			<Stack.Navigator
-				screenOptions={{
-					headerTintColor: 'green',
-					headerStyle: { backgroundColor: 'tomato' },
-				}}
-			>
-				{authData === undefined ? (
-					<Stack.Group>
-						<Stack.Screen
-							options={{ headerShown: false }}
-							name="Intro"
-							component={Intro}
-						/>
-						<Stack.Screen
-							options={{ headerShown: false }}
-							name="Login"
-							component={Login}
-						/>
-						<Stack.Screen
-							options={{ headerShown: false }}
-							name="OTP"
-							component={Otp}
-						/>
-					</Stack.Group>
-				) : (
-					<Stack.Group>
-						<Stack.Screen
-							name="Main"
-							component={DrawerNavigator}
-							options={{ headerShown: false }}
-						/>
-					</Stack.Group>
-				)}
-
-				<Stack.Screen
-					name="NotFound"
-					component={NotFoundScreen}
-					options={{ title: 'Oops!' }}
-				/>
-        	<Stack.Screen
-					name="OrderDetails"
-					component={OrderDetails}
-					options={{ headerShown: false }}
-				/>
-				<Stack.Group
-					screenOptions={{
-						presentation: 'transparentModal',
-						headerShown: true,
-						animation: 'fade_from_bottom',
-					}}
-				>
-					<Stack.Screen name="Modal" component={ModalScreen} />
-					<Stack.Screen name="RequestModal" component={RequestModal} />
-				</Stack.Group>
-			</Stack.Navigator>
-		</FlagsProvider>
-	);
+    <FlagsProvider features={{ admin: isAdmin }}>
+      <Stack.Navigator
+        screenOptions={{
+          headerTintColor: "green",
+          headerStyle: { backgroundColor: "tomato" },
+        }}
+      >
+        {authData === undefined ? (
+          <Stack.Group>
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Intro"
+              component={Intro}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Login"
+              component={Login}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="OTP"
+              component={Otp}
+            />
+          </Stack.Group>
+        ) : (
+          <Stack.Group>
+            <Stack.Screen
+              name="Main"
+              component={DrawerNavigator}
+              options={{ headerShown: false }}
+            />
+          </Stack.Group>
+        )}
+        <Stack.Screen
+          name="NotFound"
+          component={NotFoundScreen}
+          options={{ title: "Oops!" }}
+        />
+        <Stack.Screen
+          name="OrderDetails"
+          component={OrderDetails}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Cards"
+          component={Cards}
+          options={{ headerShown: false }}
+        />
+        
+        <Stack.Group
+          screenOptions={{
+            presentation: "transparentModal",
+            headerShown: true,
+            animation: "fade_from_bottom",
+          }}
+        >
+          <Stack.Screen name="Modal" component={ModalScreen} />
+          <Stack.Screen name="RequestModal" component={RequestModal} />
+        </Stack.Group>
+      </Stack.Navigator>
+    </FlagsProvider>
+  );
 }
 
 const DrawerNav = createDrawerNavigator<DrawerParamList>();
@@ -234,7 +241,7 @@ function DrawerNavigator({ route, navigation }) {
 			/>
 
 			<DrawerNav.Screen
-				name="View Profile"
+				name="ViewProfile"
 				component={ViewProfile}
 				options={{
 					drawerLabelStyle: { color: '#9C9696' },
@@ -246,7 +253,7 @@ function DrawerNavigator({ route, navigation }) {
 			/>
 			{user?.attributes?.on_boarded ? (
 				<DrawerNav.Screen
-					name="Edit Profile"
+					name="EditProfile"
 					component={EditProfile}
 					options={{
 						drawerLabelStyle: { color: '#9C9696' },
@@ -258,7 +265,7 @@ function DrawerNavigator({ route, navigation }) {
 				/>
 			) : (
 				<DrawerNav.Screen
-					name="Create Profile"
+					name="CreateProfile"
 					component={EditProfile}
 					options={{
 						drawerLabelStyle: { color: '#9C9696' },
@@ -271,7 +278,7 @@ function DrawerNavigator({ route, navigation }) {
 			)}
 			{!uploaded && (
 				<DrawerNav.Screen
-					name="Upload Document"
+					name="UploadDocument"
 					component={UploadDocument}
 					options={{
 						drawerLabelStyle: { color: '#9C9696' },
@@ -303,63 +310,79 @@ const BottomTab = createBottomTabNavigator<RootTabParamList>();
 function BottomTabNavigator() {
 	const colorScheme = useColorScheme();
 	return (
-		<BottomTab.Navigator
-			initialRouteName="Dashboard"
-			screenOptions={{
-				tabBarActiveTintColor: '#074A74',
-				tabBarStyle: { backgroundColor: '#EFF5F9' },
-			}}
-		>
-			<BottomTab.Screen
-				name="Dashboard"
-				component={Dashboard}
-				options={{
-					headerShown: false,
-					tabBarLabel: '',
-					tabBarIcon: ({ color, size }) => (
-						<FontAwesome
-							size={size}
-							color={color}
-							name="home"
-							style={{ marginBottom: -16 }}
-						/>
-					),
-				}}
-			/>
-			<BottomTab.Screen
-				name="History"
-				component={History}
-				options={{
-					headerShown: false,
-					tabBarLabel: '',
-					tabBarIcon: ({ color, size }) => (
-						<FontAwesome
-							size={size}
-							color={color}
-							name="folder-open"
-							style={{ marginBottom: -16 }}
-						/>
-					),
-				}}
-			/>
-			<BottomTab.Screen
-				name="Notification"
-				component={Notification}
-				options={{
-					headerShown: false,
-					tabBarLabel: '',
-					tabBarIcon: ({ color, size }) => (
-						<FontAwesome
-							size={size}
-							color={color}
-							name="bell"
-							style={{ marginBottom: -16 }}
-						/>
-					),
-				}}
-			/>
-		</BottomTab.Navigator>
-	);
+    <BottomTab.Navigator
+      initialRouteName="Dashboard"
+      screenOptions={{
+        tabBarActiveTintColor: "#074A74",
+        tabBarStyle: { backgroundColor: "#EFF5F9" },
+      }}
+    >
+      <BottomTab.Screen
+        name="Dashboard"
+        component={Dashboard}
+        options={{
+          headerShown: false,
+          tabBarLabel: "",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome
+              size={size}
+              color={color}
+              name="home"
+              style={{ marginBottom: -16 }}
+            />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="History"
+        component={History}
+        options={{
+          headerShown: false,
+          tabBarLabel: "",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome
+              size={size}
+              color={color}
+              name="folder-open"
+              style={{ marginBottom: -16 }}
+            />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="Notification"
+        component={Notification}
+        options={{
+          headerShown: false,
+          tabBarLabel: "",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome
+              size={size}
+              color={color}
+              name="bell"
+              style={{ marginBottom: -16 }}
+            />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="OrderRequest"
+        component={OrderRequest}
+        options={{
+          headerShown: false,
+          tabBarLabel: "",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome
+              size={size}
+              color={color}
+              name="folder"
+              style={{ marginBottom: -16 }}
+            />
+          ),
+        }}
+      />
+    </BottomTab.Navigator>
+  );
 }
 
 /**

@@ -34,7 +34,7 @@ import { FlatList } from "react-native-gesture-handler";
 
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
-type Props = NativeStackScreenProps<RootTabParamList, "History">;
+type Props = NativeStackScreenProps<RootTabParamList, "OrderRequest">;
 
 export default function History({ navigation, route }: Props) {
   const { authData } = useContext(AuthContext);
@@ -93,7 +93,7 @@ export default function History({ navigation, route }: Props) {
      }
   };
   const viewDetail = (order) => {
-    navigation.navigate('OrderDetails', order);
+    
   };
 
   useEffect(() => {

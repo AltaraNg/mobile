@@ -339,6 +339,7 @@ export default function Dashboard({ navigation, route }: Props) {
 							isDisabled={!onBoarded}
 							width={!onBoarded ? 300 : 0}
 							height={!onBoarded ? 150 : 0}
+              navigation={navigation}
 						/>
 
 						<Cards
@@ -349,6 +350,7 @@ export default function Dashboard({ navigation, route }: Props) {
 							isDisabled={!onBoarded}
 							width={!onBoarded ? 300 : 0}
 							height={!onBoarded ? 150 : 0}
+              navigation={navigation}
 						/>
 					</View>
 				</View>

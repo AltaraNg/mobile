@@ -17,33 +17,34 @@ declare global {
 }
 
 export type RootStackParamList = {
-	Intro: undefined;
-	RequestModal: undefined;
-	Modal: undefined;
-	NotFound: undefined;
-	OrderDetails: {order:object}
-
-	Main: undefined;
-	OTP: { phone_number: string };
-	Login: undefined;
+  Intro: undefined;
+  RequestModal: undefined;
+  Modal: undefined;
+  NotFound: undefined;
+  OrderDetails: { order: object };
+  Main: undefined;
+  OTP: { phone_number: string };
+  Login: undefined;
+  Cards: { order: string };
+  OrderRequest: { order: string };
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
 	NativeStackScreenProps<RootStackParamList, Screen>;
 
 export type RootTabParamList = {
-	Dashboard: {user:object};
-	History: undefined;
-	Notification: undefined;
+  Dashboard: { user: object };
+  History: undefined;
+  Notification: undefined;
+  OrderRequest:{order:string};
 };
 
 export type DrawerParamList = {
   Home: {user:object};
-	
-	"View Profile": { user: object };
-	"Edit Profile": { user: object };
-	"Create Profile" :{user: object};
-	"Upload Document" : {user: object}
+	ViewProfile: { user: object };
+	EditProfile: { user: object };
+	CreateProfile :{user: object};
+	UploadDocument : {user: object}
 
 
 }

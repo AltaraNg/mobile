@@ -4,66 +4,99 @@ import Leaf from '../assets/svgs/leaf.svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import Constants from 'expo-constants';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
-
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList, RootTabParamList } from '../types';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Modal'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Cards'>;
 
-export default function Cards(props: any) {
-	let url = Constants?.manifest?.extra?.URL;
-	axios.defaults.baseURL = url;
-	const { authData } = useContext(AuthContext);
+export default function Cards({
+  navigation,
+  route,
+  height,
+  width,
+  title,
+  amount,
+  isDisabled,
+  type,onRequest
+}) {
+  let url = Constants?.manifest?.extra?.URL;
+  axios.defaults.baseURL = url;
+  const { authData } = useContext(AuthContext);
+  const [requestOrder, setRequestOrder] = useState(false);
 
-	async function doSome() {
-		try {
-			let res = await axios({
-				method: 'POST',
-				data: {
-					order_type: props.type,
-				},
-				url: '/submit/request',
-				headers: { 'Authorization': `Bearer ${authData.token}` },
-			});
-			if (res.status === 200) {
-				props.onRequest(res.data, 'success', props.type);
-			}
-		} catch (error) {
-			props.onRequest(error.response.data, 'failed', props.type);
-		}
-	}
-	return (
-		<View style={styles.container}>
-			<View
-				style={{
-					backgroundColor: 'rgba(156, 150, 150, 0.55)',
-					height: props.height,
-					width: props.width,
-					position: 'absolute',
-					zIndex: 10,
-				}}
-			></View>
-			<Leaf style={styles.leaf} />
-			<Text style={styles.header}>{props.title}</Text>
-			<Text style={styles.amount}>{props.amount}</Text>
-			<LinearGradient
-				colors={['#074A77', '#089CA4']}
-				style={styles.buttonContainer}
-				start={{ x: 1, y: 0.5 }}
-				end={{ x: 0, y: 0.5 }}
-			>
-				<Pressable
-					style={[styles.button]}
-					onPress={doSome}
-					disabled={props.isDisabled}
-				>
-					<Text style={styles.buttonText}>Order Now</Text>
-				</Pressable>
-			</LinearGradient>
-		</View>
-	);
+  async function doSome() {
+    try {
+      let res = await axios({
+        method: "POST",
+        data: {
+          order_type: type,
+        },
+        url: "/submit/request",
+        headers: { Authorization: `Bearer ${authData.token}` },
+      });
+      if (res.status === 200) {
+        onRequest(res.data, "success", type);
+        setRequestOrder(true);
+      }
+    } catch (error) {
+      onRequest(error.response.data, "failed", type);
+    }
+  }
+  const trackOrder = () => {
+    navigation.navigate("OrderRequest");
+  };
+  return (
+    <View style={styles.container}>
+      <View
+        style={{
+          backgroundColor: "rgba(156, 150, 150, 0.55)",
+          height: height,
+          width: width,
+          position: "absolute",
+          zIndex: 10,
+        }}
+      ></View>
+      <Leaf style={styles.leaf} />
+      <Text style={styles.header}>{title}</Text>
+      <Text style={styles.amount}>{amount}</Text>
+      <View style={{ flexDirection: "row", backgroundColor: "transparent" }}>
+        <LinearGradient
+          colors={["#074A77", "#089CA4"]}
+          style={styles.buttonContainer}
+          start={{ x: 1, y: 0.5 }}
+          end={{ x: 0, y: 0.5 }}
+        >
+          <Pressable
+            style={[styles.button]}
+            onPress={doSome}
+            disabled={isDisabled}
+          >
+            <Text style={styles.buttonText}>Order Now</Text>
+          </Pressable>
+        </LinearGradient>
+        {requestOrder && (
+          <LinearGradient
+            colors={["#9C9696", "#DADADA"]}
+            style={styles.buttonContainer}
+            start={{ x: 1, y: 0.5 }}
+            end={{ x: 0, y: 0.5 }}
+          >
+            <Pressable
+              style={[styles.button]}
+              onPress={trackOrder}
+              disabled={isDisabled}
+            >
+              <Text style={[styles.buttonText, { color: "black" }]}>
+                Track Order
+              </Text>
+            </Pressable>
+          </LinearGradient>
+        )}
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -103,8 +136,9 @@ const styles = StyleSheet.create({
 		borderColor: '#074A74',
 		borderWidth: 1,
 		borderRadius: 10,
-		width: 169,
-		height: 35,
+		width: 130,
+		
+		height:40,
 	},
 	button: {
 		flex: 1,
