@@ -38,12 +38,11 @@ type Props = NativeStackScreenProps<RootTabParamList, "History">;
 
 export default function History({ navigation, route }: Props) {
   const { authData } = useContext(AuthContext);
-  const [orders, setOrders] = useState(null);
-  const [exitApp, setExitApp] = useState(1);
+  const [orders, setOrders] = useState([]);
   const [pressedOrder, setPressedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [OrderStatus, setOrderStatus] = useState("")
   const [showLoader, setShowLoader] = useState(false);
+  let mounted = true;
   const styleSVG = (item: any) => {
     const totalDebt =
       item?.included?.amortizations.reduce(
@@ -485,9 +484,14 @@ export default function History({ navigation, route }: Props) {
     );
   };
 
+
   useEffect(() => {
+    if(orders.length){
+      return;
+    }
     fetchOrder();
-  }, []);
+    return () => mounted = false;
+  }, [alert, orders]);
   return (
     <View style={styles.container}>
       <Overlay
