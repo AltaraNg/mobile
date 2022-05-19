@@ -28,7 +28,7 @@ const AuthProvider: React.FC = ({ children }) => {
 	//and stay like this, until the data be load from Async Storage
 	const [loading, setLoading] = useState(true);
 	const [isAdmin, setIsAdmin] = useState(false);
-
+	
 	useEffect(() => {
 		//Every time the App is opened, this provider is rendered
 		//and call de loadStorage function.

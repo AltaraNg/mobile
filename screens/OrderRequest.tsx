@@ -25,7 +25,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, RootTabParamList } from "../types";
 import Cards from "../components/Cards";
 import SideMenu from "./SideMenu";
-import { ELoan, Rental, ProductLoan } from "../assets/svgs/svg";
+import { FolderPlus, Rental, ProductLoan } from "../assets/svgs/svg";
 import { AuthContext } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Constants from "expo-constants";
@@ -38,70 +38,46 @@ type Props = NativeStackScreenProps<RootTabParamList, "OrderRequest">;
 
 export default function History({ navigation, route }: Props) {
   const { authData } = useContext(AuthContext);
-  const [orders, setOrders] = useState(null);
-  const [exitApp, setExitApp] = useState(1);
-  const [pressedOrder, setPressedOrder] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [OrderStatus, setOrderStatus] = useState("")
+  const [orderRequests, setOrderRequests] = useState(null);
   const [showLoader, setShowLoader] = useState(false);
   const styleSVG = (item: any) => {
-    const totalDebt =
-      item?.included?.amortizations.reduce(
-        (accumulator, object) => {
-          return accumulator + object.expected_amount;
-        },
-        0
-      ) -
-      item?.included?.amortizations.reduce((accumulator, object) => {
-        return accumulator + object.actual_amount;
-      }, 0);
-    const Today = new Date()
-    const expiryDate = new Date(
-      item?.included?.amortizations.find(
-        (item) => item.actual_amount == 0
-      )?.expected_payment_date
-    )
-
-    if (totalDebt <= 0) {
+    if (item.status == 'approved') {
       return "#074A74";
     }
-    if (totalDebt > 0 && Today < expiryDate) {
+    if (item.status == 'pending' || item.status == 'processing') {
       return "#FDC228";
     }
-    if (totalDebt > 0 && Today > expiryDate) {
+    if (item.status == 'denied') {
       return "#FF4133";
     }
-
   };
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
   };
 
-  const fetchOrder = async () => {
+  const fetchOrderRequest = async () => {
     setShowLoader(true);
     try {
       let response = await axios({
         method: "GET",
-        url: `/customers/${authData.user.id}/orders`,
+        url: `/customers/${authData.user.id}/requests`,
         headers: { Authorization: `Bearer ${authData.token}` },
       });
       setShowLoader(false);
-      const order = response.data.data[0].included.orders;
-      setOrders(order);
-
-    } catch (error: any) {
-     }
+      console.log(response.data.data.order_requests)
+      const orderRequest = response.data.data.order_requests;
+      setOrderRequests(orderRequest);
+    } catch (error: any) {}
   };
   const viewDetail = (order) => {
     
   };
 
   useEffect(() => {
-    fetchOrder();
+    fetchOrderRequest();
   }, []);
   return (
     <View style={styles.container}>
-
       <View style={styles.header}>
         <Header></Header>
         <TouchableOpacity>
@@ -112,7 +88,7 @@ export default function History({ navigation, route }: Props) {
       </View>
 
       <View style={styles.main}>
-        <Text style={styles.name}>{"History"}</Text>
+        <Text style={styles.name}>Order Request</Text>
         {showLoader ? (
           <Image
             source={require("../assets/gifs/loader.gif")}
@@ -121,21 +97,21 @@ export default function History({ navigation, route }: Props) {
         ) : (
           <View
             style={{
-              backgroundColor: "#EFF5F9",
+              backgroundColor: "#fff",
               marginBottom: 60,
             }}
           >
-            {orders?.length > 0 ? (
+            {orderRequests?.length > 0 ? (
               <FlatList
                 scrollEnabled={true}
-                data={orders}
+                data={orderRequests}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                  <View style={{ backgroundColor: "#EFF5F9" }}>
+                  <View style={{ backgroundColor: "#fff" }}>
                     <Pressable onPress={() => viewDetail(item)}>
                       <View style={styles.order}>
                         <View style={styles.details}>
-                          <ELoan color={styleSVG(item)} />
+                          <FolderPlus color={styleSVG(item)} />
                           <View style={styles.title}>
                             <Text
                               style={{
@@ -145,15 +121,15 @@ export default function History({ navigation, route }: Props) {
                               numberOfLines={1}
                               ellipsizeMode={"tail"}
                             >
-                              {item.included.product.name}{" "}
+                              {item.order_type}{" "}
                             </Text>
                             <Text style={{ color: "#000", fontSize: 12 }}>
-                              Order ID: {item?.attributes?.order_number}
+                              Status: {item?.status}
                             </Text>
                           </View>
                         </View>
-                        <Text style={{ color: "#000", fontSize: 13 }}>
-                          {item?.attributes?.order_date}
+                        <Text style={{ color: "#000", fontSize: 13, paddingRight:10 }}>
+                          {new Date(item?.created_at).toLocaleDateString()}
                         </Text>
                       </View>
                     </Pressable>
@@ -163,7 +139,7 @@ export default function History({ navigation, route }: Props) {
             ) : (
               <View
                 style={{
-                  backgroundColor: "#EFF5F9",
+                  backgroundColor: "#fff",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
@@ -198,38 +174,45 @@ const styles = StyleSheet.create({
     marginRight: 24,
   },
   cards: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     flexDirection: "column",
     alignItems: "center",
   },
   title: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#F9FBFC",
     marginLeft: 10,
     width: "65%",
   },
   details: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#F9FBFC",
     flexDirection: "row",
     alignItems: "center",
   },
   order: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#F9FBFC",
     flexDirection: "row",
     marginLeft: 26,
     marginRight: 20,
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 30,
+    marginBottom: 20,
+    padding: 7,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
   },
   header: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
   },
   main: {
     flex: 3,
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
   },
   name: {
     marginHorizontal: 30,

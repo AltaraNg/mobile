@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable } from 'react-native';
+import { StyleSheet, Pressable, Image } from 'react-native';
 import { Text, View } from '../components/Themed';
 import Leaf from '../assets/svgs/leaf.svg';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -25,8 +25,10 @@ export default function Cards({
   axios.defaults.baseURL = url;
   const { authData } = useContext(AuthContext);
   const [requestOrder, setRequestOrder] = useState(false);
+  const [loader, setLoader] = useState(false);
 
   async function doSome() {
+    setLoader(true)
     try {
       let res = await axios({
         method: "POST",
@@ -39,8 +41,10 @@ export default function Cards({
       if (res.status === 200) {
         onRequest(res.data, "success", type);
         setRequestOrder(true);
+        setLoader(false);
       }
     } catch (error) {
+      setLoader(false);
       onRequest(error.response.data, "failed", type);
     }
   }
@@ -73,7 +77,16 @@ export default function Cards({
             onPress={doSome}
             disabled={isDisabled}
           >
-            <Text style={styles.buttonText}>Order Now</Text>
+            {loader ? (
+              <View style={{alignItems:'center', justifyContent:'center', backgroundColor:'transparent'}}>
+                <Image
+                  source={require("../assets/gifs/loader.gif")}
+                  style={{ width: 60, height: 27 }}
+                />
+              </View>
+            ) : (
+              <Text style={styles.buttonText}>Order Now</Text>
+            )}
           </Pressable>
         </LinearGradient>
         {requestOrder && (
