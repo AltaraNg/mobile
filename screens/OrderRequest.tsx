@@ -64,7 +64,6 @@ export default function History({ navigation, route }: Props) {
         headers: { Authorization: `Bearer ${authData.token}` },
       });
       setShowLoader(false);
-      console.log(response.data.data.order_requests)
       const orderRequest = response.data.data.order_requests;
       setOrderRequests(orderRequest);
     } catch (error: any) {}

@@ -24,7 +24,6 @@ const OrderProvider: React.FC = ({ children }) => {
          url: `/customers/${authData.user.id}/requests`,
          headers: { Authorization: `Bearer ${authData.token}` },
        });
-       console.log(response.data.data.order_requests);
        const orderRequest = response.data.data.order_requests;
        setOrderRequests(orderRequest);
      } catch (error: any) {}
