@@ -3,7 +3,12 @@
  * https://reactnavigation.org/docs/getting-started
  *
  */
-import { AntDesign, EvilIcons, FontAwesome } from '@expo/vector-icons';
+import {
+  AntDesign,
+  EvilIcons,
+  FontAwesome,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useContext, useEffect, useState, useRef } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -372,12 +377,7 @@ function BottomTabNavigator() {
           headerShown: false,
           tabBarLabel: "",
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome
-              size={size}
-              color={color}
-              name="folder"
-              style={{ marginBottom: -16 }}
-            />
+            <MaterialCommunityIcons name="folder-plus" size={29} color={color} style={{ marginBottom: -16 }} />
           ),
         }}
       />

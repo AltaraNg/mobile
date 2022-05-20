@@ -319,3 +319,44 @@ export const BackButton = function () {
 		</Svg>
 	);
 };
+
+export const FolderPlus = function(props:any){
+	return (
+    <Svg
+      width="44"
+      height="44"
+      viewBox="0 0 44 44"
+      fill="none"
+    >
+      <Circle opacity="0.2" cx="22" cy="22" r="22" fill={props.color} />
+      <Path
+        d="M31.7719 31.0899H10.3605C10.1245 31.0892 9.89829 30.9951 9.73139 30.8282C9.56449 30.6613 9.47042 30.4352 9.46973 30.1991V15.6499H31.6647C31.9207 15.6499 32.1661 15.7516 32.3471 15.9325C32.5281 16.1135 32.6297 16.359 32.6297 16.6149V30.2321C32.6297 30.4596 32.5394 30.6778 32.3785 30.8387C32.2176 30.9995 31.9994 31.0899 31.7719 31.0899V31.0899Z"
+        stroke={props.color}
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M9.46973 15.65V12.755C9.46973 12.4991 9.5714 12.2537 9.75237 12.0727C9.93334 11.8917 10.1788 11.79 10.4347 11.79H16.79C16.9167 11.79 17.0422 11.815 17.1593 11.8635C17.2764 11.912 17.3828 11.9831 17.4724 12.0727L21.0497 15.65"
+        stroke={props.color}
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M18.1543 23.3701H23.9443"
+        stroke={props.color}
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M21.0498 20.4751V26.2651"
+        stroke={props.color}
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </Svg>
+  );
+}
