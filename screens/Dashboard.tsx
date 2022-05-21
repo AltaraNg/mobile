@@ -334,7 +334,7 @@ export default function Dashboard({ navigation, route }: Props) {
 						<Cards
 							title="Get a Loan Now!!!"
 							amount="Up to ₦500,000"
-							type="an E-Loan"
+							type="cash"
 							onRequest={handleRequest}
 							isDisabled={!onBoarded}
 							width={!onBoarded ? 300 : 0}
@@ -345,7 +345,7 @@ export default function Dashboard({ navigation, route }: Props) {
 						<Cards
 							title="Order a Product Now!!!"
 							amount="Up to ₦500,000"
-							type="a Product"
+							type="product"
 							onRequest={handleRequest}
 							isDisabled={!onBoarded}
 							width={!onBoarded ? 300 : 0}
