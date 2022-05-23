@@ -103,6 +103,30 @@ export const SuccessSvg = function () {
 		</Svg>
 	);
 };
+export const ProgressSVG = function(){
+	return (
+    <Svg
+      width="105"
+      height="105"
+      viewBox="0 0 105 105"
+      fill="none"
+    >
+      <G clip-path="url(#clip0_2679_1622)">
+        <Path
+          d="M52.2752 52.3746L41.4112 46.1069C41.4309 46.1113 41.451 46.1162 41.4712 46.1216L45.9702 48.5755L52.375 52.0691V52.3749C52.3388 52.3749 52.306 52.3748 52.2752 52.3746ZM52.5 4.25C25.9522 4.25 4.25 25.9522 4.25 52.5C4.25 79.0478 25.9522 100.75 52.5 100.75C79.0478 100.75 100.75 79.0478 100.75 52.5C100.75 25.9522 79.0478 4.25 52.5 4.25Z"
+          fill="#FDC228"
+          stroke="#FFE8AB"
+          stroke-width="9"
+        />
+      </G>
+      <Defs>
+        <ClipPath id="clip0_2679_1622">
+          <Rect width="105" height="105" fill="white" />
+        </ClipPath>
+      </Defs>
+    </Svg>
+  );
+};
 
 export const LogOut = function () {
 	return (

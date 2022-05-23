@@ -16,17 +16,16 @@ import {
   Dimensions,
 } from "react-native";
 import { Button, Overlay, Icon } from "react-native-elements";
-import { LinearGradient } from "expo-linear-gradient";
+import { SuccessSvg, ProgressSVG,  } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import React, { useState, createRef, useEffect, useContext } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, RootTabParamList } from "../types";
-import Cards from "../components/Cards";
-import SideMenu from "./SideMenu";
 import { FolderPlus, Rental, ProductLoan } from "../assets/svgs/svg";
 import { AuthContext } from "../context/AuthContext";
+import { OrderContext } from "../context/OrderContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Constants from "expo-constants";
 import axios from "axios";
@@ -38,43 +37,157 @@ type Props = NativeStackScreenProps<RootTabParamList, "OrderRequest">;
 
 export default function History({ navigation, route }: Props) {
   const { authData } = useContext(AuthContext);
+  const { setOrderRequestContext, orderRequestContext } = useContext(OrderContext);
   const [orderRequests, setOrderRequests] = useState(null);
   const [showLoader, setShowLoader] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [pressedOrder, setPressedOrder] = useState(null);
+
   const styleSVG = (item: any) => {
-    if (item.status == 'approved') {
+    if (item?.status == 'approved') {
       return "#074A74";
     }
-    if (item.status == 'pending' || item.status == 'processing') {
+    if (item?.status == 'pending' || item?.status == 'processing') {
       return "#FDC228";
     }
-    if (item.status == 'denied') {
+    if (item?.status == 'denied') {
       return "#FF4133";
     }
   };
+  const modalResponse = (item: any) => {
+      if (item?.status == "approved") {
+        return "was successful";
+      }
+      if (item?.status == "pending" || item?.status == "processing") {
+        return "is in progress";
+      }
+      if (item?.status == "denied") {
+        return "was unsuccessful";
+      }
+    };
+    const modalDetails = (item: any) => {
+      if (item?.status == "approved") {
+        return "A DSA agent will reach out to you shortly";
+      }
+      if (item?.status == "pending" || item?.status == "processing") {
+        return "A DSA agent will reach out to you shortly";
+      }
+      if (item?.status == "denied") {
+        return "You have an order request in progress";
+      }
+    };
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
   };
 
-  const fetchOrderRequest = async () => {
-    setShowLoader(true);
-    try {
-      let response = await axios({
-        method: "GET",
-        url: `/customers/${authData.user.id}/requests`,
-        headers: { Authorization: `Bearer ${authData.token}` },
-      });
-      setShowLoader(false);
-      const orderRequest = response.data.data.order_requests;
-      setOrderRequests(orderRequest);
-    } catch (error: any) {}
+  const viewDetail = (item) => {
+     setModalVisible(true);
+     setPressedOrder(item);
   };
-  const viewDetail = (order) => {
-    
-  };
+  const OrderDetails = function ({item}) {
+      return (
+        <View>
+          <Overlay
+            isVisible={modalVisible}
+            onBackdropPress={() => {
+              setModalVisible(!modalVisible);
+            }}
+          />
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+            style={{
+              justifyContent: "flex-end",
+              margin: 0,
+              position: "relative",
+            }}
+          >
+            <TouchableHighlight
+              onPress={() => setModalVisible(!modalVisible)}
+              style={{
+                borderRadius:
+                  Math.round(
+                    Dimensions.get("window").width +
+                      Dimensions.get("window").height
+                  ) / 2,
+                width: Dimensions.get("window").width * 0.13,
+                height: Dimensions.get("window").width * 0.13,
+                backgroundColor: "#fff",
+                position: "absolute",
+                //   top: 1 / 2,
+                marginHorizontal: Dimensions.get("window").width * 0.43,
+                marginVertical: Dimensions.get("window").width * 0.76,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              underlayColor="#ccc"
+            >
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: "#000",
+                  fontFamily: "Montserrat_900Black",
+                }}
+              >
+                &#x2715;
+              </Text>
+            </TouchableHighlight>
 
-  useEffect(() => {
-    fetchOrderRequest();
-  }, []);
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                {styleSVG(item) == "#FF4133" && (
+                  <TouchableHighlight
+                    style={{
+                      borderRadius:
+                        Math.round(
+                          Dimensions.get("window").width +
+                            Dimensions.get("window").height
+                        ) / 2,
+                      width: Dimensions.get("window").width * 0.3,
+                      height: Dimensions.get("window").width * 0.3,
+                      backgroundColor: "#FF4133",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                    underlayColor="#ccc"
+                  >
+                    <Text
+                      style={{
+                        fontSize: 68,
+                        color: "#fff",
+                        fontFamily: "Montserrat_900Black",
+                      }}
+                    >
+                      &#x2715;
+                    </Text>
+                  </TouchableHighlight>
+                )}
+
+                {styleSVG(item) == "#FDC228" && (
+                  <Image
+                    source={require("../assets/images/ProgressSVG.png")}
+                  />
+                )}
+                {styleSVG(item) == "#074A74" && <SuccessSvg />}
+                <Text style={styles.modalHeading}>
+                  Your Order Request{" "}
+                  <Text style={{ color: styleSVG(item) }}>
+                    {modalResponse(item)}
+                  </Text>
+                </Text>
+
+                <Text style={styles.errText}>{modalDetails(item)}</Text>
+              </View>
+            </View>
+          </Modal>
+        </View>
+      );
+    };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -97,13 +210,13 @@ export default function History({ navigation, route }: Props) {
           <View
             style={{
               backgroundColor: "#fff",
-              marginBottom: 60,
+              // marginBottom: 60,
             }}
           >
-            {orderRequests?.length > 0 ? (
+            {orderRequestContext?.length > 0 ? (
               <FlatList
                 scrollEnabled={true}
-                data={orderRequests}
+                data={orderRequestContext}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <View style={{ backgroundColor: "#fff" }}>
@@ -127,7 +240,12 @@ export default function History({ navigation, route }: Props) {
                             </Text>
                           </View>
                         </View>
-                        <Text style={{ color: "#000", fontSize: 13, paddingRight:10 }}>
+                        <Text
+                          style={{
+                            color: "#000",
+                            fontSize: 13,
+                          }}
+                        >
                           {new Date(item?.created_at).toLocaleDateString()}
                         </Text>
                       </View>
@@ -148,9 +266,10 @@ export default function History({ navigation, route }: Props) {
                   source={require("../assets/images/zerostate2.png")}
                   style={styles.image}
                 />
-                <Text style={{ color: "black" }}>No History</Text>
+                <Text style={{ color: "black" }}>No Requests</Text>
               </View>
             )}
+            <OrderDetails item={pressedOrder} />
           </View>
         )}
       </View>
@@ -194,8 +313,9 @@ const styles = StyleSheet.create({
     marginRight: 20,
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginVertical: 10,
     padding: 7,
+    paddingRight:20,
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -218,7 +338,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: "#074A74",
     fontFamily: "Montserrat_700Bold",
-    marginBottom: 60,
+    marginBottom: 30,
   },
   message: {
     fontFamily: "Montserrat_400Regular",
@@ -245,6 +365,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
+    flexDirection:'column',
+    alignItems:'center'
   },
   modalHeading: {
     fontFamily: "Montserrat_700Bold",
@@ -266,5 +388,12 @@ const styles = StyleSheet.create({
     height: "100%",
     width: 1,
     backgroundColor: "#909090",
+  },
+  errText: {
+    fontSize: 15,
+    marginTop: 20,
+    paddingHorizontal: 15,
+    textAlign: "center",
+    color: "#000",
   },
 });

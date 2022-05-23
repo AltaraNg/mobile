@@ -4,16 +4,15 @@ import Leaf from '../assets/svgs/leaf.svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import Constants from 'expo-constants';
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList, RootTabParamList } from '../types';
-
+import { OrderContext } from "../context/OrderContext";
 type Props = NativeStackScreenProps<RootStackParamList, 'Cards'>;
 
 export default function Cards({
   navigation,
-  route,
   height,
   width,
   title,
@@ -24,33 +23,51 @@ export default function Cards({
   let url = Constants?.manifest?.extra?.URL;
   axios.defaults.baseURL = url;
   const { authData } = useContext(AuthContext);
+    const {
+      setOrderRequestContext,
+      orderRequestContext,
+      fetchOrderRequestContext,
+    } = useContext(OrderContext);
   const [requestOrder, setRequestOrder] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [pendingOrder, setPendingOrder] = useState(false);
 
   async function doSome() {
-    setLoader(true)
-    try {
-      let res = await axios({
-        method: "POST",
-        data: {
-          order_type: type,
-        },
-        url: "/submit/request",
-        headers: { Authorization: `Bearer ${authData.token}` },
-      });
-      if (res.status === 200) {
-        onRequest(res.data, "success", type);
-        setRequestOrder(true);
+    setLoader(true);
+    const isPending = orderRequestContext?.some((item) => item.status === 'pending'); 
+    if (!isPending) {
+      try {
+        let res = await axios({
+          method: "POST",
+          data: {
+            order_type: type,
+          },
+          url: "/submit/request",
+          headers: { Authorization: `Bearer ${authData.token}` },
+        });
+        if (res.status === 200) {
+          fetchOrderRequestContext();
+          onRequest(res.data, "success", type);
+          setRequestOrder(true);
+          setLoader(false);
+        }
+      } catch (error) {
         setLoader(false);
+        onRequest(error.response.data, "failed", type);
       }
-    } catch (error) {
-      setLoader(false);
-      onRequest(error.response.data, "failed", type);
+    }else {
+      onRequest("You have an order request in progress.Click here to view", "failed", type);
+       setLoader(false);
     }
+   
+   
   }
   const trackOrder = () => {
     navigation.navigate("OrderRequest");
   };
+  // useEffect(() => {
+  //   fetchUser();
+  // }, [authData]);
   return (
     <View style={styles.container}>
       <View
