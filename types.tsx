@@ -40,14 +40,13 @@ export type RootTabParamList = {
 };
 
 export type DrawerParamList = {
-  Home: {user:object};
-	ViewProfile: { user: object };
-	EditProfile: { user: object };
-	CreateProfile :{user: object};
-	UploadDocument : {user: object}
-
-
-}
+  Home: { user: object };
+  ViewProfile: { user: object };
+  EditProfile: { user: object };
+  CreateProfile: { user: object };
+  UploadDocument: { user: object };
+  OrderRequest: { order: string };
+};
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> =
 	CompositeScreenProps<
 		BottomTabScreenProps<RootTabParamList, Screen>,

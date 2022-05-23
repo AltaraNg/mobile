@@ -42,6 +42,7 @@ import Dashboard from '../screens/Dashboard';
 import OrderRequest from '../screens/OrderRequest'
 import ViewProfile from '../screens/ViewProfile';
 import { AuthProvider, useAuth } from '../context/AuthContext';
+import { OrderProvider, useOrder } from "../context/OrderContext";
 import Constants from 'expo-constants';
 import axios from 'axios';
 import Notification from '../screens/Notification';
@@ -93,6 +94,7 @@ export default function Navigation({
 	let app_token = Constants?.manifest?.extra?.APP_TOKEN;
 	return (
 		<AuthProvider>
+			<OrderProvider>
 			<NavigationContainer
 				linking={LinkingConfiguration}
 				ref={navigationRef}
@@ -119,6 +121,7 @@ export default function Navigation({
 			>
 				<RootNavigator />
 			</NavigationContainer>
+			</OrderProvider>
 		</AuthProvider>
 	);
 }

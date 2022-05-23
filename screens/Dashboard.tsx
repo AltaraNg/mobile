@@ -16,7 +16,6 @@ import {
 import { Button, Overlay, Icon } from "react-native-elements";
 import { LinearGradient } from "expo-linear-gradient";
 import { SuccessSvg, FailSvg, LogOut, User } from "../assets/svgs/svg";
-
 import Header from "../components/Header";
 import React, { useState, createRef, useEffect, useContext } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
@@ -29,6 +28,7 @@ import {
 import Cards from "../components/Cards";
 import SideMenu from "./SideMenu";
 import { AuthContext } from "../context/AuthContext";
+import {OrderContext} from "../context/OrderContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { DrawerScreenProps } from "@react-navigation/drawer";
@@ -40,6 +40,11 @@ type Props = DrawerScreenProps<DrawerParamList, "Home">;
 
 export default function Dashboard({ navigation, route }: Props) {
   const { authData , setAuthData} = useContext(AuthContext);
+  const {
+    setOrderRequestContext,
+    orderRequestContext,
+    fetchOrderRequestContext,
+  } = useContext(OrderContext);
   const [exitApp, setExitApp] = useState(1);
   const [isError, setIsError] = useState(false);
   const [user, setUser] = useState(null);
@@ -75,7 +80,7 @@ export default function Dashboard({ navigation, route }: Props) {
     return true;
   };
 
-  function handleRequest(res: object, status: String, type: string) {
+  function handleRequest(res: any, status: String, type: string) {
     status === "success" ? setIsError(false) : setIsError(true);
     setModalResponse(res);
     setType(type);
@@ -102,6 +107,7 @@ export default function Dashboard({ navigation, route }: Props) {
 
   useEffect(() => {
     fetchUser();
+    fetchOrderRequestContext();
   }, [authData]);
   
   return (
@@ -167,80 +173,88 @@ export default function Dashboard({ navigation, route }: Props) {
                   for {type}
                 </Text>
 
-								{modalResponse && (
-									<Text
-										style={{
-											color: '#474A57',
-											fontFamily: 'Montserrat_500Medium',
-											marginTop: 30,
-											marginHorizontal: 30,
-											fontSize: 12,
-											textAlign: 'center',
-										}}
-									>
-										{modalResponse.message}
-									</Text>
-								)}
-							</View>
-						</View>
-					</View>
-				) : (
-					<View style={styles.modalContainer}>
-						<TouchableOpacity
-							style={{ alignItems: 'center' }}
-							onPress={() => setModalVisible(!modalVisible)}
-						>
-							<Text style={styles.modalHeaderCloseText}>X</Text>
-						</TouchableOpacity>
-						<View style={styles.modalContainer}>
-							<View style={styles.modalContent}>
-								<TouchableHighlight
-									style={{
-										borderRadius:
-											Math.round(
-												Dimensions.get('window').width +
-													Dimensions.get('window').height
-											) / 2,
-										width: Dimensions.get('window').width * 0.3,
-										height: Dimensions.get('window').width * 0.3,
-										backgroundColor: '#DB2721',
-										justifyContent: 'center',
-										alignItems: 'center',
-									}}
-									underlayColor="#ccc"
-								>
-									<Text
-										style={{
-											fontSize: 68,
-											color: '#fff',
-											fontFamily: 'Montserrat_900Black',
-										}}
-									>
-										&#x2715;
-									</Text>
-								</TouchableHighlight>
-								<Text style={styles.modalHeading}>
-									Sorry! Your Order is{' '}
-									<Text style={{ color: 'red' }}>unsuccessful</Text>
-								</Text>
-								{modalResponse && (
-									<Text style={styles.errText}>
-										{modalResponse.error_message}
-									</Text>
-								)}
-							</View>
-						</View>
-					</View>
-				)}
-			</Modal>
-			<View style={styles.header}>
-				<Header></Header>
-				<TouchableOpacity>
-					<Pressable onPress={toggleSideMenu}>
-						<Hamburger style={styles.hamburger} />
-					</Pressable>
-				</TouchableOpacity>
-			</View>
+                {modalResponse && (
+                  <Text
+                    style={{
+                      color: "#474A57",
+                      fontFamily: "Montserrat_500Medium",
+                      marginTop: 30,
+                      marginHorizontal: 30,
+                      fontSize: 12,
+                      textAlign: "center",
+                    }}
+                  >
+                    {modalResponse.message}
+                  </Text>
+                )}
+              </View>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={styles.modalHeaderCloseText}>X</Text>
+            </TouchableOpacity>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <TouchableHighlight
+                  style={{
+                    borderRadius:
+                      Math.round(
+                        Dimensions.get("window").width +
+                          Dimensions.get("window").height
+                      ) / 2,
+                    width: Dimensions.get("window").width * 0.3,
+                    height: Dimensions.get("window").width * 0.3,
+                    backgroundColor: "#DB2721",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  underlayColor="#ccc"
+                >
+                  <Text
+                    style={{
+                      fontSize: 68,
+                      color: "#fff",
+                      fontFamily: "Montserrat_900Black",
+                    }}
+                  >
+                    &#x2715;
+                  </Text>
+                </TouchableHighlight>
+                <Text style={styles.modalHeading}>
+                  Sorry! Your Order is{" "}
+                  <Text style={{ color: "red" }}>unsuccessful</Text>
+                </Text>
+                {modalResponse.error_message ? (
+                  <Text style={styles.errText}>
+                    {modalResponse.error_message}
+                  </Text>
+                ) : (
+                  <Text
+                    style={styles.errText}
+                    onPress={() => navigation.navigate("OrderRequest")}
+                  >
+                    You have an order request in progress.Click{" "}
+                    <Text style={{ color: "red" }}>here</Text> to view
+                  </Text>
+                )}
+              </View>
+            </View>
+          </View>
+        )}
+      </Modal>
+      <View style={styles.header}>
+        <Header></Header>
+        <TouchableOpacity>
+          <Pressable onPress={toggleSideMenu}>
+            <Hamburger style={styles.hamburger} />
+          </Pressable>
+        </TouchableOpacity>
+      </View>
 
       {showLoader ? (
         <Image
@@ -330,33 +344,33 @@ export default function Dashboard({ navigation, route }: Props) {
             </View>
           )}
 
-					<View style={styles.cards}>
-						<Cards
-							title="Get a Loan Now!!!"
-							amount="Up to ₦500,000"
-							type="cash"
-							onRequest={handleRequest}
-							isDisabled={!onBoarded}
-							width={!onBoarded ? 300 : 0}
-							height={!onBoarded ? 150 : 0}
+          <View style={styles.cards}>
+            <Cards
+              title="Get a Loan Now!!!"
+              amount="Up to ₦500,000"
+              type="cash"
+              onRequest={handleRequest}
+              isDisabled={!onBoarded}
+              width={!onBoarded ? 300 : 0}
+              height={!onBoarded ? 150 : 0}
               navigation={navigation}
-						/>
+            />
 
-						<Cards
-							title="Order a Product Now!!!"
-							amount="Up to ₦500,000"
-							type="product"
-							onRequest={handleRequest}
-							isDisabled={!onBoarded}
-							width={!onBoarded ? 300 : 0}
-							height={!onBoarded ? 150 : 0}
+            <Cards
+              title="Order a Product Now!!!"
+              amount="Up to ₦500,000"
+              type="product"
+              onRequest={handleRequest}
+              isDisabled={!onBoarded}
+              width={!onBoarded ? 300 : 0}
+              height={!onBoarded ? 150 : 0}
               navigation={navigation}
-						/>
-					</View>
-				</View>
-			)}
-		</View>
-	);
+            />
+          </View>
+        </View>
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
