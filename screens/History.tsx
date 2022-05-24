@@ -2,18 +2,10 @@ import {
   Pressable,
   StyleSheet,
   TouchableOpacity,
-  Touchable,
-  TextInput,
-  ActivityIndicator,
-  ToastAndroid,
-  BackHandler,
-  Platform,
-  ScrollView,
-  Modal,
-  TouchableHighlight,
-  Alert,
+  RefreshControl,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { Button, Overlay, Icon } from "react-native-elements";
 import { LinearGradient } from "expo-linear-gradient";
@@ -37,6 +29,7 @@ axios.defaults.baseURL = url;
 type Props = NativeStackScreenProps<RootTabParamList, "History">;
 
 export default function History({ navigation, route }: Props) {
+  const [refreshing, setRefreshing] = useState(true)
   const { authData } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
   const [pressedOrder, setPressedOrder] = useState(null);
@@ -78,6 +71,7 @@ export default function History({ navigation, route }: Props) {
 
   const fetchOrder = async () => {
     setShowLoader(true);
+    console.log('u called me')
     try {
       let response = await axios({
         method: "GET",
@@ -85,6 +79,7 @@ export default function History({ navigation, route }: Props) {
         headers: { Authorization: `Bearer ${authData.token}` },
       });
       setShowLoader(false);
+      setRefreshing(false);
       const order = response.data.data[0].included.orders;
       setOrders(order);
 
@@ -129,11 +124,15 @@ export default function History({ navigation, route }: Props) {
               marginBottom: 60,
             }}
           >
+            {refreshing ? <ActivityIndicator /> : null}
             {orders?.length > 0 ? (
               <FlatList
                 scrollEnabled={true}
                 data={orders}
                 keyExtractor={(item) => item.id}
+                refreshControl={
+                  <RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />
+                }
                 renderItem={({ item }) => (
                   <View style={{ backgroundColor: "#EFF5F9" }}>
                     <Pressable onPress={() => viewDetail(item)}>
