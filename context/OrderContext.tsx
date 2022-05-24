@@ -5,12 +5,17 @@ type OrderContextData = {
   orderRequestContext;
   setOrderRequestContext;
   fetchOrderRequestContext;
+  showButton;
+  showLoader;
+  setShowLoader;
 };
 
 const OrderContext = createContext<OrderContextData>({} as OrderContextData);
 const OrderProvider: React.FC = ({ children }) => {
   const [orderRequestContext, setOrderRequestContext] = useState(null);
+  const [showButton, setShowButton] = useState(null);
   const { authData } = useContext(AuthContext);
+  const [showLoader, setShowLoader] = useState(false);
   useEffect(() => {
     //Every time the App is opened, this provider is rendered
     //and call de fetchOrderRequestContext function.
@@ -18,6 +23,7 @@ const OrderProvider: React.FC = ({ children }) => {
   }, []);
 
   async function fetchOrderRequestContext(): Promise<void> {
+    setShowLoader(true)
     try {
       let response = await axios({
         method: "GET",
@@ -27,14 +33,27 @@ const OrderProvider: React.FC = ({ children }) => {
       const orderRequestContext = response.data.data.order_requests;
       const reversed = orderRequestContext.reverse();
       setOrderRequestContext(reversed);
-    } catch (error: any) {}
+      const isPending = orderRequestContext?.some(
+        (item) => item.status === "pending"
+      );
+      isPending ? setShowButton(false) : setShowButton(true);
+       setShowLoader(false);
+    } catch (error: any) {setShowLoader(false);}
+    
+     
   }
 
   return (
     //This component will be used to encapsulate the whole App,
     //so all components will have access to the Context
     <OrderContext.Provider
-      value={{ setOrderRequestContext, fetchOrderRequestContext, orderRequestContext }}
+      value={{
+        setOrderRequestContext,
+        fetchOrderRequestContext,
+        orderRequestContext,
+        showButton,
+        showLoader,setShowLoader
+      }}
     >
       {children}
     </OrderContext.Provider>
