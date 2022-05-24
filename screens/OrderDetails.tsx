@@ -82,6 +82,7 @@ export default function OrderDetails({ navigation, route }: Props) {
 			return {
 				backgroundColor: '#d0dce4',
 				color: '#074a74',
+				alignSelf: 'center',
 				paddingHorizontal: 10,
 				paddingVertical: 6,
 				borderRadius: 6,
@@ -92,6 +93,7 @@ export default function OrderDetails({ navigation, route }: Props) {
 			return {
 				backgroundColor: '#fff4d4',
 				color: '#FDC228',
+				alignSelf: 'center',
 				paddingHorizontal: 10,
 				paddingVertical: 6,
 				borderRadius: 6,
@@ -102,10 +104,11 @@ export default function OrderDetails({ navigation, route }: Props) {
 			return {
 				backgroundColor: '#ffd4d4',
 				color: '#DB2721',
+				alignSelf: 'center',
+				paddingHorizontal: 10,
 				paddingVertical: 6,
 				borderRadius: 6,
 				fontFamily: 'Montserrat_700Bold',
-				paddingHorizontal: 10,
 			};
 		}
 	};
@@ -152,13 +155,13 @@ export default function OrderDetails({ navigation, route }: Props) {
 			</View>
 			<View style={styles.orderSummary}>
 				<View style={styles.orderDetail}>
-					<Text style={{ fontFamily: 'Montserrat_400Regular' }}>
+					<Text style={{ fontFamily: 'Montserrat_400Regular', color: '#000000', }}>
 						Order ID: {order.attributes.order_number}
 					</Text>
 					<Text
 						numberOfLines={1}
 						ellipsizeMode={'tail'}
-						style={{ fontFamily: 'Montserrat_700Bold', fontSize: 16 }}
+						style={{ fontFamily: 'Montserrat_700Bold', fontSize: 16, color: '#000000', }}
 					>
 						{order.included.product.name}
 					</Text>
@@ -316,8 +319,8 @@ export default function OrderDetails({ navigation, route }: Props) {
 								}}
 							>
 								{checkValid(item) ? 'Payment date: ' : 'Due date: '}
-								<Text style={{ fontWeight: 'bold', fontSize: 14 }}>
-									{item.expected_payment_date}
+								<Text style={{ fontWeight: 'bold', fontSize: 14, color: '#000000', }}>
+									{checkValid(item) ? item.actual_payment_date : item.expected_payment_date}
 								</Text>
 							</Text>
 						</View>
