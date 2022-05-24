@@ -50,7 +50,7 @@ export default function History({ navigation, route }: Props) {
     if (item?.status == 'pending' || item?.status == 'processing') {
       return "#FDC228";
     }
-    if (item?.status == 'denied') {
+    if (item?.status == 'declined') {
       return "#FF4133";
     }
   };
@@ -61,7 +61,7 @@ export default function History({ navigation, route }: Props) {
       if (item?.status == "pending" || item?.status == "processing") {
         return "is in progress";
       }
-      if (item?.status == "denied") {
+      if (item?.status == "declined") {
         return "was unsuccessful";
       }
     };
@@ -72,7 +72,7 @@ export default function History({ navigation, route }: Props) {
       if (item?.status == "pending" || item?.status == "processing") {
         return "A DSA agent will reach out to you shortly";
       }
-      if (item?.status == "denied") {
+      if (item?.status == "declined") {
         return "You have an order request in progress";
       }
     };
