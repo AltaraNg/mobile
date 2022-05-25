@@ -39,11 +39,12 @@ import Upload from "../components/Upload";
 type Props = DrawerScreenProps<DrawerParamList, "Home">;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { authData , setAuthData} = useContext(AuthContext);
+  const { authData, setAuthData, showLoader2 } = useContext(AuthContext);
   const {
     setOrderRequestContext,
     orderRequestContext,
     fetchOrderRequestContext,
+    showLoader,
   } = useContext(OrderContext);
   const [exitApp, setExitApp] = useState(1);
   const [isError, setIsError] = useState(false);
@@ -52,7 +53,6 @@ export default function Dashboard({ navigation, route }: Props) {
   const [modalVisible, setModalVisible] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [onBoarded, setOnBoarded] = useState(null);
-  const [showLoader, setShowLoader] = useState(false);
   const [type, setType] = useState("");
   const [uploaded, setUploaded] = useState(null);
   const toggleSideMenu = async () => {
@@ -88,7 +88,6 @@ export default function Dashboard({ navigation, route }: Props) {
     setModalVisible(true);
   }
   const fetchUser = async () => {
-    //setShowLoader(true);
     setUser(authData?.user);
     setOnBoarded(authData?.user?.attributes?.on_boarded);
     const upload = Object.values(authData.user?.included?.verification).every(
@@ -108,7 +107,7 @@ export default function Dashboard({ navigation, route }: Props) {
   useEffect(() => {
     fetchUser();
     fetchOrderRequestContext();
-  }, [authData]);
+  }, [authData, orderRequestContext,]);
   
   return (
     <View style={styles.container}>
@@ -229,19 +228,10 @@ export default function Dashboard({ navigation, route }: Props) {
                   Sorry! Your Order is{" "}
                   <Text style={{ color: "red" }}>unsuccessful</Text>
                 </Text>
-                {modalResponse.error_message ? (
-                  <Text style={styles.errText}>
-                    {modalResponse.error_message}
-                  </Text>
-                ) : (
-                  <Text
-                    style={styles.errText}
-                    onPress={() => navigation.navigate("OrderRequest")}
-                  >
-                    You have an order request in progress.Click{" "}
-                    <Text style={{ color: "red" }}>here</Text> to view
-                  </Text>
-                )}
+
+                <Text style={styles.errText}>
+                  {modalResponse?.error_message}
+                </Text>
               </View>
             </View>
           </View>
@@ -256,7 +246,7 @@ export default function Dashboard({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
-      {showLoader ? (
+      {showLoader || showLoader2 ? (
         <Image
           source={require("../assets/gifs/loader.gif")}
           style={styles.image}

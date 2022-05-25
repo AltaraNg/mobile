@@ -7,6 +7,8 @@ import { AuthData, authService } from '../services/authService';
 type AuthContextData = {
   setAuthData;
   isAdmin: boolean;
+  showLoader2;
+  setShowLoader;
   authData?: AuthData;
   loading: boolean;
   signIn(
@@ -23,7 +25,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
 	const [authData, setAuthData] = useState<AuthData>();
-
+	const [showLoader2, setShowLoader] = useState(false);
 	//the AuthContext start with loading equals true
 	//and stay like this, until the data be load from Async Storage
 	const [loading, setLoading] = useState(true);
@@ -36,6 +38,7 @@ const AuthProvider: React.FC = ({ children }) => {
 	}, []);
 
 	async function loadStorageData(): Promise<void> {
+		setShowLoader(true)
 		try {
 			//Try get the data from Async Storage
 			const authDataSerialized = await SecureStore.getItemAsync('AuthData');
@@ -48,7 +51,9 @@ const AuthProvider: React.FC = ({ children }) => {
 					setIsAdmin(true);
 				}
 			}
+			setShowLoader(false)
 		} catch (error) {
+			setShowLoader(false)
 		} finally {
 			//loading finished
 			setLoading(false);
@@ -60,6 +65,7 @@ const AuthProvider: React.FC = ({ children }) => {
 		otp: string,
 		device_name: string
 	) => {
+		setShowLoader(true);
 		//call the service passing credential (email and password).
 		//In a real App this data will be provided by the user from some InputText components.
 		const _authData = await authService.signIn(phone_number, otp, device_name);
@@ -72,7 +78,7 @@ const AuthProvider: React.FC = ({ children }) => {
 			if(_authData.user.attributes.staff_id === 999999){
 				setIsAdmin(true);
 			}
-
+			setShowLoader(false);
 		}
 
 		//Persist the data in the Async Storage
@@ -90,12 +96,23 @@ const AuthProvider: React.FC = ({ children }) => {
 	};
 
 	return (
-		//This component will be used to encapsulate the whole App,
-		//so all components will have access to the Context
-		<AuthContext.Provider value={{ authData, setAuthData, loading, signIn, signOut, isAdmin }}>
-			{children}
-		</AuthContext.Provider>
-	);
+    //This component will be used to encapsulate the whole App,
+    //so all components will have access to the Context
+    <AuthContext.Provider
+      value={{
+        authData,
+        setAuthData,
+        loading,
+        signIn,
+        signOut,
+        isAdmin,
+        setShowLoader,
+		showLoader2
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 //A simple hooks to facilitate the access to the AuthContext

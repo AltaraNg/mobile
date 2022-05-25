@@ -61,19 +61,8 @@ export default function History({ navigation, route }: Props) {
       if (item?.status == "pending" || item?.status == "processing") {
         return "is in progress";
       }
-      if (item?.status == "denied") {
+      if (item?.status == "declined") {
         return "was unsuccessful";
-      }
-    };
-    const modalDetails = (item: any) => {
-      if (item?.status == "approved") {
-        return "A DSA agent will reach out to you shortly";
-      }
-      if (item?.status == "pending" || item?.status == "processing") {
-        return "A DSA agent will reach out to you shortly";
-      }
-      if (item?.status == "denied") {
-        return "You have an order request in progress";
       }
     };
   const toggleSideMenu = async () => {
@@ -180,7 +169,7 @@ export default function History({ navigation, route }: Props) {
                   </Text>
                 </Text>
 
-                <Text style={styles.errText}>{modalDetails(item)}</Text>
+                <Text style={styles.errText}>{item?.reason || "An agent will reach out to you shortly"}</Text>
               </View>
             </View>
           </Modal>

@@ -27,10 +27,9 @@ export default function Cards({
       setOrderRequestContext,
       orderRequestContext,
       fetchOrderRequestContext,
+      showButton,
     } = useContext(OrderContext);
-  const [requestOrder, setRequestOrder] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [pendingOrder, setPendingOrder] = useState(false);
 
   async function doSome() {
     setLoader(true);
@@ -48,7 +47,6 @@ export default function Cards({
         if (res.status === 200) {
           fetchOrderRequestContext();
           onRequest(res.data, "success", type);
-          setRequestOrder(true);
           setLoader(false);
         }
       } catch (error) {
@@ -56,7 +54,6 @@ export default function Cards({
         onRequest(error.response.data, "failed", type);
       }
     }else {
-      onRequest("You have an order request in progress.Click here to view", "failed", type);
        setLoader(false);
     }
    
@@ -65,9 +62,7 @@ export default function Cards({
   const trackOrder = () => {
     navigation.navigate("OrderRequest");
   };
-  // useEffect(() => {
-  //   fetchUser();
-  // }, [authData]);
+
   return (
     <View style={styles.container}>
       <View
@@ -83,30 +78,37 @@ export default function Cards({
       <Text style={styles.header}>{title}</Text>
       <Text style={styles.amount}>{amount}</Text>
       <View style={{ flexDirection: "row", backgroundColor: "transparent" }}>
-        <LinearGradient
-          colors={["#074A77", "#089CA4"]}
-          style={styles.buttonContainer}
-          start={{ x: 1, y: 0.5 }}
-          end={{ x: 0, y: 0.5 }}
-        >
-          <Pressable
-            style={[styles.button]}
-            onPress={doSome}
-            disabled={isDisabled}
+        {showButton ? (
+          <LinearGradient
+            colors={["#074A77", "#089CA4"]}
+            style={styles.buttonContainer}
+            start={{ x: 1, y: 0.5 }}
+            end={{ x: 0, y: 0.5 }}
           >
-            {loader ? (
-              <View style={{alignItems:'center', justifyContent:'center', backgroundColor:'transparent'}}>
-                <Image
-                  source={require("../assets/gifs/loader.gif")}
-                  style={{ width: 60, height: 27 }}
-                />
-              </View>
-            ) : (
-              <Text style={styles.buttonText}>Order Now</Text>
-            )}
-          </Pressable>
-        </LinearGradient>
-        {requestOrder && (
+            <Pressable
+              style={[styles.button]}
+              onPress={doSome}
+              disabled={isDisabled}
+            >
+              {loader ? (
+                <View
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "transparent",
+                  }}
+                >
+                  <Image
+                    source={require("../assets/gifs/loader.gif")}
+                    style={{ width: 60, height: 27 }}
+                  />
+                </View>
+              ) : (
+                <Text style={styles.buttonText}>Order Now</Text>
+              )}
+            </Pressable>
+          </LinearGradient>
+        ) : (
           <LinearGradient
             colors={["#9C9696", "#DADADA"]}
             style={styles.buttonContainer}
