@@ -2,8 +2,8 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 type OrderContextData = {
-  orderRequestContext;
-  setOrderRequestContext;
+  orderRequest;
+  setOrderRequest;
   fetchOrderRequestContext;
   showButton;
   showLoader;
@@ -12,7 +12,7 @@ type OrderContextData = {
 
 const OrderContext = createContext<OrderContextData>({} as OrderContextData);
 const OrderProvider: React.FC = ({ children }) => {
-  const [orderRequestContext, setOrderRequestContext] = useState(null);
+  const [orderRequest, setOrderRequest] = useState(null);
   const [showButton, setShowButton] = useState(null);
   const { authData } = useContext(AuthContext);
   const [showLoader, setShowLoader] = useState(false);
@@ -32,27 +32,25 @@ const OrderProvider: React.FC = ({ children }) => {
       });
       const orderRequestContext = response.data.data.order_requests;
       const reversed = orderRequestContext.reverse();
-      setOrderRequestContext(reversed);
+      setOrderRequest(reversed);
       const isPending = orderRequestContext?.some(
         (item) => item.status === "pending"
       );
-      isPending ? setShowButton(false) : setShowButton(true);
-       setShowLoader(false);
-    } catch (error: any) {setShowLoader(false);}
-    
-     
+      isPending ? setShowButton(false) : setShowButton(true); 
+      setShowLoader(false);
+    } catch (error: any) {setShowLoader(false);} 
   }
-
   return (
     //This component will be used to encapsulate the whole App,
     //so all components will have access to the Context
     <OrderContext.Provider
       value={{
-        setOrderRequestContext,
+        setOrderRequest,
         fetchOrderRequestContext,
-        orderRequestContext,
+        orderRequest,
+        showLoader,
+        setShowLoader,
         showButton,
-        showLoader,setShowLoader
       }}
     >
       {children}

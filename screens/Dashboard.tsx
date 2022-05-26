@@ -41,8 +41,8 @@ type Props = DrawerScreenProps<DrawerParamList, "Home">;
 export default function Dashboard({ navigation, route }: Props) {
   const { authData, setAuthData, showLoader2 } = useContext(AuthContext);
   const {
-    setOrderRequestContext,
-    orderRequestContext,
+    setOrderRequest,
+    orderRequest,
     fetchOrderRequestContext,
     showLoader,
   } = useContext(OrderContext);
@@ -106,8 +106,8 @@ export default function Dashboard({ navigation, route }: Props) {
 
   useEffect(() => {
     fetchUser();
-    fetchOrderRequestContext();
-  }, [authData, orderRequestContext,]);
+    // fetchOrderRequestContext();
+  }, [authData,]);
   
   return (
     <View style={styles.container}>
