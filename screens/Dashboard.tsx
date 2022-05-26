@@ -106,8 +106,8 @@ export default function Dashboard({ navigation, route }: Props) {
 
   useEffect(() => {
     fetchUser();
-    // fetchOrderRequestContext();
-  }, [authData,]);
+    fetchOrderRequestContext();
+  }, [authData, orderRequest]);
   
   return (
     <View style={styles.container}>
