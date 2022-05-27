@@ -92,12 +92,12 @@ export default function History({ navigation, route }: Props) {
 
 
   useEffect(() => {
-    if(orders.length){
-      return;
-    }
+    // if(orders.length){
+    //   return;
+    // }
     fetchOrder();
-    return () => mounted = false;
-  }, [alert, orders]);
+    // return () => mounted = false;
+  }, []);
   return (
     <View style={styles.container}>
 
