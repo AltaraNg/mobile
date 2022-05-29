@@ -37,31 +37,34 @@ type Props = NativeStackScreenProps<RootTabParamList, "OrderRequest">;
 
 export default function History({ navigation, route }: Props) {
   const { authData } = useContext(AuthContext);
-  const { setOrderRequestContext, orderRequestContext } = useContext(OrderContext);
-  const [orderRequests, setOrderRequests] = useState(null);
-  const [showLoader, setShowLoader] = useState(false);
+  const {
+    setOrderRequest,
+    orderRequest,
+    fetchOrderRequestContext,
+    showLoader,
+  } = useContext(OrderContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [pressedOrder, setPressedOrder] = useState(null);
 
   const styleSVG = (item: any) => {
-    if (item?.status == 'approved') {
+    if (item?.status == "approved" || item?.status == "accepted") {
       return "#074A74";
     }
     if (item?.status == 'pending' || item?.status == 'processing') {
       return "#FDC228";
     }
-    if (item?.status == 'denied') {
+    if (item?.status == "denied" || item?.status == "declined") {
       return "#FF4133";
     }
   };
   const modalResponse = (item: any) => {
-      if (item?.status == "approved") {
+      if (item?.status == "approved" || item?.status == "accepted") {
         return "was successful";
       }
       if (item?.status == "pending" || item?.status == "processing") {
         return "is in progress";
       }
-      if (item?.status == "declined") {
+      if (item?.status == "declined" || item?.status == "denied") {
         return "was unsuccessful";
       }
     };
@@ -176,6 +179,9 @@ export default function History({ navigation, route }: Props) {
         </View>
       );
     };
+      useEffect(() => {
+        fetchOrderRequestContext();
+      }, [orderRequest]);
 
   return (
     <View style={styles.container}>
@@ -193,7 +199,7 @@ export default function History({ navigation, route }: Props) {
         {showLoader ? (
           <Image
             source={require("../assets/gifs/loader.gif")}
-            style={styles.image}
+            style={styles.image2}
           />
         ) : (
           <View
@@ -202,10 +208,10 @@ export default function History({ navigation, route }: Props) {
               // marginBottom: 60,
             }}
           >
-            {orderRequestContext?.length > 0 ? (
+            {orderRequest?.length > 0 ? (
               <FlatList
                 scrollEnabled={true}
-                data={orderRequestContext}
+                data={orderRequest}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <View style={{ backgroundColor: "#fff" }}>
@@ -304,7 +310,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginVertical: 10,
     padding: 7,
-    paddingRight:20,
+    paddingRight: 20,
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -321,6 +327,14 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#fff",
+  },
+  image2: {
+    width: Dimensions.get("window").height * 0.2,
+    height: Dimensions.get("window").height * 0.2,
+    backgroundColor: "#fff",
+    position: "absolute",
+    top: Dimensions.get("window").height * 0.2,
+    left: Dimensions.get("window").width * 0.25,
   },
   name: {
     marginHorizontal: 30,
@@ -354,8 +368,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    flexDirection:'column',
-    alignItems:'center'
+    flexDirection: "column",
+    alignItems: "center",
   },
   modalHeading: {
     fontFamily: "Montserrat_700Bold",

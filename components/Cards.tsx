@@ -24,17 +24,18 @@ export default function Cards({
   axios.defaults.baseURL = url;
   const { authData } = useContext(AuthContext);
     const {
-      setOrderRequestContext,
-      orderRequestContext,
+      setOrderRequest,
+      orderRequest,
       fetchOrderRequestContext,
       showButton,
     } = useContext(OrderContext);
   const [loader, setLoader] = useState(false);
+  const [requestOrder, setRequestOrder] = useState(null);
 
   async function doSome() {
     setLoader(true);
-    const isPending = orderRequestContext?.some((item) => item.status === 'pending'); 
-    if (!isPending) {
+    // const isPending = orderRequest?.some((item) => item.status === 'pending'); 
+    
       try {
         let res = await axios({
           method: "POST",
@@ -48,20 +49,24 @@ export default function Cards({
           fetchOrderRequestContext();
           onRequest(res.data, "success", type);
           setLoader(false);
+          setRequestOrder(true);
         }
       } catch (error) {
         setLoader(false);
         onRequest(error.response.data, "failed", type);
       }
-    }else {
-       setLoader(false);
-    }
+    // }else {
+    //   setRequestOrder(false)
+    //    setLoader(false);
+    // }
    
    
   }
+  
   const trackOrder = () => {
     navigation.navigate("OrderRequest");
   };
+
 
   return (
     <View style={styles.container}>
@@ -108,24 +113,27 @@ export default function Cards({
               )}
             </Pressable>
           </LinearGradient>
-        ) : (
-          <LinearGradient
-            colors={["#9C9696", "#DADADA"]}
-            style={styles.buttonContainer}
-            start={{ x: 1, y: 0.5 }}
-            end={{ x: 0, y: 0.5 }}
-          >
-            <Pressable
-              style={[styles.button]}
-              onPress={trackOrder}
-              disabled={isDisabled}
+        ):( 
+                       <LinearGradient
+              colors={["#9C9696", "#DADADA"]}
+              style={styles.buttonContainer}
+              start={{ x: 1, y: 0.5 }}
+              end={{ x: 0, y: 0.5 }}
             >
-              <Text style={[styles.buttonText, { color: "black" }]}>
-                Track Order
-              </Text>
-            </Pressable>
-          </LinearGradient>
+              <Pressable
+                style={[styles.button]}
+                onPress={trackOrder}
+                disabled={isDisabled}
+              >
+                <Text style={[styles.buttonText, { color: "black" }]}>
+                  Track Order
+                </Text>
+              </Pressable>
+            </LinearGradient>
+
         )}
+      
+ 
       </View>
     </View>
   );
