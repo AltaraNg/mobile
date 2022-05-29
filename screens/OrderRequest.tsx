@@ -38,8 +38,8 @@ type Props = NativeStackScreenProps<RootTabParamList, "OrderRequest">;
 export default function History({ navigation, route }: Props) {
   const { authData } = useContext(AuthContext);
   const {
-    setOrderRequestContext,
-    orderRequestContext,
+    setOrderRequest,
+    orderRequest,
     fetchOrderRequestContext,
     showLoader2,
   } = useContext(OrderContext);
@@ -47,24 +47,24 @@ export default function History({ navigation, route }: Props) {
   const [pressedOrder, setPressedOrder] = useState(null);
 
   const styleSVG = (item: any) => {
-    if (item?.status == 'accepted') {
+    if (item?.status == "approved" || item?.status == "accepted") {
       return "#074A74";
     }
     if (item?.status == 'pending' || item?.status == 'processing') {
       return "#FDC228";
     }
-    if (item?.status == 'declined') {
+    if (item?.status == "denied" || item?.status == "declined") {
       return "#FF4133";
     }
   };
   const modalResponse = (item: any) => {
-      if (item?.status == "accepted") {
+      if (item?.status == "approved" || item?.status == "accepted") {
         return "was successful";
       }
       if (item?.status == "pending" || item?.status == "processing") {
         return "is in progress";
       }
-      if (item?.status == "declined") {
+      if (item?.status == "declined" || item?.status == "denied") {
         return "was unsuccessful";
       }
     };
@@ -208,10 +208,10 @@ export default function History({ navigation, route }: Props) {
               // marginBottom: 60,
             }}
           >
-            {orderRequestContext?.length > 0 ? (
+            {orderRequest?.length > 0 ? (
               <FlatList
                 scrollEnabled={true}
-                data={orderRequestContext}
+                data={orderRequest}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <View style={{ backgroundColor: "#fff" }}>
@@ -335,6 +335,14 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#fff",
+  },
+  image2: {
+    width: Dimensions.get("window").height * 0.2,
+    height: Dimensions.get("window").height * 0.2,
+    backgroundColor: "#fff",
+    position: "absolute",
+    top: Dimensions.get("window").height * 0.2,
+    left: Dimensions.get("window").width * 0.25,
   },
   name: {
     marginHorizontal: 30,

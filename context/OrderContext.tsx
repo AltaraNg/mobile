@@ -2,8 +2,8 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 type OrderContextData = {
-  orderRequestContext;
-  setOrderRequestContext;
+  orderRequest;
+  setOrderRequest;
   fetchOrderRequestContext;
   showLoader2;
   setShowLoader;
@@ -11,7 +11,7 @@ type OrderContextData = {
 
 const OrderContext = createContext<OrderContextData>({} as OrderContextData);
 const OrderProvider: React.FC = ({ children }) => {
-  const [orderRequestContext, setOrderRequestContext] = useState(null);
+  const [orderRequest, setOrderRequest] = useState(null);
   const { authData } = useContext(AuthContext);
   const [showLoader2, setShowLoader] = useState(false);
   useEffect(() => {
@@ -30,7 +30,7 @@ const OrderProvider: React.FC = ({ children }) => {
       });
       const orderRequestContext = response.data.data.order_requests;
       const reversed = orderRequestContext.reverse();
-      setOrderRequestContext(reversed);
+      setOrderRequest(reversed);
       // const isPending = orderRequestContext?.some(
       //   (item) => item.status === "pending"
       // );
@@ -40,16 +40,16 @@ const OrderProvider: React.FC = ({ children }) => {
     
      
   }
-
   return (
     //This component will be used to encapsulate the whole App,
     //so all components will have access to the Context
     <OrderContext.Provider
       value={{
-        setOrderRequestContext,
+        setOrderRequest,
         fetchOrderRequestContext,
-        orderRequestContext,
-        showLoader2,setShowLoader
+        orderRequest,
+        showLoader2,
+        setShowLoader,
       }}
     >
       {children}

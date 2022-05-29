@@ -42,8 +42,8 @@ export default function Dashboard({ navigation, route }: Props) {
   const { authData, setAuthData, showLoader, setShowLoader } =
     useContext(AuthContext);
   const {
-    setOrderRequestContext,
-    orderRequestContext,
+    setOrderRequest,
+    orderRequest,
     fetchOrderRequestContext,
     showLoader2,
   } = useContext(OrderContext);
