@@ -37,25 +37,28 @@ type Props = NativeStackScreenProps<RootTabParamList, "OrderRequest">;
 
 export default function History({ navigation, route }: Props) {
   const { authData } = useContext(AuthContext);
-  const { setOrderRequestContext, orderRequestContext } = useContext(OrderContext);
-  const [orderRequests, setOrderRequests] = useState(null);
-  const [showLoader, setShowLoader] = useState(false);
+  const {
+    setOrderRequestContext,
+    orderRequestContext,
+    fetchOrderRequestContext,
+    showLoader2,
+  } = useContext(OrderContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [pressedOrder, setPressedOrder] = useState(null);
 
   const styleSVG = (item: any) => {
-    if (item?.status == 'approved') {
+    if (item?.status == 'accepted') {
       return "#074A74";
     }
     if (item?.status == 'pending' || item?.status == 'processing') {
       return "#FDC228";
     }
-    if (item?.status == 'denied') {
+    if (item?.status == 'declined') {
       return "#FF4133";
     }
   };
   const modalResponse = (item: any) => {
-      if (item?.status == "approved") {
+      if (item?.status == "accepted") {
         return "was successful";
       }
       if (item?.status == "pending" || item?.status == "processing") {
@@ -176,6 +179,9 @@ export default function History({ navigation, route }: Props) {
         </View>
       );
     };
+      useEffect(() => {
+        fetchOrderRequestContext();
+      }, []);
 
   return (
     <View style={styles.container}>
@@ -190,10 +196,10 @@ export default function History({ navigation, route }: Props) {
 
       <View style={styles.main}>
         <Text style={styles.name}>Order Request</Text>
-        {showLoader ? (
+        {showLoader2 ? (
           <Image
             source={require("../assets/gifs/loader.gif")}
-            style={styles.image}
+            style={styles.image2}
           />
         ) : (
           <View
@@ -276,6 +282,14 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").height * 0.46,
     height: Dimensions.get("window").height * 0.46,
   },
+  image2: {
+    width: Dimensions.get("window").height * 0.2,
+    height: Dimensions.get("window").height * 0.2,
+    backgroundColor: "#fff",
+    position: "absolute",
+    top: Dimensions.get("window").height * 0.2,
+    left: Dimensions.get("window").width * 0.25,
+  },
   hamburger: {
     marginTop: 80,
     marginRight: 24,
@@ -304,7 +318,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginVertical: 10,
     padding: 7,
-    paddingRight:20,
+    paddingRight: 20,
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -354,8 +368,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    flexDirection:'column',
-    alignItems:'center'
+    flexDirection: "column",
+    alignItems: "center",
   },
   modalHeading: {
     fontFamily: "Montserrat_700Bold",

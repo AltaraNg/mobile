@@ -115,7 +115,7 @@ export default function History({ navigation, route }: Props) {
         {showLoader ? (
           <Image
             source={require("../assets/gifs/loader.gif")}
-            style={styles.image}
+            style={styles.image2}
           />
         ) : (
           <View
@@ -195,6 +195,14 @@ const styles = StyleSheet.create({
   image: {
     width: Dimensions.get("window").height * 0.46,
     height: Dimensions.get("window").height * 0.46,
+  },
+  image2: {
+    width: Dimensions.get("window").height * 0.2,
+    height: Dimensions.get("window").height * 0.2,
+    backgroundColor: "#EFF5F9",
+    position: "absolute",
+    top: Dimensions.get("window").height * 0.2,
+    left: Dimensions.get("window").width * 0.25,
   },
   hamburger: {
     marginTop: 80,

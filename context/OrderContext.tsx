@@ -5,17 +5,15 @@ type OrderContextData = {
   orderRequestContext;
   setOrderRequestContext;
   fetchOrderRequestContext;
-  showButton;
-  showLoader;
+  showLoader2;
   setShowLoader;
 };
 
 const OrderContext = createContext<OrderContextData>({} as OrderContextData);
 const OrderProvider: React.FC = ({ children }) => {
   const [orderRequestContext, setOrderRequestContext] = useState(null);
-  const [showButton, setShowButton] = useState(null);
   const { authData } = useContext(AuthContext);
-  const [showLoader, setShowLoader] = useState(false);
+  const [showLoader2, setShowLoader] = useState(false);
   useEffect(() => {
     //Every time the App is opened, this provider is rendered
     //and call de fetchOrderRequestContext function.
@@ -33,10 +31,10 @@ const OrderProvider: React.FC = ({ children }) => {
       const orderRequestContext = response.data.data.order_requests;
       const reversed = orderRequestContext.reverse();
       setOrderRequestContext(reversed);
-      const isPending = orderRequestContext?.some(
-        (item) => item.status === "pending"
-      );
-      isPending ? setShowButton(false) : setShowButton(true);
+      // const isPending = orderRequestContext?.some(
+      //   (item) => item.status === "pending"
+      // );
+      // isPending ? setShowButton(false) : setShowButton(true);
        setShowLoader(false);
     } catch (error: any) {setShowLoader(false);}
     
@@ -51,8 +49,7 @@ const OrderProvider: React.FC = ({ children }) => {
         setOrderRequestContext,
         fetchOrderRequestContext,
         orderRequestContext,
-        showButton,
-        showLoader,setShowLoader
+        showLoader2,setShowLoader
       }}
     >
       {children}

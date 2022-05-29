@@ -27,10 +27,9 @@ export default function Cards({
       setOrderRequestContext,
       orderRequestContext,
       fetchOrderRequestContext,
-      showButton,
     } = useContext(OrderContext);
   const [loader, setLoader] = useState(false);
-
+  const [showButton, setShowButton] = useState(null);
   async function doSome() {
     setLoader(true);
     const isPending = orderRequestContext?.some((item) => item.status === 'pending'); 
@@ -47,6 +46,7 @@ export default function Cards({
         if (res.status === 200) {
           fetchOrderRequestContext();
           onRequest(res.data, "success", type);
+          setShowButton(true)
           setLoader(false);
         }
       } catch (error) {

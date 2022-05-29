@@ -17,7 +17,7 @@ import { Button, Overlay, Icon } from "react-native-elements";
 import { LinearGradient } from "expo-linear-gradient";
 import { SuccessSvg, FailSvg, LogOut, User } from "../assets/svgs/svg";
 import Header from "../components/Header";
-import React, { useState, createRef, useEffect, useContext } from "react";
+import React, { useState, createRef, useEffect, useContext, } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
 import {
@@ -39,12 +39,13 @@ import Upload from "../components/Upload";
 type Props = DrawerScreenProps<DrawerParamList, "Home">;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { authData, setAuthData, showLoader2 } = useContext(AuthContext);
+  const { authData, setAuthData, showLoader, setShowLoader } =
+    useContext(AuthContext);
   const {
     setOrderRequestContext,
     orderRequestContext,
     fetchOrderRequestContext,
-    showLoader,
+    showLoader2,
   } = useContext(OrderContext);
   const [exitApp, setExitApp] = useState(1);
   const [isError, setIsError] = useState(false);
@@ -94,6 +95,7 @@ export default function Dashboard({ navigation, route }: Props) {
       (val) => val
     );
     setUploaded(upload);
+    setShowLoader(true)
   };
   const navigating = (first_choice, second_choice) => {
     if (!onBoarded) {
@@ -106,8 +108,7 @@ export default function Dashboard({ navigation, route }: Props) {
 
   useEffect(() => {
     fetchUser();
-    fetchOrderRequestContext();
-  }, [authData, orderRequestContext,]);
+  }, [authData,]);
   
   return (
     <View style={styles.container}>
@@ -246,7 +247,7 @@ export default function Dashboard({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
-      {showLoader || showLoader2 ? (
+      {!showLoader || showLoader2 ? (
         <Image
           source={require("../assets/gifs/loader.gif")}
           style={styles.image}

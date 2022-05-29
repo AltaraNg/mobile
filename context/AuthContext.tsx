@@ -7,7 +7,7 @@ import { AuthData, authService } from '../services/authService';
 type AuthContextData = {
   setAuthData;
   isAdmin: boolean;
-  showLoader2;
+  showLoader;
   setShowLoader;
   authData?: AuthData;
   loading: boolean;
@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
 	const [authData, setAuthData] = useState<AuthData>();
-	const [showLoader2, setShowLoader] = useState(false);
+	const [showLoader, setShowLoader] = useState(false);;
 	//the AuthContext start with loading equals true
 	//and stay like this, until the data be load from Async Storage
 	const [loading, setLoading] = useState(true);
@@ -107,7 +107,7 @@ const AuthProvider: React.FC = ({ children }) => {
         signOut,
         isAdmin,
         setShowLoader,
-		showLoader2
+        showLoader,
       }}
     >
       {children}
