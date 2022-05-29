@@ -130,6 +130,7 @@ export default function History({ navigation, route }: Props) {
                 scrollEnabled={true}
                 data={orders}
                 keyExtractor={(item) => item.id}
+                extraData={orders}
                 refreshControl={
                   <RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />
                 }
