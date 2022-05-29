@@ -23,51 +23,54 @@ export default function Cards({
   let url = Constants?.manifest?.extra?.URL;
   axios.defaults.baseURL = url;
   const { authData } = useContext(AuthContext);
-    const {
-      setOrderRequest,
-      orderRequest,
-      fetchOrderRequestContext,
-    } = useContext(OrderContext);
+  const { setOrderRequest, orderRequest, fetchOrderRequestContext } =
+    useContext(OrderContext);
   const [loader, setLoader] = useState(false);
   const [showButton, setShowButton] = useState(null);
   const [requestOrder, setRequestOrder] = useState(null);
 
   async function doSome() {
     setLoader(true);
-    // const isPending = orderRequest?.some((item) => item.status === 'pending'); 
-    
-      try {
-        let res = await axios({
-          method: "POST",
-          data: {
-            order_type: type,
-          },
-          url: "/submit/request",
-          headers: { Authorization: `Bearer ${authData.token}` },
-        });
-        if (res.status === 200) {
-          fetchOrderRequestContext();
-          onRequest(res.data, "success", type);
-          setShowButton(true)
-          setLoader(false);
-          setRequestOrder(true);
-        }
-      } catch (error) {
+    try {
+      let res = await axios({
+        method: "POST",
+        data: {
+          order_type: type,
+        },
+        url: "/submit/request",
+        headers: { Authorization: `Bearer ${authData.token}` },
+      });
+      if (res.status === 200) {
+        fetchOrderRequestContext();
+        onRequest(res.data, "success", type);
+        // setShowButton(false);
         setLoader(false);
-        onRequest(error.response.data, "failed", type);
+        setRequestOrder(true);
       }
+    } catch (error) {
+      setLoader(false);
+      onRequest(error.response.data, "failed", type);
+    }
     // }else {
     //   setRequestOrder(false)
     //    setLoader(false);
     // }
-   
-   
   }
-  
+    const checkOrder = () => {
+       const isPending = orderRequest?.some(
+         (item) => item.status === "pending"
+       );
+       const checkTitle= orderRequest?.find((item)=>{ return item.status=='pending'} )
+       isPending ? setShowButton(false) : setShowButton(true);
+    };
+ 
   const trackOrder = () => {
     navigation.navigate("OrderRequest");
   };
-
+    useEffect(() => {
+      
+      checkOrder();
+    }, []);
 
   return (
     <View style={styles.container}>
@@ -114,27 +117,24 @@ export default function Cards({
               )}
             </Pressable>
           </LinearGradient>
-        ):( 
-                       <LinearGradient
-              colors={["#9C9696", "#DADADA"]}
-              style={styles.buttonContainer}
-              start={{ x: 1, y: 0.5 }}
-              end={{ x: 0, y: 0.5 }}
+        ) : (
+          <LinearGradient
+            colors={["#9C9696", "#DADADA"]}
+            style={styles.buttonContainer}
+            start={{ x: 1, y: 0.5 }}
+            end={{ x: 0, y: 0.5 }}
+          >
+            <Pressable
+              style={[styles.button]}
+              onPress={trackOrder}
+              disabled={isDisabled}
             >
-              <Pressable
-                style={[styles.button]}
-                onPress={trackOrder}
-                disabled={isDisabled}
-              >
-                <Text style={[styles.buttonText, { color: "black" }]}>
-                  Track Order
-                </Text>
-              </Pressable>
-            </LinearGradient>
-
+              <Text style={[styles.buttonText, { color: "black" }]}>
+                Track Order
+              </Text>
+            </Pressable>
+          </LinearGradient>
         )}
-      
- 
       </View>
     </View>
   );

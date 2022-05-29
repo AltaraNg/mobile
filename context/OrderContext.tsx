@@ -34,7 +34,7 @@ const OrderProvider: React.FC = ({ children }) => {
       // const isPending = orderRequestContext?.some(
       //   (item) => item.status === "pending"
       // );
-      // isPending ? setShowButton(false) : setShowButton(true);
+      // 
        setShowLoader(false);
     } catch (error: any) {setShowLoader(false);}
     
