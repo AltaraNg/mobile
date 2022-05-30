@@ -119,7 +119,7 @@ export default function History({ navigation, route }: Props) {
         ) : (
           <View
             style={{
-              backgroundColor: "#EFF5F9",
+              backgroundColor: "#fff",
               marginBottom: 60,
             }}
           >
@@ -134,7 +134,7 @@ export default function History({ navigation, route }: Props) {
                   <RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />
                 }
                 renderItem={({ item }) => (
-                  <View style={{ backgroundColor: "#EFF5F9" }}>
+                  <View style={{ backgroundColor: "#fff" }}>
                     <Pressable onPress={() => viewDetail(item)}>
                       <View style={styles.order}>
                         <View style={styles.details}>
@@ -155,7 +155,7 @@ export default function History({ navigation, route }: Props) {
                             </Text>
                           </View>
                         </View>
-                        <Text style={{ color: "#000", fontSize: 13 }}>
+                        <Text style={{ color: "#000", fontSize: 13, marginRight:59 }}>
                           {item?.attributes?.order_date}
                         </Text>
                       </View>
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   image2: {
     width: Dimensions.get("window").height * 0.2,
     height: Dimensions.get("window").height * 0.2,
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     position: "absolute",
     top: Dimensions.get("window").height * 0.2,
     left: Dimensions.get("window").width * 0.25,
@@ -209,38 +209,47 @@ const styles = StyleSheet.create({
     marginRight: 24,
   },
   cards: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     flexDirection: "column",
     alignItems: "center",
   },
   title: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     marginLeft: 10,
     width: "65%",
   },
   details: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     flexDirection: "row",
     alignItems: "center",
+    
   },
   order: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     flexDirection: "row",
     marginLeft: 26,
     marginRight: 20,
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 30,
+    marginVertical: 10,
+    padding: 7,
+    paddingRight: 30,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
   },
   header: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
   },
   main: {
     flex: 3,
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
   },
   name: {
     marginHorizontal: 30,

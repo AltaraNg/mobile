@@ -138,281 +138,290 @@ export default function OrderDetails({ navigation, route }: Props) {
 	};
 
 	return (
-		<View style={styles.container}>
-			<View style={styles.header}>
-				<View
-					style={{
-						backgroundColor: '#074A74',
-						alignSelf: 'center',
-						// marginLeft:
-					}}
-				>
-					<Pressable onPress={goBack}>
-						<BackButton />
-					</Pressable>
-				</View>
-				<Text style={styles.headerText}>Order Details</Text>
-			</View>
-			<View style={styles.orderSummary}>
-				<View style={styles.orderDetail}>
-					<Text style={{ fontFamily: 'Montserrat_400Regular', color: '#000000', }}>
-						Order ID: {order.attributes.order_number}
-					</Text>
-					<Text
-						numberOfLines={1}
-						ellipsizeMode={'tail'}
-						style={{ fontFamily: 'Montserrat_700Bold', fontSize: 16, color: '#000000', }}
-					>
-						{order.included.product.name}
-					</Text>
-				</View>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View
+          style={{
+            backgroundColor: "#074A74",
+            alignSelf: "center",
+            // marginLeft:
+          }}
+        >
+          <Pressable onPress={goBack}>
+            <BackButton />
+          </Pressable>
+        </View>
+        <Text style={styles.headerText}>Order Details</Text>
+      </View>
+      <View style={styles.orderSummary}>
+        <View style={styles.orderDetail}>
+          <Text
+            style={{ fontFamily: "Montserrat_400Regular", color: "#000000", fontSize:11 }}
+          >
+            Order ID: {order.attributes.order_number}
+          </Text>
+          <Text
+            numberOfLines={1}
+            ellipsizeMode={"tail"}
+            style={{
+              fontFamily: "Montserrat_700Bold",
+              fontSize: 16,
+              color: "#000000",
+            }}
+          >
+            {order.included.product.name}
+          </Text>
+        </View>
 
-				<Text style={styleStatus(order)}>{orderStatusChi(order)}</Text>
-			</View>
-			<View style={styles.cardContainer}>
-				<View
-					style={{
-						backgroundColor: 'rgba(156, 150, 150, 0.55)',
+        <Text style={styleStatus(order)}>{orderStatusChi(order)}</Text>
+      </View>
+      <View style={styles.cardContainer}>
+        <View
+          style={{
+            backgroundColor: "rgba(156, 150, 150, 0.55)",
 
-						position: 'absolute',
-						zIndex: 10,
-					}}
-				></View>
-				<Leaf style={styles.leaf} />
-				
-				<View style={{
-					backgroundColor: 'transparent',
-					position: 'absolute',
-					right: 0,
-					width: '50%',
-					marginVertical: 8,
-					paddingHorizontal: 9,
-					
-				}}>
-				<Text
-					style={{
-						color: 'white',
-						fontFamily: 'Montserrat_400Regular',
-						textAlign: 'left',
-						alignSelf:'auto',
-						textTransform: 'capitalize',
-						fontSize: 12,
-					}}
-				>
-					next repayment
-				</Text>
-				<Text
-					style={{
-						color: 'white',
-						fontFamily: 'Montserrat_500Medium',
-						textAlign: 'left',
-						textTransform: 'capitalize',
-						fontSize: 14,
-						alignSelf:'auto',
+            position: "absolute",
+            zIndex: 10,
+          }}
+        ></View>
+        <Leaf style={styles.leaf} />
 
-					}}
-				>
-					{nextRepayment(order)}
-				</Text>
-				</View>
-				<Text
-					style={{
-						color: 'white',
-						fontFamily: 'Montserrat_400Regular',
-						marginVertical: 20
-					}}
-				>
-					Product Price
-				</Text>
-				<Text
-					style={{
-						color: 'white',
-						fontFamily: 'Montserrat_700Bold',
-						fontSize: 28,
-					}}
-				>
-					₦
-					{order.attributes.product_price
-						.toString()
-						.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-				</Text>
-				<View style={styles.statusBar}>
-					<Animated.View
-						style={[
-							StyleSheet.absoluteFill,
-							{ backgroundColor: '#007AFF', width: `${progressBar}%` },
-						]}
-					/>
-				</View>
+        <View
+          style={{
+            backgroundColor: "transparent",
+            position: "absolute",
+            right: -40,
+            width: "50%",
+            marginVertical: 8,
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              fontFamily: "Montserrat_400Regular",
+              textAlign: "left",
+              alignSelf: "auto",
+              textTransform: "capitalize",
+              fontSize: 12,
+            }}
+          >
+            next repayment
+          </Text>
+          <Text
+            style={{
+              color: "white",
+              fontFamily: "Montserrat_700Bold",
+              textAlign: "left",
+              textTransform: "capitalize",
+              fontSize: 14,
+              alignSelf: "auto",
+            }}
+          >
+            {nextRepayment(order)}
+          </Text>
+        </View>
+        <Text
+          style={{
+            color: "white",
+            fontFamily: "Montserrat_400Regular",
+            marginTop: 35,
+          }}
+        >
+          Product Price
+        </Text>
+        <Text
+          style={{
+            color: "white",
+            fontFamily: "Montserrat_700Bold",
+            fontSize: 28,
+          }}
+        >
+          ₦
+          {order.attributes.product_price
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+        </Text>
+        <View style={styles.statusBar}>
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFill,
+              { backgroundColor: "#007AFF", width: `${progressBar}%` },
+            ]}
+          />
+        </View>
 
-				<View style={styles.repaymentStatus}>
-					<Text style={{ color: 'white', fontFamily: 'Montserrat_500Medium' }}>
-						Total Paid{' '}
-						<Text style={{ color: 'white', fontFamily: 'Montserrat_700Bold' }}>
-							₦{totalPaid.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-						</Text>
-					</Text>
-					<Text style={{ color: 'white', fontFamily: 'Montserrat_500Medium' }}>
-						Total Debt{' '}
-						<Text style={{ color: 'white', fontFamily: 'Montserrat_700Bold' }}>
-							₦{totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-						</Text>
-					</Text>
-				</View>
-			</View>
+        <View style={styles.repaymentStatus}>
+          <Text style={{ color: "white", fontFamily: "Montserrat_400Regular", }}>
+            Total Paid{" "}
+            <Text style={{ color: "white", fontFamily: "Montserrat_700Bold" }}>
+              ₦{totalPaid.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+            </Text>
+          </Text>
+          <Text style={{ color: "white", fontFamily: "Montserrat_400Regular", }}>
+            Total Debt{" "}
+            <Text style={{ color: "white", fontFamily: "Montserrat_700Bold" }}>
+              ₦{totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+            </Text>
+          </Text>
+        </View>
+      </View>
 
-			<View style={styles.amortizationContainer}>
-				<Text style={styles.amorHeader}>Repayments</Text>
+      <View style={styles.amortizationContainer}>
+        <Text style={styles.amorHeader}>Repayments</Text>
 
-				<FlatList
-					scrollEnabled={true}
-					data={amortization}
-					keyExtractor={(item) => item.id}
-					renderItem={({ item }) => (
-						<View
-							style={{
-								backgroundColor: '#CDDBE3',
-								flexDirection: 'row',
-								justifyContent: 'space-between',
-								marginVertical: 10,
-								elevation: 5,
-								paddingVertical: 10,
-								paddingHorizontal: 10,
-								borderRadius: 10,
-								alignItems: 'center',
-							}}
-						>
-							<View
-								style={{
-									justifyContent: 'space-between',
-									flexDirection: 'row',
-									backgroundColor: '#CDDBE3',
-								}}
-							>
-								<View style={{ backgroundColor: '#CDDBE3', paddingRight: 10 }}>
-									{orderStatus(item) === 'fail' ? (
-										<OrderStatusFail />
-									) : orderStatus(item) === 'pending' ? (
-										<OrderStatusPending />
-									) : (
-										<OrderStatusPass />
-									)}
-								</View>
+        <FlatList
+          scrollEnabled={true}
+          data={amortization}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View
+              style={{
+                backgroundColor: "#EFF5F9",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginVertical: 10,
+                elevation: 5,
+                paddingVertical: 10,
+                paddingHorizontal: 10,
+                borderRadius: 10,
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  justifyContent: "space-between",
+                  flexDirection: "row",
+                  backgroundColor: "#EFF5F9",
+                }}
+              >
+                <View style={{ backgroundColor: "#EFF5F9", paddingRight: 10 }}>
+                  {orderStatus(item) === "fail" ? (
+                    <OrderStatusFail />
+                  ) : orderStatus(item) === "pending" ? (
+                    <OrderStatusPending />
+                  ) : (
+                    <OrderStatusPass />
+                  )}
+                </View>
 
-								<Text
-									style={{
-										fontFamily: 'Montserrat_500Medium',
-										fontSize: 18,
-										color: '#074A74',
-									}}
-								>
-									₦
-									{item.expected_amount
-										.toString()
-										.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-								</Text>
-							</View>
-							<Text
-								style={{
-									fontSize: 12,
-									color: '#000000',
-								}}
-							>
-								{checkValid(item) ? 'Payment date: ' : 'Due date: '}
-								<Text style={{ fontWeight: 'bold', fontSize: 14, color: '#000000', }}>
-									{checkValid(item) ? item.actual_payment_date : item.expected_payment_date}
-								</Text>
-							</Text>
-						</View>
-					)}
-				/>
-			</View>
-		</View>
-	);
+                <Text
+                  style={{
+                    fontFamily: "Montserrat_500Medium",
+                    fontSize: 18,
+                    color: "#074A74",
+                  }}
+                >
+                  ₦
+                  {item.expected_amount
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                </Text>
+              </View>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: "#000000",
+                }}
+              >
+                {checkValid(item) ? "Payment date: " : "Due date: "}
+                <Text
+                  style={{ fontWeight: "bold", fontSize: 14, color: "#000000" }}
+                >
+                  {checkValid(item)
+                    ? item.actual_payment_date
+                    : item.expected_payment_date}
+                </Text>
+              </Text>
+            </View>
+          )}
+        />
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#EFF5F9',
-		paddingTop: 23,
-	},
-	header: {
-		backgroundColor: '#074A74',
-		padding: 20,
-		flexDirection: 'row',
-		justifyContent: 'flex-start',
-		alignItems: 'center',
-	},
-	headerText: {
-		color: 'white',
-		textTransform: 'uppercase',
-		fontFamily: 'Montserrat_700Bold',
-		marginLeft: 90,
-	},
-	orderSummary: {
-		flexDirection: 'row',
-		paddingHorizontal: 20,
-		backgroundColor: '#EFF5F9',
-		marginTop: 10,
-	},
-	orderDetail: {
-		flex: 1,
-		backgroundColor: '#EFF5F9',
-	},
-	orderStatus: {
-		flex: 1,
-		backgroundColor: '#EFF5F9',
-	},
-	leaf: {
-		position: 'absolute',
-		right: 0,
-	},
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: 23,
+  },
+  header: {
+    backgroundColor: "#074A74",
+    padding: 20,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  headerText: {
+    color: "white",
+    textTransform: "uppercase",
+    fontFamily: "Montserrat_700Bold",
+    marginLeft: 90,
+  },
+  orderSummary: {
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    backgroundColor: "#fff",
+    marginTop: 10,
+  },
+  orderDetail: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  orderStatus: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  leaf: {
+    position: "absolute",
+    right: 0,
+  },
 
-	statusText: {
-		textAlign: 'right',
-		paddingVertical: 10,
-		marginHorizontal: 10,
-	},
-	cardContainer: {
-		height: 200,
-		width: 350,
-		backgroundColor: '#074A74',
-		borderRadius: 5,
-		marginBottom: 10,
-		marginTop: 10,
-		padding: 10,
-		alignSelf: 'center',
-		paddingLeft: 15,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.8,
-		shadowRadius: 2,
-		elevation: 5,
-	},
-	amortizationContainer: {
-		backgroundColor: '#EFF5F9',
-		marginHorizontal: 15,
-		flex: 1,
-	},
-	amorHeader: {
-		fontFamily: 'Montserrat_700Bold',
-		color: '#074A74',
-		fontSize: 19,
-		marginVertical: 10,
-	},
-	statusBar: {
-		height: 15,
-		width: '100%',
-		backgroundColor: '#C4C4C4',
-		opacity: 0.4,
-		borderWidth: 2,
-		borderRadius: 10,
-		marginVertical: 15,
-	},
-	repaymentStatus: {
-		backgroundColor: '#074A74',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-	},
+  statusText: {
+    textAlign: "right",
+    paddingVertical: 10,
+    marginHorizontal: 10,
+  },
+  cardContainer: {
+    height: 200,
+    width: 350,
+    backgroundColor: "#074A74",
+    borderRadius: 5,
+    marginBottom: 10,
+    marginTop: 10,
+    padding: 10,
+    alignSelf: "center",
+    paddingLeft: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  amortizationContainer: {
+    backgroundColor: "#fff",
+    marginHorizontal: 15,
+    flex: 1,
+  },
+  amorHeader: {
+    fontFamily: "Montserrat_700Bold",
+    color: "#074A74",
+    fontSize: 19,
+    marginVertical: 10,
+  },
+  statusBar: {
+    height: 15,
+    width: "100%",
+    backgroundColor: "#EFF5F9",
+    opacity: 0.7,
+    borderWidth: 2,
+    borderRadius: 10,
+    marginVertical: 15,
+  },
+  repaymentStatus: {
+    backgroundColor: "#074A74",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
 });
