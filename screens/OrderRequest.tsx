@@ -336,14 +336,7 @@ const styles = StyleSheet.create({
     flex: 3,
     backgroundColor: "#fff",
   },
-  image2: {
-    width: Dimensions.get("window").height * 0.2,
-    height: Dimensions.get("window").height * 0.2,
-    backgroundColor: "#fff",
-    position: "absolute",
-    top: Dimensions.get("window").height * 0.2,
-    left: Dimensions.get("window").width * 0.25,
-  },
+
   name: {
     marginHorizontal: 30,
     fontSize: 25,
