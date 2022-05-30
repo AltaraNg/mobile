@@ -22,7 +22,7 @@ import { AuthContext } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Constants from "expo-constants";
 import axios from "axios";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList } from "react-native";
 
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
@@ -71,7 +71,6 @@ export default function History({ navigation, route }: Props) {
 
   const fetchOrder = async () => {
     setShowLoader(true);
-    console.log('u called me')
     try {
       let response = await axios({
         method: "GET",
