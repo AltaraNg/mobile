@@ -123,7 +123,7 @@ export default function OrderDetails({ navigation, route }: Props) {
 
 		let expectedDate = new Date(amor.expected_payment_date);
 		let today = new Date();
-		if (expectedDate.getTime() > today.getTime()) {
+		if (expectedDate.getTime() > today.getTime() && amor.actual_payment_date === null) {
 			answer = 'pending';
 			return answer;
 		} else if (amor.actual_payment_date === null) {
