@@ -120,7 +120,7 @@ export default function History({ navigation, route }: Props) {
           <View
             style={{
               backgroundColor: "#fff",
-              marginBottom: 60,
+              marginBottom: 100,
             }}
           >
             {refreshing ? <ActivityIndicator /> : null}

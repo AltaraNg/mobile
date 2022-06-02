@@ -49,7 +49,8 @@ export default function OrderDetails({ navigation, route }: Props) {
 		return answer;
 	};
 
-	const progressBar = (totalPaid / order.attributes.repayment) * 100;
+	const progressBar = ((totalPaid - order.attributes.down_payment) / order.attributes.repayment) * 100;
+  console.log(progressBar);
 
 	const orderStatusChi = (props) => {
 		const totalDebt =
