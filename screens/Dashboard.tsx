@@ -297,7 +297,7 @@ export default function Dashboard({ navigation, route }: Props) {
                 {!onBoarded && (
                   <Pressable
                     onPress={() =>
-                      navigation.navigate("Create Profile", {
+                      navigation.navigate("CreateProfile", {
                         user: authData.user,
                       })
                     }
@@ -316,7 +316,7 @@ export default function Dashboard({ navigation, route }: Props) {
                 {onBoarded && !uploaded && (
                   <Pressable
                     onPress={() => {
-                      navigation.navigate("Upload Document", {
+                      navigation.navigate("UploadDocument", {
                         user: authData.user,
                       });
                     }}
