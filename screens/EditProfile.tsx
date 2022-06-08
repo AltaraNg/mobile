@@ -57,6 +57,12 @@ export default function Dashboard({ navigation, route }: Props) {
   const [show, setShow] = useState(false);
   const [text, setText] = useState("Enter Date");
   const [uploaded, setUploaded] = useState(null);
+  interface Obj {
+    state?: string;
+    reg_id?: string;
+    middle_name?: string;
+    email_address?: string;
+  }
   const onChange= (event, selectedDate)=>{
     const currentDate = selectedDate|| date;
     setShow(Platform.OS == 'ios')
@@ -126,6 +132,11 @@ export default function Dashboard({ navigation, route }: Props) {
       setLoading(false);
 		}
 	};
+  
+  const { state, reg_id, middle_name, email_address, ...rest } = user || ({} as Obj);;
+  const validateForm = Object.values(rest || { item: false }).every(
+    (userData:String) => userData
+  );
 
 	const fetchUser = async () => {
 		try {
@@ -484,11 +495,19 @@ export default function Dashboard({ navigation, route }: Props) {
             >
               <LinearGradient
                 colors={["#074A77", "#089CA4"]}
-                style={styles.buttonContainer}
+                style={
+                  !validateForm
+                    ? [styles.buttonContainer, { opacity: 0.5 }]
+                    : styles.buttonContainer
+                }
                 start={{ x: 1, y: 0.5 }}
                 end={{ x: 0, y: 0.5 }}
               >
-                <Pressable style={[styles.button]} onPress={handleUpdate}>
+                <Pressable
+                  style={[styles.button]}
+                  onPress={handleUpdate}
+                  disabled={!validateForm}
+                >
                   {loading ? (
                     <Image
                       source={require("../assets/gifs/loader.gif")}

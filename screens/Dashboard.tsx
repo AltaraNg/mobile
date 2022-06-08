@@ -88,11 +88,12 @@ export default function Dashboard({ navigation, route }: Props) {
     
     setModalVisible(true);
   }
-  const fetchUser = async () => {
+
+  const settUser = async () => {
     fetchOrderRequestContext();
     setUser(authData?.user);
     setOnBoarded(authData?.user?.attributes?.on_boarded);
-    const upload = Object.values(authData.user?.included?.verification).every(
+    const upload = Object?.values(authData?.user?.included?.verification || {'item': false}).every(
       (val) => val
     );
     setUploaded(upload);
@@ -108,9 +109,9 @@ export default function Dashboard({ navigation, route }: Props) {
   };
 
   useEffect(() => {
-    fetchUser();
+    settUser();
   }, [authData,]);
-  
+
   return (
     <View style={styles.container}>
       <Overlay
