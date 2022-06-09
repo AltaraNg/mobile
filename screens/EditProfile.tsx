@@ -31,7 +31,7 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import Cards from "../components/Cards";
 import SideMenu from "./SideMenu";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext, useAuth } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { UserInterfaceIdiom } from "expo-constants";
 import axios from "axios";
@@ -44,7 +44,9 @@ let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { authData, setAuthData, saveProfile } = useContext(AuthContext);
+	const auth = useAuth();
+
+  const { authData, setAuthData } = useContext(AuthContext);
   const [exitApp, setExitApp] = useState(1);
   const [isError, setIsError] = useState(false);
   const [user, setUser] = useState(null);
@@ -116,7 +118,7 @@ export default function Dashboard({ navigation, route }: Props) {
       const res = result.data.data[0]; 
       
       setAuthData(prevState => { return {...prevState, user:{...res}}});
-      saveProfile(authData)
+      auth.saveProfile(authData.user)
       setUser(authData.user.attributes);
       setOnBoarded(authData.user?.attributes?.on_boarded);
        const upload = Object.values(authData.user?.included?.verification || {}).every(

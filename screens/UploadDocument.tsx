@@ -28,7 +28,7 @@ import {
   RootTabParamList,
 } from "../types";
 import SideMenu from "./SideMenu";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext, useAuth } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { UserInterfaceIdiom } from "expo-constants";
 import axios from "axios";
@@ -41,7 +41,9 @@ let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { authData, saveProfile } = useContext(AuthContext);
+	const auth = useAuth();
+
+  const { authData } = useContext(AuthContext);
   const [exitApp, setExitApp] = useState(1);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(null);
@@ -76,7 +78,7 @@ export default function Dashboard({ navigation, route }: Props) {
         alert("Please upload all documents")
       }else {
         navigation.navigate("Dashboard", {user:user});
-        saveProfile(authData);
+        auth.saveProfile(user);
       }
       
       setLoading(false)
