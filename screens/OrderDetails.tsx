@@ -33,7 +33,6 @@ export default function OrderDetails({ navigation, route }: Props) {
 	const amortization = order?.included?.amortizations;
 
 	let totalDebt, totalPaid: number;
-  console.log(order)
 
 	let newArray = amortization.map((item: { actual_amount: number }) => {
 		return item.actual_amount;
@@ -51,7 +50,6 @@ export default function OrderDetails({ navigation, route }: Props) {
 	};
 
 	const progressBar = ((totalPaid - order.attributes.down_payment) / order.attributes.repayment) * 100;
-  console.log(progressBar);
 
 	const orderStatusChi = (props) => {
 		const totalDebt =
@@ -262,7 +260,7 @@ export default function OrderDetails({ navigation, route }: Props) {
           <Text style={{ color: "white", fontFamily: "Montserrat_400Regular", }}>
             Total Debt{" "}
             <Text style={{ color: "white", fontFamily: "Montserrat_700Bold" }}>
-              ₦{totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              ₦{totalDebt < 0 ? 0 : totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
             </Text>
           </Text>
         </View>
