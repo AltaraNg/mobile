@@ -72,7 +72,7 @@ export default function Dashboard({ navigation, route }: Props) {
     let tempDate = new Date(currentDate)
     let fDate = tempDate.getDate() + '/' + (tempDate.getMonth() + 1) + '/' + tempDate.getFullYear();
     setText(fDate);
-    setUser({ ...user, date_of_birth: selectedDate });
+    setUser({ ...user, date_of_birth: selectedDate.toLocaleDateString() });
 
   }
   const showMode = (currentMode) => {
@@ -125,8 +125,8 @@ export default function Dashboard({ navigation, route }: Props) {
          (val) => val 
        );
        setUploaded(upload);
-      uploaded && navigation.navigate("ViewProfile", {user:user})
-      !uploaded && navigation.navigate("UploadDocument", {user:user});
+      uploaded && navigation.navigate("ViewProfile", {user:authData?.user})
+      !uploaded && navigation.navigate("UploadDocument", {user:authData?.user});
 		} catch (error) {
 			ToastAndroid.showWithGravity(
 				'Error! Request was not completed, Please complete all fields',
@@ -152,7 +152,7 @@ export default function Dashboard({ navigation, route }: Props) {
 			const user = response.data.data[0].attributes;
       
 			setUser(user);
-      setOnBoarded(user?.on_boarded);
+      setOnBoarded(!user?.on_boarded);
 		} catch (error: any) {
 			ToastAndroid.showWithGravity(
 				'Unable to fetch user',

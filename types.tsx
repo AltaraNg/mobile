@@ -36,7 +36,12 @@ export type RootTabParamList = {
   Dashboard: { user: object };
   History: undefined;
   Notification: undefined;
-  OrderRequest:{order:string};
+  Home: { user: object };
+  ViewProfile: { user: object };
+  EditProfile: { user: object };
+  CreateProfile: { user: object };
+  UploadDocument: { user: object };
+  OrderRequest: { order: string };
 };
 
 export type DrawerParamList = {

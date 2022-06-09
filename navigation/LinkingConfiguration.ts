@@ -16,10 +16,10 @@ const linking: LinkingOptions<RootStackParamList> = {
       Main: {
         screens: {
           Home: {},
-          "View Profile" : {},
-          "Edit Profile" : {},
-          "Create Profile" :{},
-          "Upload Document":{}
+          "ViewProfile" : {},
+          "EditProfile" : {},
+          "CreateProfile" :{},
+          "UploadDocument":{}
         },
       },
       Intro: {},
