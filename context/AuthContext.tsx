@@ -5,18 +5,19 @@ import { useFeatures } from 'flagged';
 import { AuthData, authService } from '../services/authService';
 
 type AuthContextData = {
-  setAuthData;
-  isAdmin: boolean;
-  showLoader;
-  setShowLoader;
-  authData?: AuthData;
-  loading: boolean;
-  signIn(
-    phone_number: string,
-    otp: string,
-    device_name: string | null
-  ): Promise<void>;
-  signOut(): void;
+	setAuthData;
+	isAdmin: boolean;
+	showLoader;
+	setShowLoader;
+	authData?: AuthData;
+	loading: boolean;
+	signIn(
+		phone_number: string,
+		otp: string,
+		device_name: string | null
+	): Promise<void>;
+	signOut(): void;
+	saveProfile(user: object): void;
 };
 
 //Create the Auth Context with the data type specified
@@ -25,12 +26,12 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
 	const [authData, setAuthData] = useState<AuthData>();
-	const [showLoader, setShowLoader] = useState(false);;
+	const [showLoader, setShowLoader] = useState(false);
 	//the AuthContext start with loading equals true
 	//and stay like this, until the data be load from Async Storage
 	const [loading, setLoading] = useState(true);
 	const [isAdmin, setIsAdmin] = useState(false);
-	
+
 	useEffect(() => {
 		//Every time the App is opened, this provider is rendered
 		//and call de loadStorage function.
@@ -38,7 +39,7 @@ const AuthProvider: React.FC = ({ children }) => {
 	}, []);
 
 	async function loadStorageData(): Promise<void> {
-		setShowLoader(true)
+		setShowLoader(true);
 		try {
 			//Try get the data from Async Storage
 			const authDataSerialized = await SecureStore.getItemAsync('AuthData');
@@ -47,13 +48,13 @@ const AuthProvider: React.FC = ({ children }) => {
 				const _authData: AuthData = JSON.parse(authDataSerialized);
 
 				setAuthData(_authData);
-				if(_authData.user.attributes.staff_id === 999999){
+				if (_authData.user.attributes.staff_id === 999999) {
 					setIsAdmin(true);
 				}
 			}
-			setShowLoader(false)
+			setShowLoader(false);
 		} catch (error) {
-			setShowLoader(false)
+			setShowLoader(false);
 		} finally {
 			//loading finished
 			setLoading(false);
@@ -75,7 +76,7 @@ const AuthProvider: React.FC = ({ children }) => {
 		if (_authData !== undefined) {
 			setAuthData(_authData);
 			SecureStore.setItemAsync('AuthData', JSON.stringify(_authData));
-			if(_authData.user.attributes.staff_id === 999999){
+			if (_authData.user.attributes.staff_id === 999999) {
 				setIsAdmin(true);
 			}
 			setShowLoader(false);
@@ -83,6 +84,24 @@ const AuthProvider: React.FC = ({ children }) => {
 
 		//Persist the data in the Async Storage
 		//to be recovered in the next user session.
+	};
+
+	const saveProfile = async (user: object) => {
+		try {
+			const authDataSerialized = await SecureStore.getItemAsync('AuthData');
+			if (authDataSerialized) {
+				//If there are data, it's converted to an Object and the state is updated.
+				const _authData: AuthData = JSON.parse(authDataSerialized);
+				const token = _authData.token;
+				const newUser = user;
+				const newAuthData: AuthData = { token: token, user: newUser };
+
+				setAuthData(newAuthData);
+				SecureStore.setItemAsync('AuthData', JSON.stringify(newAuthData));
+			}
+		} catch (error) {
+			console.log('unable to complete');
+		}
 	};
 
 	const signOut = async () => {
@@ -96,23 +115,24 @@ const AuthProvider: React.FC = ({ children }) => {
 	};
 
 	return (
-    //This component will be used to encapsulate the whole App,
-    //so all components will have access to the Context
-    <AuthContext.Provider
-      value={{
-        authData,
-        setAuthData,
-        loading,
-        signIn,
-        signOut,
-        isAdmin,
-        setShowLoader,
-        showLoader,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+		//This component will be used to encapsulate the whole App,
+		//so all components will have access to the Context
+		<AuthContext.Provider
+			value={{
+				authData,
+				setAuthData,
+				loading,
+				signIn,
+				signOut,
+				isAdmin,
+				setShowLoader,
+				showLoader,
+				saveProfile
+			}}
+		>
+			{children}
+		</AuthContext.Provider>
+	);
 };
 
 //A simple hooks to facilitate the access to the AuthContext
