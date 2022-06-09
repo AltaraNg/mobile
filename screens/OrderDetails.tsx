@@ -167,6 +167,7 @@ export default function OrderDetails({ navigation, route }: Props) {
               fontFamily: "Montserrat_700Bold",
               fontSize: 16,
               color: "#000000",
+              marginRight: 10
             }}
           >
             {order.included.product.name}
