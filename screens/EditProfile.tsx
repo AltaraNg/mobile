@@ -44,7 +44,7 @@ let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { authData, setAuthData } = useContext(AuthContext);
+  const { authData, setAuthData, saveProfile } = useContext(AuthContext);
   const [exitApp, setExitApp] = useState(1);
   const [isError, setIsError] = useState(false);
   const [user, setUser] = useState(null);
@@ -98,6 +98,7 @@ export default function Dashboard({ navigation, route }: Props) {
     }
   }
 	const handleUpdate = async () => {
+    console.log(rest, validateForm);
     setLoading(true);
 		try {
 			let result = await axios({
@@ -115,6 +116,7 @@ export default function Dashboard({ navigation, route }: Props) {
       const res = result.data.data[0]; 
       
       setAuthData(prevState => { return {...prevState, user:{...res}}});
+      saveProfile(authData)
       setUser(authData.user.attributes);
       setOnBoarded(authData.user?.attributes?.on_boarded);
        const upload = Object.values(authData.user?.included?.verification || {}).every(
@@ -506,7 +508,7 @@ export default function Dashboard({ navigation, route }: Props) {
                 <Pressable
                   style={[styles.button]}
                   onPress={handleUpdate}
-                  disabled={!validateForm}
+                //  disabled={!validateForm}
                 >
                   {loading ? (
                     <Image

@@ -41,7 +41,7 @@ let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { authData } = useContext(AuthContext);
+  const { authData, saveProfile } = useContext(AuthContext);
   const [exitApp, setExitApp] = useState(1);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(null);
@@ -74,7 +74,11 @@ export default function Dashboard({ navigation, route }: Props) {
       setLoading(true)
       if(!uploaded){
         alert("Please upload all documents")
-      }else navigation.navigate("Dashboard", {user:user})
+      }else {
+        navigation.navigate("Dashboard", {user:user});
+        saveProfile(authData);
+      }
+      
       setLoading(false)
     }
 
