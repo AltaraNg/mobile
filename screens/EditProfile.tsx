@@ -100,7 +100,6 @@ export default function Dashboard({ navigation, route }: Props) {
     }
   }
 	const handleUpdate = async () => {
-    console.log(rest, validateForm);
     setLoading(true);
 		try {
 			let result = await axios({
@@ -118,7 +117,7 @@ export default function Dashboard({ navigation, route }: Props) {
       const res = result.data.data[0]; 
       
       setAuthData(prevState => { return {...prevState, user:{...res}}});
-      auth.saveProfile(authData.user)
+      auth.saveProfile(res)
       setUser(authData.user.attributes);
       setOnBoarded(authData.user?.attributes?.on_boarded);
        const upload = Object.values(authData.user?.included?.verification || {}).every(
