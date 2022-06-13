@@ -115,7 +115,6 @@ export default function Dashboard({ navigation, route }: Props) {
 				ToastAndroid.CENTER
 			);
       const res = result.data.data[0]; 
-      
       setAuthData(prevState => { return {...prevState, user:{...res}}});
       auth.saveProfile(res)
       setUser(authData.user.attributes);

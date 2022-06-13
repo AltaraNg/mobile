@@ -40,7 +40,7 @@ import Upload from '../components/Upload';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
-export default function Dashboard({ navigation, route }: Props) {
+export default function UploadDocument({ navigation, route }: Props) {
 	const auth = useAuth();
 
 	const { authData } = useContext(AuthContext);
@@ -72,44 +72,22 @@ export default function Dashboard({ navigation, route }: Props) {
 		}
 	};
 
-	const completeRegistration = () => {
-		setLoading(true);
-		if (!uploaded) {
-			alert('Please upload all documents');
-		} else {
-      let updatedUser = getUpdatedUser();
-			navigation.navigate('Dashboard', { user: updatedUser });
-			auth.saveProfile(updatedUser);
-		}
-
-		setLoading(false);
-	};
-	const getUpdatedUser = async () => {
-		try {
-			let result = await axios({
-				method: 'GET',
-				url: 'auth/user',
-				headers: { Authorization: `Bearer ${authData.token}` },
-			});
-      return result.data.data[0]
-		} catch (error) {
-      console.log(error.response.data)
-    }
-	};
-
-	const fetchUser = async () => {
+	const checkVerification = async () => {
 		setUser(authData.user.attributes);
 		const upload = Object.values(authData.user.included.verification).every(
 			(val) => val
 		);
 		setUploaded(upload);
+    if(upload){
+   auth.saveProfile(authData.user)
+    }
 	};
 	function handleRequest() {
 		// fetchUser()
 	}
 
 	useEffect(() => {
-		fetchUser();
+		checkVerification();
 	}, [authData]);
 
 	return (
@@ -193,7 +171,7 @@ export default function Dashboard({ navigation, route }: Props) {
 								<Pressable
 									style={[styles.button]}
 									disabled={!uploaded}
-									onPress={completeRegistration}
+									//onPress={completeRegistration}
 								>
 									{loading ? (
 										<Image
