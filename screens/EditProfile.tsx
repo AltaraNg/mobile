@@ -51,6 +51,7 @@ export default function Dashboard({ navigation, route }: Props) {
   const [isError, setIsError] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(null)
   const [onBoarded, setOnBoarded] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
@@ -72,9 +73,9 @@ export default function Dashboard({ navigation, route }: Props) {
      last_name?: string;
      add_street?: string;
      city?: string;
-     civil_status?: string;
+     civil_status?: any;
      date_of_registration?: string;
-     empployment_status?: string;
+     empployment_status?: any;
      gender?: string;
      on_boarded?: boolean;
      phone_number?: string;
@@ -117,7 +118,6 @@ export default function Dashboard({ navigation, route }: Props) {
 	const handleUpdate = async () => {
     setLoading(true);
     setUser({ ...user, ...userData });
-    console.log(userData, validateForm, user);
 		try {
 			let result = await axios({
 				method: 'PATCH',
@@ -154,12 +154,13 @@ export default function Dashboard({ navigation, route }: Props) {
   
   const checkUser=()=>{
   const validateForm = Object.values(userData as Obj).every(
-    (userData:String) => userData
+    (userData:String) => (userData !=='N/A') && userData
   );
     validateForm ? setValidateForm(true) : setValidateForm(false);
   }
 
 	const fetchUser = async () => {
+    setLoading2(true)
 		try {
 			let response = await axios({
 				method: 'GET',
@@ -168,15 +169,17 @@ export default function Dashboard({ navigation, route }: Props) {
 			});
 			const user = response.data.data[0].attributes;
       setUser(user)
-      const { state, reg_id, middle_name, email_address, ...rest } = user || ({} as Obj);
+      const { state, reg_id, middle_name, email_address,on_boarded, ...rest } = user || ({} as Obj);
 			setUserData(rest);
-      setOnBoarded(!user?.on_boarded);
+      setOnBoarded(user?.on_boarded);
+      setLoading2(false)
 		} catch (error: any) {
 			ToastAndroid.showWithGravity(
 				'Unable to fetch user',
 				ToastAndroid.SHORT,
 				ToastAndroid.CENTER
 			);
+      setLoading2(false)
 		}
 	};
    
@@ -237,7 +240,7 @@ export default function Dashboard({ navigation, route }: Props) {
           </Pressable>
         </TouchableOpacity>
       </View>
-      {userData && (
+      {(userData && !loading2) && (
         <View style={styles.main}>
           <Text style={styles.title}>
             {!onBoarded ? "Create" : "Edit"} Profile
@@ -538,7 +541,7 @@ export default function Dashboard({ navigation, route }: Props) {
                 <Pressable
                   style={[styles.button]}
                   onPress={handleUpdate}
-                  //disabled={!validateForm}
+                  disabled={!validateForm}
                 >
                   {loading ? (
                     <Image
