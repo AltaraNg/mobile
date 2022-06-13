@@ -59,12 +59,27 @@ export default function Dashboard({ navigation, route }: Props) {
   const [show, setShow] = useState(false);
   const [text, setText] = useState("Enter Date");
   const [uploaded, setUploaded] = useState(null);
+  const [validateForm, setValidateForm] = useState(false);
+  const [userData, setUserData]= useState({} as UserData)
   interface Obj {
     state?: string;
     reg_id?: string;
     middle_name?: string;
     email_address?: string;
   }
+   interface UserData {
+     first_name?: string;
+     last_name?: string;
+     add_street?: string;
+     city?: string;
+     civil_status?: string;
+     date_of_registration?: string;
+     empployment_status?: string;
+     gender?: string;
+     on_boarded?: boolean;
+     phone_number?: string;
+     staff_id?:number
+   }
   const onChange= (event, selectedDate)=>{
     const currentDate = selectedDate|| date;
     setShow(Platform.OS == 'ios')
@@ -72,7 +87,7 @@ export default function Dashboard({ navigation, route }: Props) {
     let tempDate = new Date(currentDate)
     let fDate = tempDate.getDate() + '/' + (tempDate.getMonth() + 1) + '/' + tempDate.getFullYear();
     setText(fDate);
-    setUser({ ...user, date_of_birth: selectedDate.toLocaleDateString() });
+    setUserData({ ...userData, date_of_birth: selectedDate.toLocaleDateString() });
 
   }
   const showMode = (currentMode) => {
@@ -101,6 +116,8 @@ export default function Dashboard({ navigation, route }: Props) {
   }
 	const handleUpdate = async () => {
     setLoading(true);
+    setUser({ ...user, ...userData });
+    console.log(userData, validateForm, user);
 		try {
 			let result = await axios({
 				method: 'PATCH',
@@ -135,10 +152,12 @@ export default function Dashboard({ navigation, route }: Props) {
 		}
 	};
   
-  const { state, reg_id, middle_name, email_address, ...rest } = user || ({} as Obj);;
-  const validateForm = Object.values(rest || { item: false }).every(
+  const checkUser=()=>{
+  const validateForm = Object.values(userData as Obj).every(
     (userData:String) => userData
   );
+    validateForm ? setValidateForm(true) : setValidateForm(false);
+  }
 
 	const fetchUser = async () => {
 		try {
@@ -148,9 +167,10 @@ export default function Dashboard({ navigation, route }: Props) {
 				headers: { 'Authorization': `Bearer ${authData.token}` },
 			});
 			const user = response.data.data[0].attributes;
-      
-			setUser(user);
-      setOnBoarded(user?.on_boarded);
+      setUser(user)
+      const { state, reg_id, middle_name, email_address, ...rest } = user || ({} as Obj);
+			setUserData(rest);
+      setOnBoarded(!user?.on_boarded);
 		} catch (error: any) {
 			ToastAndroid.showWithGravity(
 				'Unable to fetch user',
@@ -201,6 +221,9 @@ export default function Dashboard({ navigation, route }: Props) {
   useEffect(() => {
     fetchUser();
   }, [authData]);
+  useEffect(()=>{
+    checkUser();
+  }, [userData]);
   
 
   return (
@@ -214,7 +237,7 @@ export default function Dashboard({ navigation, route }: Props) {
           </Pressable>
         </TouchableOpacity>
       </View>
-      {user && (
+      {userData && (
         <View style={styles.main}>
           <Text style={styles.title}>
             {!onBoarded ? "Create" : "Edit"} Profile
@@ -245,8 +268,10 @@ export default function Dashboard({ navigation, route }: Props) {
                     styles.input,
                     { width: Dimensions.get("window").width * 0.92 },
                   ]}
-                  value={prefilledData(user.first_name)}
-                  onChangeText={(txt) => setUser({ ...user, first_name: txt })}
+                  value={prefilledData(userData.first_name)}
+                  onChangeText={(txt) =>
+                    setUserData({ ...userData, first_name: txt })
+                  }
                 ></TextInput>
               </View>
               <View style={styles.data}>
@@ -264,8 +289,10 @@ export default function Dashboard({ navigation, route }: Props) {
                     styles.input,
                     { width: Dimensions.get("window").width * 0.92 },
                   ]}
-                  value={prefilledData(user.last_name)}
-                  onChangeText={(txt) => setUser({ ...user, last_name: txt })}
+                  value={prefilledData(userData.last_name)}
+                  onChangeText={(txt) =>
+                    setUserData({ ...userData, last_name: txt })
+                  }
                 ></TextInput>
               </View>
               <View style={styles.data}>
@@ -276,10 +303,10 @@ export default function Dashboard({ navigation, route }: Props) {
                     { width: Dimensions.get("window").width * 0.92 },
                   ]}
                   onChangeText={(txt) =>
-                    setUser({ ...user, phone_number: txt })
+                    setUserData({ ...userData, phone_number: txt })
                   }
                 >
-                  {prefilledData(user.phone_number)}
+                  {prefilledData(userData.phone_number)}
                 </TextInput>
               </View>
             </View>
@@ -306,10 +333,10 @@ export default function Dashboard({ navigation, route }: Props) {
 
                     <View style={{ backgroundColor: "white" }}>
                       <RadioButton
-                        value={prefilledData(user.gender)}
+                        value={prefilledData(userData.gender)}
                         data={gender}
                         onSelect={(txt: any) =>
-                          setUser({ ...user, gender: txt })
+                          setUserData({ ...userData, gender: txt })
                         }
                       />
                     </View>
@@ -343,7 +370,7 @@ export default function Dashboard({ navigation, route }: Props) {
                         onPress={() => showMode("date")}
                       >
                         <Text style={{ color: "#444" }}>
-                          {displayDate(user.date_of_birth)}
+                          {displayDate(userData.date_of_birth)}
                         </Text>
                         <Calender />
                       </TouchableOpacity>
@@ -377,10 +404,10 @@ export default function Dashboard({ navigation, route }: Props) {
                       { width: Dimensions.get("window").width * 0.92 },
                     ]}
                     onChangeText={(txt) =>
-                      setUser({ ...user, add_street: txt })
+                      setUserData({ ...userData, add_street: txt })
                     }
                   >
-                    {prefilledData(user.add_street)}
+                    {prefilledData(userData.add_street)}
                   </TextInput>
                 </View>
                 <View style={styles.data}>
@@ -403,11 +430,11 @@ export default function Dashboard({ navigation, route }: Props) {
                       valueField="value"
                       placeholder={!isFocus ? "Select item" : "..."}
                       searchPlaceholder="Search..."
-                      value={user.city}
+                      value={userData.city}
                       onFocus={() => setIsFocus(true)}
                       onBlur={() => setIsFocus(false)}
                       onChange={(txt) => {
-                        setUser({ ...user, city: txt.value });
+                        setUserData({ ...userData, city: txt.value });
                         setIsFocus(false);
                       }}
                     />
@@ -437,13 +464,16 @@ export default function Dashboard({ navigation, route }: Props) {
                         maxHeight={300}
                         labelField="label"
                         valueField="value"
-                        value={user.employment_status}
+                        value={userData.employment_status}
                         placeholder={!isFocus ? "Select item" : "..."}
                         searchPlaceholder="Search..."
                         onFocus={() => setIsFocus(true)}
                         onBlur={() => setIsFocus(false)}
                         onChange={(txt) => {
-                          setUser({ ...user, employment_status: txt.value });
+                          setUserData({
+                            ...userData,
+                            employment_status: txt.value,
+                          });
                           setIsFocus(false);
                         }}
                       />
@@ -473,11 +503,11 @@ export default function Dashboard({ navigation, route }: Props) {
                         valueField="value"
                         placeholder={!isFocus ? "Select item" : "..."}
                         searchPlaceholder="Search..."
-                        value={user.civil_status}
+                        value={userData.civil_status}
                         onFocus={() => setIsFocus(true)}
                         onBlur={() => setIsFocus(false)}
                         onChange={(txt) => {
-                          setUser({ ...user, civil_status: txt.value });
+                          setUserData({ ...userData, civil_status: txt.value });
                           setIsFocus(false);
                         }}
                       />
@@ -508,7 +538,7 @@ export default function Dashboard({ navigation, route }: Props) {
                 <Pressable
                   style={[styles.button]}
                   onPress={handleUpdate}
-                //  disabled={!validateForm}
+                  //disabled={!validateForm}
                 >
                   {loading ? (
                     <Image
