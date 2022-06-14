@@ -75,11 +75,12 @@ export default function Dashboard({ navigation, route }: Props) {
      city?: string;
      civil_status?: any;
      date_of_registration?: string;
-     empployment_status?: any;
+     employment_status?: any;
      gender?: string;
      on_boarded?: boolean;
      phone_number?: string;
-     staff_id?:number
+     staff_id?: number;
+     date_of_birth;
    }
   const onChange= (event, selectedDate)=>{
     const currentDate = selectedDate|| date;
@@ -117,14 +118,13 @@ export default function Dashboard({ navigation, route }: Props) {
   }
 	const handleUpdate = async () => {
     setLoading(true);
-    setUser({ ...user, ...userData });
 		try {
 			let result = await axios({
-				method: 'PATCH',
-				url: `/customers/${authData.user.id}`,
-				headers: { Authorization: `Bearer ${authData.token}` },
-				data: user,
-			});
+        method: "PATCH",
+        url: `/customers/${authData.user.id}`,
+        headers: { Authorization: `Bearer ${authData.token}` },
+        data: userData,
+      });
       setLoading(false);
 			ToastAndroid.showWithGravity(
 				'Profile updated successfully',
@@ -140,8 +140,7 @@ export default function Dashboard({ navigation, route }: Props) {
          (val) => val 
        );
        setUploaded(upload);
-      uploaded && navigation.navigate("ViewProfile", {user:authData?.user})
-      !uploaded && navigation.navigate("UploadDocument", {user:authData?.user});
+      uploaded ? navigation.navigate("ViewProfile", {user:authData?.user}): navigation.navigate("UploadDocument", {user:authData?.user});
 		} catch (error) {
 			ToastAndroid.showWithGravity(
 				'Error! Request was not completed, Please complete all fields',
@@ -169,8 +168,8 @@ export default function Dashboard({ navigation, route }: Props) {
 			});
 			const user = response.data.data[0].attributes;
       setUser(user)
-      const { state, reg_id, middle_name, email_address,on_boarded, ...rest } = user || ({} as Obj);
-			setUserData(rest);
+      const {  reg_id, middle_name, email_address,on_boarded,staff_id, ...rest } = user || ({} as Obj);
+			setUserData({...rest, ...{state:'none'}});
       setOnBoarded(user?.on_boarded);
       setLoading2(false)
 		} catch (error: any) {
