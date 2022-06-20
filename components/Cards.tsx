@@ -23,11 +23,25 @@ export default function Cards({
   let url = Constants?.manifest?.extra?.URL;
   axios.defaults.baseURL = url;
   const { authData } = useContext(AuthContext);
-  const { setOrderRequest, orderRequest, fetchOrderRequestContext } =
+  const { setOrderRequest, orderRequest, } =
     useContext(OrderContext);
   const [loader, setLoader] = useState(false);
   const [showButton, setShowButton] = useState(null);
   const [requestOrder, setRequestOrder] = useState(null);
+
+  async function fetchOrder(): Promise<void> {
+    try {
+      let response = await axios({
+        method: "GET",
+        url: `/customers/${authData.user.id}/requests`,
+        headers: { Authorization: `Bearer ${authData.token}` },
+      });
+      const orderRequestContext = response.data.data.order_requests;
+      const reversed = orderRequestContext.reverse();
+      setOrderRequest(reversed);
+    } catch (error: any) {
+    }
+  }
 
   async function doSome() {
     setLoader(true);
@@ -41,9 +55,8 @@ export default function Cards({
         headers: { Authorization: `Bearer ${authData.token}` },
       });
       if (res.status === 200) {
-        fetchOrderRequestContext();
+        fetchOrder()
         onRequest(res.data, "success", type);
-        // setShowButton(false);
         setLoader(false);
         setRequestOrder(true);
       }
@@ -51,10 +64,6 @@ export default function Cards({
       setLoader(false);
       onRequest(error.response.data, "failed", type);
     }
-    // }else {
-    //   setRequestOrder(false)
-    //    setLoader(false);
-    // }
   }
     const checkOrder = () => {
        const isPending = orderRequest?.some(
@@ -68,9 +77,8 @@ export default function Cards({
     navigation.navigate("OrderRequest");
   };
     useEffect(() => {
-      
       checkOrder();
-    }, []);
+    }, [orderRequest]);
 
   return (
     <View style={styles.container}>
