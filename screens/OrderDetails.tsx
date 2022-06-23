@@ -29,9 +29,12 @@ import Animated from 'react-native-reanimated';
 type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
 
 export default function OrderDetails({ navigation, route }: Props) {
+  const [lateFee, setLateFee] = useState(true);
+  const [viewLateFee, setViewLateFee] = useState(true);
 	const order: object = route.params;
 	const amortization = order?.included?.amortizations;
-
+  const width = Dimensions.get('window').width;
+  const height = Dimensions.get('window').height;
 	let totalDebt, totalPaid: number;
 
 	let newArray = amortization.map((item: { actual_amount: number }) => {
@@ -156,7 +159,11 @@ export default function OrderDetails({ navigation, route }: Props) {
       <View style={styles.orderSummary}>
         <View style={styles.orderDetail}>
           <Text
-            style={{ fontFamily: "Montserrat_400Regular", color: "#000000", fontSize:11 }}
+            style={{
+              fontFamily: "Montserrat_400Regular",
+              color: "#000000",
+              fontSize: 11,
+            }}
           >
             Order ID: {order.attributes.order_number}
           </Text>
@@ -167,7 +174,7 @@ export default function OrderDetails({ navigation, route }: Props) {
               fontFamily: "Montserrat_700Bold",
               fontSize: 16,
               color: "#000000",
-              marginRight: 10
+              marginRight: 10,
             }}
           >
             {order.included.product.name}
@@ -252,90 +259,245 @@ export default function OrderDetails({ navigation, route }: Props) {
         </View>
 
         <View style={styles.repaymentStatus}>
-          <Text style={{ color: "white", fontFamily: "Montserrat_400Regular", }}>
+          <Text style={{ color: "white", fontFamily: "Montserrat_400Regular" }}>
             Total Paid{" "}
             <Text style={{ color: "white", fontFamily: "Montserrat_700Bold" }}>
               ₦{totalPaid.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
             </Text>
           </Text>
-          <Text style={{ color: "white", fontFamily: "Montserrat_400Regular", }}>
+          <Text style={{ color: "white", fontFamily: "Montserrat_400Regular" }}>
             Total Debt{" "}
             <Text style={{ color: "white", fontFamily: "Montserrat_700Bold" }}>
-              ₦{totalDebt < 0 ? 0 : totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              ₦
+              {totalDebt < 0
+                ? 0
+                : totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
             </Text>
           </Text>
         </View>
       </View>
 
       <View style={styles.amortizationContainer}>
-        <Text style={styles.amorHeader}>Repayments</Text>
-
-        <FlatList
-          scrollEnabled={true}
-          data={amortization}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View
-              style={{
-                backgroundColor: "#EFF5F9",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginVertical: 10,
-                elevation: 5,
-                paddingVertical: 10,
-                paddingHorizontal: 10,
-                borderRadius: 10,
-                alignItems: "center",
-              }}
+        {lateFee ? (
+          <View style={styles.toggle}>
+            <LinearGradient
+              colors={
+                !viewLateFee ? ["#074A74", "#089CA4"] : ["#EEEFF0", "#EEEFF0"]
+              }
+              style={!viewLateFee ? styles.buttonContainer : [styles.toggleoff]}
+              start={{ x: 1, y: 0.5 }}
+              end={{ x: 0, y: 0.5 }}
             >
+              <Pressable
+                style={[styles.button]}
+                onPress={() => setViewLateFee(false)}
+              >
+                <Text
+                  style={
+                    !viewLateFee
+                      ? [styles.buttonText]
+                      : {
+                          color: "#9C9696",
+                          textAlign: "left",
+                          fontWeight: "bold",
+                          fontSize: 15,
+                        }
+                  }
+                >
+                  Repayment
+                </Text>
+              </Pressable>
+            </LinearGradient>
+            <LinearGradient
+              colors={
+                viewLateFee ? ["#074A74", "#089CA4"] : ["#EEEFF0", "#EEEFF0"]
+              }
+              style={viewLateFee ? styles.buttonContainer : [styles.toggleoff]}
+              start={{ x: 1, y: 0.5 }}
+              end={{ x: 0, y: 0.5 }}
+            >
+              <Pressable
+                style={[styles.button]}
+                onPress={() => setViewLateFee(true)}
+              >
+                <Text
+                  style={
+                    viewLateFee
+                      ? [styles.buttonText]
+                      : {
+                          color: "#9C9696",
+                          textAlign: "left",
+                          fontWeight: "bold",
+                          fontSize: 15,
+                        }
+                  }
+                >
+                  Late Fee
+                </Text>
+              </Pressable>
+            </LinearGradient>
+          </View>
+        ) : (
+          <Text style={styles.amorHeader}>Repayments</Text>
+        )}
+
+        {(!lateFee || !viewLateFee) && (
+          <FlatList
+            scrollEnabled={true}
+            data={amortization}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
               <View
                 style={{
-                  justifyContent: "space-between",
-                  flexDirection: "row",
                   backgroundColor: "#EFF5F9",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginVertical: 10,
+                  elevation: 5,
+                  paddingVertical: 10,
+                  paddingHorizontal: 10,
+                  borderRadius: 10,
+                  alignItems: "center",
                 }}
               >
-                <View style={{ backgroundColor: "#EFF5F9", paddingRight: 10 }}>
-                  {orderStatus(item) === "fail" ? (
-                    <OrderStatusFail />
-                  ) : orderStatus(item) === "pending" ? (
-                    <OrderStatusPending />
-                  ) : (
-                    <OrderStatusPass />
-                  )}
-                </View>
-
-                <Text
+                <View
                   style={{
-                    fontFamily: "Montserrat_500Medium",
-                    fontSize: 18,
-                    color: "#074A74",
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    backgroundColor: "#EFF5F9",
                   }}
                 >
-                  ₦
-                  {item.expected_amount
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  <View
+                    style={{ backgroundColor: "#EFF5F9", paddingRight: 10 }}
+                  >
+                    {orderStatus(item) === "fail" ? (
+                      <OrderStatusFail />
+                    ) : orderStatus(item) === "pending" ? (
+                      <OrderStatusPending />
+                    ) : (
+                      <OrderStatusPass />
+                    )}
+                  </View>
+
+                  <Text
+                    style={{
+                      fontFamily: "Montserrat_500Medium",
+                      fontSize: 18,
+                      color: "#074A74",
+                    }}
+                  >
+                    ₦
+                    {item.expected_amount
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </Text>
+                </View>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: "#000000",
+                  }}
+                >
+                  {checkValid(item) ? "Payment date: " : "Due date: "}
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      fontSize: 14,
+                      color: "#000000",
+                    }}
+                  >
+                    {checkValid(item)
+                      ? item.actual_payment_date
+                      : item.expected_payment_date}
+                  </Text>
                 </Text>
               </View>
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: "#000000",
-                }}
-              >
-                {checkValid(item) ? "Payment date: " : "Due date: "}
-                <Text
-                  style={{ fontWeight: "bold", fontSize: 14, color: "#000000" }}
+            )}
+          />
+        )}
+        {lateFee && viewLateFee && (
+          <View style={{ backgroundColor: "transparent" }}>
+            <FlatList
+              scrollEnabled={true}
+              data={amortization}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View
+                  style={{
+                    backgroundColor: "#EFF5F9",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginVertical: 10,
+                    elevation: 5,
+                    paddingVertical: 10,
+                    paddingHorizontal: 10,
+                    borderRadius: 10,
+                    alignItems: "center",
+                  }}
                 >
-                  {checkValid(item)
-                    ? item.actual_payment_date
-                    : item.expected_payment_date}
-                </Text>
-              </Text>
+                  <View
+                    style={{
+                      justifyContent: "space-between",
+                      flexDirection: "row",
+                      backgroundColor: "#EFF5F9",
+                    }}
+                  >
+                    <View
+                      style={{ backgroundColor: "#EFF5F9", paddingRight: 10 }}
+                    >
+                      <OrderStatusFail />
+                    </View>
+
+                    <Text
+                      style={{
+                        fontFamily: "Montserrat_500Medium",
+                        fontSize: 18,
+                        color: "#074A74",
+                      }}
+                    >
+                      ₦
+                      {item.expected_amount
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    </Text>
+                  </View>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: "#000000",
+                    }}
+                  >
+                    Penalty Date:
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: 14,
+                        color: "#000000",
+                      }}
+                    >
+                      {checkValid(item)
+                        ? item.actual_payment_date
+                        : item.expected_payment_date}
+                    </Text>
+                  </Text>
+                </View>
+              )}
+            />
+            <View style={[styles.total, { width: width }]}>
+              <Text style={styles.totalText}>Total</Text>
+              <LinearGradient
+                colors={["#074A74", "#089CA4"]}
+                style={
+                  [styles.buttonContainer,{alignItems:'center', justifyContent:'center'}]
+                }
+                start={{ x: 1, y: 0.5 }}
+                end={{ x: 0, y: 0.5 }}
+              >
+                <Text style={[styles.totalText,{color:'white'}]}>N45,000</Text>
+              </LinearGradient>
             </View>
-          )}
-        />
+          </View>
+        )}
       </View>
     </View>
   );
@@ -347,12 +509,44 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingTop: 23,
   },
+  totalText: {
+    fontWeight: "bold",
+    fontSize: 24,
+    color: "#9C9696",
+  },
+  total: {
+    position: "absolute",
+    bottom: 50,
+    marginHorizontal: -15,
+    zIndex: 1000,
+    height: 75,
+    backgroundColor: "#F9FBFC",
+    flexDirection:'row',
+    alignItems:'center',
+    paddingHorizontal:10,
+    justifyContent:'space-between'
+  },
   header: {
     backgroundColor: "#074A74",
     padding: 20,
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
+  },
+  toggle: {
+    flexDirection: "row",
+    width: 326,
+    height: 50,
+    borderRadius: 19,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+    backgroundColor: "#EEEFF0",
+    alignItems: "center",
+    paddingHorizontal: 1,
+    justifyContent: "space-evenly",
   },
   headerText: {
     color: "white",
@@ -365,6 +559,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: "#fff",
     marginTop: 10,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    borderColor: "transparent",
+    borderWidth: 1,
+    borderRadius: 15,
+    width: 162,
+    height: 40,
+  },
+
+  toggleoff: {
+    flexDirection: "row",
+    backgroundColor: "#EEEFF0",
+    width: 162,
+    height: 40,
+  },
+  button: {
+    flex: 1,
+    marginHorizontal: 8,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 14,
   },
   orderDetail: {
     flex: 1,
