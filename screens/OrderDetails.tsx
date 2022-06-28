@@ -415,8 +415,8 @@ export default function OrderDetails({ navigation, route }: Props) {
             )}
           />
         )}
-        {lateFee && viewLateFee && (
-          <View style={{ backgroundColor: "transparent" }}>
+        {(lateFee && viewLateFee) && (
+          <View style={{ backgroundColor: "transparent", position:'relative',height:height* 0.5  }}>
             <FlatList
               scrollEnabled={true}
               data={amortization}
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
   },
   total: {
     position: "absolute",
-    bottom: 50,
+    bottom: 0,
     marginHorizontal: -15,
     zIndex: 1000,
     height: 75,
