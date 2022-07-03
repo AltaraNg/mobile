@@ -30,9 +30,10 @@ type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
 
 export default function OrderDetails({ navigation, route }: Props) {
   const [lateFee, setLateFee] = useState(true);
-  const [viewLateFee, setViewLateFee] = useState(true);
+  const [viewLateFee, setViewLateFee] = useState(null);
 	const order: object = route.params;
 	const amortization = order?.included?.amortizations;
+  const lateFees = order?.included?.late_fees;
   const width = Dimensions.get('window').width;
   const height = Dimensions.get('window').height;
 	let totalDebt, totalPaid: number;
@@ -278,7 +279,7 @@ export default function OrderDetails({ navigation, route }: Props) {
       </View>
 
       <View style={styles.amortizationContainer}>
-        {lateFee ? (
+        {lateFees.length>0  ? (
           <View style={styles.toggle}>
             <LinearGradient
               colors={
@@ -341,7 +342,7 @@ export default function OrderDetails({ navigation, route }: Props) {
           <Text style={styles.amorHeader}>Repayments</Text>
         )}
 
-        {(!lateFee || !viewLateFee) && (
+        {(!lateFees.length || !viewLateFee) && (
           <FlatList
             scrollEnabled={true}
             data={amortization}
@@ -415,11 +416,17 @@ export default function OrderDetails({ navigation, route }: Props) {
             )}
           />
         )}
-        {(lateFee && viewLateFee) && (
-          <View style={{ backgroundColor: "transparent", position:'relative',height:height* 0.5  }}>
+        {(lateFees.length > 0 && viewLateFee) && (
+          <View
+            style={{
+              backgroundColor: "transparent",
+              position: "relative",
+              height: height * 0.5,
+            }}
+          >
             <FlatList
               scrollEnabled={true}
-              data={amortization}
+              data={lateFees}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <View
@@ -456,7 +463,7 @@ export default function OrderDetails({ navigation, route }: Props) {
                       }}
                     >
                       ₦
-                      {item.expected_amount
+                      {item.amount
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                     </Text>
@@ -475,9 +482,7 @@ export default function OrderDetails({ navigation, route }: Props) {
                         color: "#000000",
                       }}
                     >
-                      {checkValid(item)
-                        ? item.actual_payment_date
-                        : item.expected_payment_date}
+                      {new Date(item.date_created).toLocaleDateString()}
                     </Text>
                   </Text>
                 </View>
@@ -487,13 +492,16 @@ export default function OrderDetails({ navigation, route }: Props) {
               <Text style={styles.totalText}>Total</Text>
               <LinearGradient
                 colors={["#074A74", "#089CA4"]}
-                style={
-                  [styles.buttonContainer,{alignItems:'center', justifyContent:'center'}]
-                }
+                style={[
+                  styles.buttonContainer,
+                  { alignItems: "center", justifyContent: "center" },
+                ]}
                 start={{ x: 1, y: 0.5 }}
                 end={{ x: 0, y: 0.5 }}
               >
-                <Text style={[styles.totalText,{color:'white'}]}>N45,000</Text>
+                <Text style={[styles.totalText, { color: "white" }]}>
+                  {lateFees?.reduce((accumulator, object) => {return accumulator + object.amount;  }, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                </Text>
               </LinearGradient>
             </View>
           </View>
