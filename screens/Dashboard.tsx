@@ -56,6 +56,7 @@ export default function Dashboard({ navigation, route }: Props) {
   const [onBoarded, setOnBoarded] = useState(null);
   const [type, setType] = useState("");
   const [latefee, setlateFee] = useState(null);
+  const [orders, setOrders] = useState(null)
   const [uploaded, setUploaded] = useState(null);
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
@@ -90,6 +91,7 @@ export default function Dashboard({ navigation, route }: Props) {
         headers: { Authorization: `Bearer ${authData.token}` },
       });
       const order = response.data.data[0].included.orders;
+      setOrders(order)
       const checkLateFee = order.some(function (item) {
         return item.included?.late_fees.length > 0;
       });
@@ -122,6 +124,11 @@ export default function Dashboard({ navigation, route }: Props) {
       return second_choice;
     }
   };
+  const navigateHistory =()=>{
+    const lateOrder = orders.find((order) => order.included?.late_fees.length > 0);
+    navigation.navigate("OrderDetails", lateOrder );
+    
+  }
 
   useEffect(() => {
     settUser();
@@ -355,45 +362,38 @@ export default function Dashboard({ navigation, route }: Props) {
             </View>
           )}
           {latefee && (
-            <View
-              style={{
-                alignItems: "center",
-                backgroundColor: "#EFF5F9",
-                marginBottom: 20,
-              }}
-            >
-              <View style={styles.activate}>
-                <View
-                  style={{
-                    backgroundColor: "white",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-evenly",
-                  }}
-                >
-                  <Warning />
-                  <Text style={{ color: "#474A57", fontSize: 14 }}>
-                    Your loan repayment is{" "}
-                    <Text style={{ color: "red" }}>overdue</Text>
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    height: 1,
-                    width: 250,
-                    backgroundColor: "#DADADA",
-                    marginVertical: 8,
-                    alignSelf: "center",
-                  }}
-                ></View>
-                {
-                  <Pressable
-                    onPress={() =>
-                      navigation.navigate("CreateProfile", {
-                        user: authData.user,
-                      })
-                    }
+            <Pressable onPress={navigateHistory}>
+              <View
+                style={{
+                  alignItems: "center",
+                  backgroundColor: "#EFF5F9",
+                  marginBottom: 20,
+                }}
+              >
+                <View style={styles.activate}>
+                  <View
+                    style={{
+                      backgroundColor: "white",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-evenly",
+                    }}
                   >
+                    <Warning />
+                    <Text style={{ color: "#474A57", fontSize: 14 }}>
+                      Your loan repayment is{" "}
+                      <Text style={{ color: "red" }}>overdue</Text>
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      height: 1,
+                      width: 250,
+                      backgroundColor: "#DADADA",
+                      marginVertical: 8,
+                      alignSelf: "center",
+                    }}
+                  ></View>
                     <Text
                       style={{
                         color: "#074A74",
@@ -403,10 +403,10 @@ export default function Dashboard({ navigation, route }: Props) {
                     >
                       Check Order History
                     </Text>
-                  </Pressable>
-                }
+                  
+                </View>
               </View>
-            </View>
+            </Pressable>
           )}
 
           <View style={styles.cards}>

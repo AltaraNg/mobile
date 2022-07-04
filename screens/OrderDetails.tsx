@@ -1,17 +1,20 @@
 import {
-	Pressable,
-	StyleSheet,
-	TextInput,
-	ActivityIndicator,
-	Dimensions,
-	Image,
-} from 'react-native';
+  Pressable,
+  StyleSheet,
+  TextInput,
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  Modal,
+  TouchableHighlight,
+  TouchableOpacity,
+} from "react-native";
 
 import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header';
 import React, { useState, createRef } from 'react';
 import { post } from '../utilities/api';
-
+import { Button, Overlay, Icon } from "react-native-elements";
 import { Text, View } from '../components/Themed';
 import { RootStackParamList } from '../types';
 import Leaf from '../assets/svgs/leaf.svg';
@@ -36,24 +39,25 @@ export default function OrderDetails({ navigation, route }: Props) {
   const lateFees = order?.included?.late_fees;
   const width = Dimensions.get('window').width;
   const height = Dimensions.get('window').height;
+  const [modalVisible, setModalVisible] = useState(true);
 	let totalDebt, totalPaid: number;
 
-	let newArray = amortization.map((item: { actual_amount: number }) => {
+	let newArray = amortization?.map((item: { actual_amount: number }) => {
 		return item.actual_amount;
 	});
 	totalPaid =
-		newArray.reduce((total, item) => {
+		newArray?.reduce((total, item) => {
 			return total + item;
-		}) + order.attributes.down_payment;
-	totalDebt = order.attributes.down_payment + order.attributes.repayment - totalPaid;
+		}) + order?.attributes?.down_payment;
+	totalDebt = order?.attributes?.down_payment + order?.attributes?.repayment - totalPaid;
 
 	const checkValid = (amor: object) => {
 		let answer: boolean;
-		amor.actual_payment_date === null ? (answer = false) : (answer = true);
+		amor?.actual_payment_date === null ? (answer = false) : (answer = true);
 		return answer;
 	};
 
-	const progressBar = ((totalPaid - order.attributes.down_payment) / order.attributes.repayment) * 100;
+	const progressBar = ((totalPaid - order?.attributes?.down_payment) / order?.attributes?.repayment) * 100;
 
 	const orderStatusChi = (props) => {
 		const totalDebt =
@@ -143,6 +147,80 @@ export default function OrderDetails({ navigation, route }: Props) {
 
 	return (
     <View style={styles.container}>
+      {lateFees?.length > 0 && (
+        <View>
+          <Overlay
+            isVisible={modalVisible}
+            onBackdropPress={() => {
+              setModalVisible(!modalVisible);
+            }}
+          />
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+            style={{
+              justifyContent: "flex-end",
+              margin: 0,
+              position: "relative",
+            }}
+          >
+            <TouchableHighlight
+              onPress={() => setModalVisible(!modalVisible)}
+              style={{
+                borderRadius:
+                  Math.round(
+                    Dimensions.get("window").width +
+                      Dimensions.get("window").height
+                  ) / 2,
+                width: Dimensions.get("window").width * 0.13,
+                height: Dimensions.get("window").width * 0.13,
+                backgroundColor: "#fff",
+                position: "absolute",
+                //   top: 1 / 2,
+                marginHorizontal: Dimensions.get("window").width * 0.43,
+                marginVertical: Dimensions.get("window").width * 0.76,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              underlayColor="#ccc"
+            >
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: "#000",
+                  fontFamily: "Montserrat_900Black",
+                }}
+              >
+                &#x2715;
+              </Text>
+            </TouchableHighlight>
+            {
+              <View style={styles.modalContainer}>
+                <TouchableOpacity
+                  style={{ alignItems: "center" }}
+                  onPress={() => setModalVisible(!modalVisible)}
+                >
+                  <Text style={styles.modalHeaderCloseText}>X</Text>
+                </TouchableOpacity>
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalText}>Dear Customer, </Text>
+                    <Text style={styles.modalText}>
+                      Your loan repayment is <Text style={{color:'red'}}>overdue</Text> and it has led
+                      to an extended repayment. Please pay up all your debt
+                      completely to avoid further extension
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            }
+          </Modal>
+        </View>
+      )}
       <View style={styles.header}>
         <View
           style={{
@@ -166,7 +244,7 @@ export default function OrderDetails({ navigation, route }: Props) {
               fontSize: 11,
             }}
           >
-            Order ID: {order.attributes.order_number}
+            Order ID: {order?.attributes?.order_number}
           </Text>
           <Text
             numberOfLines={1}
@@ -178,7 +256,7 @@ export default function OrderDetails({ navigation, route }: Props) {
               marginRight: 10,
             }}
           >
-            {order.included.product.name}
+            {order?.included?.product.name}
           </Text>
         </View>
 
@@ -246,7 +324,7 @@ export default function OrderDetails({ navigation, route }: Props) {
           }}
         >
           ₦
-          {order.attributes.product_price
+          {order?.attributes?.product_price
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
         </Text>
@@ -279,7 +357,7 @@ export default function OrderDetails({ navigation, route }: Props) {
       </View>
 
       <View style={styles.amortizationContainer}>
-        {lateFees.length>0  ? (
+        {lateFees?.length > 0 ? (
           <View style={styles.toggle}>
             <LinearGradient
               colors={
@@ -342,7 +420,7 @@ export default function OrderDetails({ navigation, route }: Props) {
           <Text style={styles.amorHeader}>Repayments</Text>
         )}
 
-        {(!lateFees.length || !viewLateFee) && (
+        {(!lateFees?.length || !viewLateFee) && (
           <FlatList
             scrollEnabled={true}
             data={amortization}
@@ -416,7 +494,7 @@ export default function OrderDetails({ navigation, route }: Props) {
             )}
           />
         )}
-        {(lateFees.length > 0 && viewLateFee) && (
+        {lateFees?.length > 0 && viewLateFee && (
           <View
             style={{
               backgroundColor: "transparent",
@@ -500,7 +578,12 @@ export default function OrderDetails({ navigation, route }: Props) {
                 end={{ x: 0, y: 0.5 }}
               >
                 <Text style={[styles.totalText, { color: "white" }]}>
-                  {lateFees?.reduce((accumulator, object) => {return accumulator + object.amount;  }, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  {lateFees
+                    ?.reduce((accumulator, object) => {
+                      return accumulator + object.amount;
+                    }, 0)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 </Text>
               </LinearGradient>
             </View>
@@ -522,6 +605,15 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "#9C9696",
   },
+  modalText:{
+  color: "#353232",
+  fontFamily: "Montserrat_500Medium",
+  marginTop: 30,
+  marginHorizontal: 30,
+  fontSize: 22,
+  textAlign: "center",
+  lineHeight:35
+},
   total: {
     position: "absolute",
     bottom: 0,
@@ -529,10 +621,10 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     height: 75,
     backgroundColor: "#F9FBFC",
-    flexDirection:'row',
-    alignItems:'center',
-    paddingHorizontal:10,
-    justifyContent:'space-between'
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    justifyContent: "space-between",
   },
   header: {
     backgroundColor: "#074A74",
@@ -654,5 +746,36 @@ const styles = StyleSheet.create({
     backgroundColor: "#074A74",
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  modalContainer: {
+    height: Dimensions.get("screen").height / 2.1,
+    alignItems: "center",
+    marginTop: "auto",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    backgroundColor: "white",
+  },
+  modalContent: {
+    paddingVertical: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    alignItems: "center",
+    backgroundColor: "white",
+  },
+  modalHeading: {
+    fontFamily: "Montserrat_700Bold",
+    fontSize: 30,
+    textAlign: "center",
+    color: "black",
+    marginTop: 20,
+  },
+  modalHeaderCloseText: {
+    backgroundColor: "white",
+    textAlign: "center",
+    paddingLeft: 5,
+    paddingRight: 5,
+    width: 30,
+    fontSize: 15,
+    borderRadius: 50,
   },
 });
