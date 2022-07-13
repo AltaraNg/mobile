@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { Button, Overlay, Icon } from "react-native-elements";
 import { LinearGradient } from "expo-linear-gradient";
-import { SuccessSvg, FailSvg, LogOut, User } from "../assets/svgs/svg";
+import { SuccessSvg, FailSvg, LogOut, User, Warning } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import React, { useState, createRef, useEffect, useContext, } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
@@ -55,6 +55,8 @@ export default function Dashboard({ navigation, route }: Props) {
   const [showMenu, setShowMenu] = useState(false);
   const [onBoarded, setOnBoarded] = useState(null);
   const [type, setType] = useState("");
+  const [latefee, setlateFee] = useState(null);
+  const [orders, setOrders] = useState(null)
   const [uploaded, setUploaded] = useState(null);
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
@@ -80,7 +82,23 @@ export default function Dashboard({ navigation, route }: Props) {
 
     return true;
   };
-
+  const fetchOrder = async () => {
+    setShowLoader(true);
+    try {
+      let response = await axios({
+        method: "GET",
+        url: `/customers/${authData.user.id}/orders`,
+        headers: { Authorization: `Bearer ${authData.token}` },
+      });
+      const order = response.data.data[0].included.orders;
+      setOrders(order)
+      
+      const checkLateFee = order.some(function (item) {
+        return item.included?.late_fees.length > 0;
+      });
+      setlateFee(checkLateFee);
+    } catch (error: any) {}
+  };
   function handleRequest(res: any, status: String, type: string) {
     status === "success" ? setIsError(false) : setIsError(true);
     setModalResponse(res);
@@ -107,10 +125,18 @@ export default function Dashboard({ navigation, route }: Props) {
       return second_choice;
     }
   };
+  const navigateHistory =()=>{
+    const lateOrder = orders.find((order) => order.included?.late_fees.length > 0);
+    navigation.navigate("OrderDetails", lateOrder );
+    
+  }
 
   useEffect(() => {
     settUser();
   }, [authData,]);
+    useEffect(() => {
+      fetchOrder();
+    }, []);
 
   return (
     <View style={styles.container}>
@@ -335,6 +361,53 @@ export default function Dashboard({ navigation, route }: Props) {
                 )}
               </View>
             </View>
+          )}
+          {latefee && (
+            <Pressable onPress={navigateHistory}>
+              <View
+                style={{
+                  alignItems: "center",
+                  backgroundColor: "#EFF5F9",
+                  marginBottom: 20,
+                }}
+              >
+                <View style={styles.activate}>
+                  <View
+                    style={{
+                      backgroundColor: "white",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
+                    <Warning />
+                    <Text style={{ color: "#474A57", fontSize: 14 }}>
+                      Your loan repayment is{" "}
+                      <Text style={{ color: "red" }}>overdue</Text>
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      height: 1,
+                      width: 250,
+                      backgroundColor: "#DADADA",
+                      marginVertical: 8,
+                      alignSelf: "center",
+                    }}
+                  ></View>
+                    <Text
+                      style={{
+                        color: "#074A74",
+                        fontFamily: "Montserrat_700Bold",
+                        fontSize: 12,
+                      }}
+                    >
+                      Check Order History
+                    </Text>
+                  
+                </View>
+              </View>
+            </Pressable>
           )}
 
           <View style={styles.cards}>

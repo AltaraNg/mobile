@@ -34,7 +34,7 @@ export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
 
 export type RootTabParamList = {
   Dashboard: { user: object };
-  History: undefined;
+  History: { order: undefined };
   Notification: undefined;
   Home: { user: object };
   ViewProfile: { user: object };
@@ -42,6 +42,7 @@ export type RootTabParamList = {
   CreateProfile: { user: object };
   UploadDocument: { user: object };
   OrderRequest: { order: string };
+  OrderDetails: { order: object };
 };
 
 export type DrawerParamList = {
@@ -51,6 +52,8 @@ export type DrawerParamList = {
   CreateProfile: { user: object };
   UploadDocument: { user: object };
   OrderRequest: { order: string };
+  History: { order: undefined };
+  OrderDetails: { order: object };
 };
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> =
 	CompositeScreenProps<
