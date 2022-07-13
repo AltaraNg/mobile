@@ -40,7 +40,15 @@ export default function OrderDetails({ navigation, route }: Props) {
   const width = Dimensions.get('window').width;
   const height = Dimensions.get('window').height;
   const [modalVisible, setModalVisible] = useState(true);
-	let totalDebt, totalPaid: number;
+
+	let totalDebt, totalPaid, lateFeeDebt: number;
+    lateFeeDebt = lateFees.reduce((accumulator, object) => {
+       return accumulator + Number(object.amount_due)
+     }, 0) -
+     lateFees.reduce((accumulator, object) => {
+       return accumulator + Number(object.amount_paid);
+     }, 0);
+
 
 	let newArray = amortization?.map((item: { actual_amount: number }) => {
 		return item.actual_amount;
@@ -51,9 +59,9 @@ export default function OrderDetails({ navigation, route }: Props) {
 		}) + order?.attributes?.down_payment;
 	totalDebt = order?.attributes?.down_payment + order?.attributes?.repayment - totalPaid;
 
-	const checkValid = (amor: object) => {
+	const checkValid = (item) => {
 		let answer: boolean;
-		amor?.actual_payment_date === null ? (answer = false) : (answer = true);
+		item === null ? (answer = false) : (answer = true);
 		return answer;
 	};
 
@@ -141,6 +149,15 @@ export default function OrderDetails({ navigation, route }: Props) {
 		}
 		return answer;
 	};
+  const lateFeeStatus = (item)=>{
+    	if (item.amount_paid === item.amount_due) {
+        return "pass";
+      } else if (item.amount_paid == 0) {
+        return "fail";
+      } else {
+        return "pending";
+      }
+  }
 	const goBack = () => {
 		navigation.goBack();
 	};
@@ -210,8 +227,9 @@ export default function OrderDetails({ navigation, route }: Props) {
                   <View style={styles.modalContent}>
                     <Text style={styles.modalText}>Dear Customer, </Text>
                     <Text style={styles.modalText}>
-                      Your loan repayment is <Text style={{color:'red'}}>overdue</Text> and it has led
-                      to an extended repayment. Please pay up all your debt
+                      Your loan repayment is{" "}
+                      <Text style={{ color: "red" }}>overdue</Text> and it has
+                      led to an extended repayment. Please pay up all your debt
                       completely to avoid further extension
                     </Text>
                   </View>
@@ -477,7 +495,9 @@ export default function OrderDetails({ navigation, route }: Props) {
                     color: "#000000",
                   }}
                 >
-                  {checkValid(item) ? "Payment date: " : "Due date: "}
+                  {checkValid(item.actual_payment_date)
+                    ? "Payment date: "
+                    : "Due date: "}
                   <Text
                     style={{
                       fontWeight: "bold",
@@ -485,7 +505,7 @@ export default function OrderDetails({ navigation, route }: Props) {
                       color: "#000000",
                     }}
                   >
-                    {checkValid(item)
+                    {checkValid(item.actual_payment_date)
                       ? item.actual_payment_date
                       : item.expected_payment_date}
                   </Text>
@@ -530,7 +550,13 @@ export default function OrderDetails({ navigation, route }: Props) {
                     <View
                       style={{ backgroundColor: "#EFF5F9", paddingRight: 10 }}
                     >
-                      <OrderStatusFail />
+                      {lateFeeStatus(item) === "fail" ? (
+                        <OrderStatusFail />
+                      ) : lateFeeStatus(item) === "pending" ? (
+                        <OrderStatusPending />
+                      ) : (
+                        <OrderStatusPass />
+                      )}
                     </View>
 
                     <Text
@@ -541,9 +567,9 @@ export default function OrderDetails({ navigation, route }: Props) {
                       }}
                     >
                       ₦
-                      {item.amount
-                        .toString()
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      {item.amount_due
+                        ?.toString()
+                        ?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                     </Text>
                   </View>
                   <Text
@@ -552,7 +578,9 @@ export default function OrderDetails({ navigation, route }: Props) {
                       color: "#000000",
                     }}
                   >
-                    Penalty Date:
+                    {checkValid(item.date_paid)
+                      ? "Payment date: "
+                      : "Penalty date: "}
                     <Text
                       style={{
                         fontWeight: "bold",
@@ -560,14 +588,17 @@ export default function OrderDetails({ navigation, route }: Props) {
                         color: "#000000",
                       }}
                     >
-                      {new Date(item.date_created).toLocaleDateString()}
+                      {checkValid(item.date_paid)
+                        ? item.date_paid.substring(0, 10).split("-").join("/")
+                        : new Date(item.date_created).toLocaleDateString()}
+                      {/* {new Date(item.date_created).toLocaleDateString()} */}
                     </Text>
                   </Text>
                 </View>
               )}
             />
             <View style={[styles.total, { width: width }]}>
-              <Text style={styles.totalText}>Total</Text>
+              <Text style={styles.totalText}>Latefee Debt</Text>
               <LinearGradient
                 colors={["#074A74", "#089CA4"]}
                 style={[
@@ -578,12 +609,7 @@ export default function OrderDetails({ navigation, route }: Props) {
                 end={{ x: 0, y: 0.5 }}
               >
                 <Text style={[styles.totalText, { color: "white" }]}>
-                  {lateFees
-                    ?.reduce((accumulator, object) => {
-                      return accumulator + object.amount;
-                    }, 0)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  ₦{lateFeeDebt}.00
                 </Text>
               </LinearGradient>
             </View>

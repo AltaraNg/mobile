@@ -92,6 +92,7 @@ export default function Dashboard({ navigation, route }: Props) {
       });
       const order = response.data.data[0].included.orders;
       setOrders(order)
+      
       const checkLateFee = order.some(function (item) {
         return item.included?.late_fees.length > 0;
       });
