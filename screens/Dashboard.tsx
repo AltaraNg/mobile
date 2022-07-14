@@ -94,7 +94,15 @@ export default function Dashboard({ navigation, route }: Props) {
       setOrders(order)
       
       const checkLateFee = order.some(function (item) {
-        return item.included?.late_fees.length > 0;
+           const lateFees = item?.included?.late_fees;
+           const lateFeeDebt =
+             lateFees?.reduce((accumulator, object) => {
+               return accumulator + Number(object.amount_due);
+             }, 0) -
+             lateFees.reduce((accumulator, object) => {
+               return accumulator + Number(object.amount_paid);
+             }, 0);
+           return item?.included?.late_fees.length > 0 && lateFeeDebt != 0;
       });
       setlateFee(checkLateFee);
     } catch (error: any) {}
@@ -126,7 +134,16 @@ export default function Dashboard({ navigation, route }: Props) {
     }
   };
   const navigateHistory =()=>{
-    const lateOrder = orders.find((order) => order.included?.late_fees.length > 0);
+    const lateOrder = orders.find((order) =>{
+      const lateFees = order?.included?.late_fees
+      const lateFeeDebt = lateFees?.reduce((accumulator, object) => {
+          return accumulator + Number(object.amount_due);
+        }, 0) -
+        lateFees.reduce((accumulator, object) => {
+          return accumulator + Number(object.amount_paid);
+        }, 0);
+      return order?.included?.late_fees.length > 0 && lateFeeDebt != 0;
+      });
     navigation.navigate("OrderDetails", lateOrder );
     
   }
