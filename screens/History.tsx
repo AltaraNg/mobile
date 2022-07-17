@@ -99,7 +99,6 @@ export default function History({ navigation, route }: Props) {
   }, []);
   return (
     <View style={styles.container}>
-
       <View style={styles.header}>
         <Header></Header>
         <TouchableOpacity>
@@ -131,7 +130,10 @@ export default function History({ navigation, route }: Props) {
                 keyExtractor={(item) => item.id}
                 extraData={orders}
                 refreshControl={
-                  <RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={fetchOrder}
+                  />
                 }
                 renderItem={({ item }) => (
                   <View style={{ backgroundColor: "#fff" }}>
@@ -155,7 +157,13 @@ export default function History({ navigation, route }: Props) {
                             </Text>
                           </View>
                         </View>
-                        <Text style={{ color: "#000", fontSize: 13, marginRight:59 }}>
+                        <Text
+                          style={{
+                            color: "#000",
+                            fontSize: 13,
+                            marginRight: 59,
+                          }}
+                        >
                           {item?.attributes?.order_date}
                         </Text>
                       </View>
