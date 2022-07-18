@@ -1,8 +1,7 @@
 import {
   Pressable,
   StyleSheet,
-  TextInput,
-  ActivityIndicator,
+  ScrollView,
   ToastAndroid,
   BackHandler,
   Platform,
@@ -10,6 +9,7 @@ import {
   Modal,
   TouchableHighlight,
   Alert,
+  RefreshControl,
   Image,
   Dimensions,
 } from "react-native";
@@ -50,6 +50,7 @@ export default function Dashboard({ navigation, route }: Props) {
   const [exitApp, setExitApp] = useState(1);
   const [isError, setIsError] = useState(false);
   const [user, setUser] = useState(null);
+  const [refreshing, setRefreshing] = useState(true);
   const [modalResponse, setModalResponse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -94,7 +95,15 @@ export default function Dashboard({ navigation, route }: Props) {
       setOrders(order)
       
       const checkLateFee = order.some(function (item) {
-        return item.included?.late_fees.length > 0;
+           const lateFees = item?.included?.late_fees;
+           const lateFeeDebt =
+             lateFees?.reduce((accumulator, object) => {
+               return accumulator + Number(object.amount_due);
+             }, 0) -
+             lateFees.reduce((accumulator, object) => {
+               return accumulator + Number(object.amount_paid);
+             }, 0);
+           return item?.included?.late_fees.length > 0 && lateFeeDebt != 0;
       });
       setlateFee(checkLateFee);
     } catch (error: any) {}
@@ -108,6 +117,7 @@ export default function Dashboard({ navigation, route }: Props) {
   }
 
   const settUser = async () => {
+    fetchOrder()
     fetchOrderRequestContext();
     setUser(authData?.user);
     setOnBoarded(authData?.user?.attributes?.on_boarded);
@@ -116,6 +126,7 @@ export default function Dashboard({ navigation, route }: Props) {
     );
     setUploaded(upload);
     setShowLoader(true)
+    setRefreshing(false);
   };
   const navigating = (first_choice, second_choice) => {
     if (!onBoarded) {
@@ -126,7 +137,16 @@ export default function Dashboard({ navigation, route }: Props) {
     }
   };
   const navigateHistory =()=>{
-    const lateOrder = orders.find((order) => order.included?.late_fees.length > 0);
+    const lateOrder = orders.find((order) =>{
+      const lateFees = order?.included?.late_fees
+      const lateFeeDebt = lateFees?.reduce((accumulator, object) => {
+          return accumulator + Number(object.amount_due);
+        }, 0) -
+        lateFees.reduce((accumulator, object) => {
+          return accumulator + Number(object.amount_paid);
+        }, 0);
+      return order?.included?.late_fees.length > 0 && lateFeeDebt != 0;
+      });
     navigation.navigate("OrderDetails", lateOrder );
     
   }
@@ -139,7 +159,12 @@ export default function Dashboard({ navigation, route }: Props) {
     }, []);
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={settUser} />
+      }
+    >
       <Overlay
         isVisible={modalVisible}
         onBackdropPress={() => {
@@ -275,7 +300,7 @@ export default function Dashboard({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
-      {!showLoader || showLoader2 ? (
+      {!showLoader || showLoader2  ? (
         <Image
           source={require("../assets/gifs/loader.gif")}
           style={styles.image}
@@ -395,16 +420,15 @@ export default function Dashboard({ navigation, route }: Props) {
                       alignSelf: "center",
                     }}
                   ></View>
-                    <Text
-                      style={{
-                        color: "#074A74",
-                        fontFamily: "Montserrat_700Bold",
-                        fontSize: 12,
-                      }}
-                    >
-                      Check Order History
-                    </Text>
-                  
+                  <Text
+                    style={{
+                      color: "#074A74",
+                      fontFamily: "Montserrat_700Bold",
+                      fontSize: 12,
+                    }}
+                  >
+                    Check Order History
+                  </Text>
                 </View>
               </View>
             </Pressable>
@@ -435,7 +459,7 @@ export default function Dashboard({ navigation, route }: Props) {
           </View>
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -444,6 +468,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     position: "relative",
+    backgroundColor: "#EFF5F9",
   },
   activate: {
     backgroundColor: "white",
@@ -461,8 +486,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").height * 0.2,
     height: Dimensions.get("window").height * 0.2,
     backgroundColor: "#EFF5F9",
-    position: "absolute",
-    top: Dimensions.get("window").height * 0.5,
+    marginTop: Dimensions.get("window").height * 0.2,
     left: Dimensions.get("window").width * 0.25,
   },
   hamburger: {
@@ -483,6 +507,7 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#EFF5F9",
+    marginTop:40
   },
   name: {
     marginHorizontal: 30,
@@ -503,43 +528,43 @@ const styles = StyleSheet.create({
     right: 0,
   },
 
-	modalContainer: {
-		height: Dimensions.get('screen').height / 2.1,
-		alignItems: 'center',
-		marginTop: 'auto',
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		backgroundColor: 'white',
-	},
-	modalContent: {
-		paddingVertical: 20,
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		alignItems: 'center',
-		backgroundColor: 'white',
-	},
-	modalHeading: {
-		fontFamily: 'Montserrat_700Bold',
-		fontSize: 30,
-		textAlign: 'center',
-		color: 'black',
-		marginTop: 20,
-	},
-	modalHeaderCloseText: {
-		backgroundColor: 'white',
-		textAlign: 'center',
-		paddingLeft: 5,
-		paddingRight: 5,
-		width: 30,
-		fontSize: 15,
-		borderRadius: 50,
-	},
+  modalContainer: {
+    height: Dimensions.get("screen").height / 2.1,
+    alignItems: "center",
+    marginTop: "auto",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    backgroundColor: "white",
+  },
+  modalContent: {
+    paddingVertical: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    alignItems: "center",
+    backgroundColor: "white",
+  },
+  modalHeading: {
+    fontFamily: "Montserrat_700Bold",
+    fontSize: 30,
+    textAlign: "center",
+    color: "black",
+    marginTop: 20,
+  },
+  modalHeaderCloseText: {
+    backgroundColor: "white",
+    textAlign: "center",
+    paddingLeft: 5,
+    paddingRight: 5,
+    width: 30,
+    fontSize: 15,
+    borderRadius: 50,
+  },
 
-	errText: {
-		fontSize: 15,
-		marginTop: 20,
-		paddingHorizontal: 15,
-		textAlign: 'center',
-		color: '#000',
-	},
+  errText: {
+    fontSize: 15,
+    marginTop: 20,
+    paddingHorizontal: 15,
+    textAlign: "center",
+    color: "#000",
+  },
 });

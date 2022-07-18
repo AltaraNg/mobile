@@ -42,7 +42,7 @@ export default function OrderDetails({ navigation, route }: Props) {
   const [modalVisible, setModalVisible] = useState(true);
 
 	let totalDebt, totalPaid, lateFeeDebt: number;
-    lateFeeDebt = lateFees.reduce((accumulator, object) => {
+    lateFeeDebt = lateFees?.reduce((accumulator, object) => {
        return accumulator + Number(object.amount_due)
      }, 0) -
      lateFees.reduce((accumulator, object) => {
@@ -164,7 +164,7 @@ export default function OrderDetails({ navigation, route }: Props) {
 
 	return (
     <View style={styles.container}>
-      {lateFees?.length > 0 && (
+      {(lateFees?.length > 0 && lateFeeDebt != 0  ) && (
         <View>
           <Overlay
             isVisible={modalVisible}
@@ -591,7 +591,6 @@ export default function OrderDetails({ navigation, route }: Props) {
                       {checkValid(item.date_paid)
                         ? item.date_paid.substring(0, 10).split("-").join("/")
                         : new Date(item.date_created).toLocaleDateString()}
-                      {/* {new Date(item.date_created).toLocaleDateString()} */}
                     </Text>
                   </Text>
                 </View>
@@ -609,7 +608,11 @@ export default function OrderDetails({ navigation, route }: Props) {
                 end={{ x: 0, y: 0.5 }}
               >
                 <Text style={[styles.totalText, { color: "white" }]}>
-                  ₦{lateFeeDebt}.00
+                  ₦
+                  {lateFeeDebt
+                    ?.toString()
+                    ?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  .00
                 </Text>
               </LinearGradient>
             </View>
