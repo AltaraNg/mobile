@@ -53,11 +53,17 @@ export default function OrderDetails({ navigation, route }: Props) {
 	let newArray = amortization?.map((item: { actual_amount: number }) => {
 		return item.actual_amount;
 	});
+  let repaymentArray = amortization?.map((item: { expected_amount: number }) => {
+		return item.expected_amount;
+	});
+  let totalRepayment = repaymentArray?.reduce((total, item) => {
+    return total + item;
+  });
 	totalPaid =
 		newArray?.reduce((total, item) => {
 			return total + item;
 		}) + order?.attributes?.down_payment;
-	totalDebt = order?.attributes?.down_payment + order?.attributes?.repayment - totalPaid;
+	totalDebt = order?.attributes?.down_payment + totalRepayment - totalPaid;
 
 	const checkValid = (item) => {
 		let answer: boolean;
