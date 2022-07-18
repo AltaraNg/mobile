@@ -2,101 +2,187 @@ import {
   Pressable,
   StyleSheet,
   TouchableOpacity,
-  RefreshControl,
+  Touchable,
+  TextInput,
+  ActivityIndicator,
+  ToastAndroid,
+  BackHandler,
+  Platform,
+  ScrollView,
+  Modal,
+  TouchableHighlight,
+  Alert,
   Image,
   Dimensions,
-  ActivityIndicator,
 } from "react-native";
 import { Button, Overlay, Icon } from "react-native-elements";
-import { LinearGradient } from "expo-linear-gradient";
+import { SuccessSvg, ProgressSVG,  } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import React, { useState, createRef, useEffect, useContext } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, RootTabParamList } from "../types";
-import Cards from "../components/Cards";
-import SideMenu from "./SideMenu";
-import { ELoan, Rental, ProductLoan } from "../assets/svgs/svg";
+import { FolderPlus, Rental, ProductLoan } from "../assets/svgs/svg";
 import { AuthContext } from "../context/AuthContext";
+import { OrderContext } from "../context/OrderContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Constants from "expo-constants";
 import axios from "axios";
-import { FlatList } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
-type Props = NativeStackScreenProps<RootTabParamList, "History">;
+type Props = NativeStackScreenProps<RootTabParamList, "OrderRequest">;
 
 export default function History({ navigation, route }: Props) {
-  const [refreshing, setRefreshing] = useState(true)
   const { authData } = useContext(AuthContext);
-  const [orders, setOrders] = useState([]);
-  const [pressedOrder, setPressedOrder] = useState(null);
+  const {
+    setOrderRequest,
+    orderRequest,
+    fetchOrderRequestContext,
+    showLoader2,
+  } = useContext(OrderContext);
   const [modalVisible, setModalVisible] = useState(false);
-  const [showLoader, setShowLoader] = useState(false);
-  let mounted = true;
-  const styleSVG = (item: any) => {
-    const totalDebt =
-      item?.included?.amortizations.reduce(
-        (accumulator, object) => {
-          return accumulator + object.expected_amount;
-        },
-        0
-      ) -
-      item?.included?.amortizations.reduce((accumulator, object) => {
-        return accumulator + object.actual_amount;
-      }, 0);
-    const Today = new Date()
-    const expiryDate = new Date(
-      item?.included?.amortizations.find(
-        (item) => item.actual_amount == 0
-      )?.expected_payment_date
-    )
+  const [pressedOrder, setPressedOrder] = useState(null);
 
-    if (totalDebt <= 0) {
+  const styleSVG = (item: any) => {
+    if (item?.status == "approved" || item?.status == "accepted") {
       return "#074A74";
     }
-    if (totalDebt > 0 && Today < expiryDate) {
+    if (item?.status == 'pending' || item?.status == 'processing') {
       return "#FDC228";
     }
-    if (totalDebt > 0 && Today > expiryDate) {
+    if (item?.status == "denied" || item?.status == "declined") {
       return "#FF4133";
     }
-
   };
+  const modalResponse = (item: any) => {
+      if (item?.status == "approved" || item?.status == "accepted") {
+        return "was successful";
+      }
+      if (item?.status == "pending" || item?.status == "processing") {
+        return "is in progress";
+      }
+      if (item?.status == "declined" || item?.status == "denied") {
+        return "was unsuccessful";
+      }
+    };
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
   };
 
-  const fetchOrder = async () => {
-    setShowLoader(true);
-    try {
-      let response = await axios({
-        method: "GET",
-        url: `/customers/${authData.user.id}/orders`,
-        headers: { Authorization: `Bearer ${authData.token}` },
-      });
-      setShowLoader(false);
-      setRefreshing(false);
-      const order = response.data.data[0].included.orders;
-      setOrders(order);
-
-    } catch (error: any) {
-     }
+  const viewDetail = (item) => {
+     setModalVisible(true);
+     setPressedOrder(item);
   };
-  const viewDetail = (order) => {
-    navigation.navigate('OrderDetails', order);
-  };
+  const OrderDetails = function ({item}) {
+      return (
+        <View>
+          <Overlay
+            isVisible={modalVisible}
+            onBackdropPress={() => {
+              setModalVisible(!modalVisible);
+            }}
+          />
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+            style={{
+              justifyContent: "flex-end",
+              margin: 0,
+              position: "relative",
+            }}
+          >
+            <TouchableHighlight
+              onPress={() => setModalVisible(!modalVisible)}
+              style={{
+                borderRadius:
+                  Math.round(
+                    Dimensions.get("window").width +
+                      Dimensions.get("window").height
+                  ) / 2,
+                width: Dimensions.get("window").width * 0.13,
+                height: Dimensions.get("window").width * 0.13,
+                backgroundColor: "#fff",
+                position: "absolute",
+                //   top: 1 / 2,
+                marginHorizontal: Dimensions.get("window").width * 0.43,
+                marginVertical: Dimensions.get("window").width * 0.76,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              underlayColor="#ccc"
+            >
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: "#000",
+                  fontFamily: "Montserrat_900Black",
+                }}
+              >
+                &#x2715;
+              </Text>
+            </TouchableHighlight>
 
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                {styleSVG(item) == "#FF4133" && (
+                  <TouchableHighlight
+                    style={{
+                      borderRadius:
+                        Math.round(
+                          Dimensions.get("window").width +
+                            Dimensions.get("window").height
+                        ) / 2,
+                      width: Dimensions.get("window").width * 0.3,
+                      height: Dimensions.get("window").width * 0.3,
+                      backgroundColor: "#FF4133",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                    underlayColor="#ccc"
+                  >
+                    <Text
+                      style={{
+                        fontSize: 68,
+                        color: "#fff",
+                        fontFamily: "Montserrat_900Black",
+                      }}
+                    >
+                      &#x2715;
+                    </Text>
+                  </TouchableHighlight>
+                )}
 
-  useEffect(() => {
-    // if(orders.length){
-    //   return;
-    // }
-    fetchOrder();
-    // return () => mounted = false;
-  }, []);
+                {styleSVG(item) == "#FDC228" && (
+                  <Image
+                    source={require("../assets/images/ProgressSVG.png")}
+                  />
+                )}
+                {styleSVG(item) == "#074A74" && <SuccessSvg />}
+                <Text style={styles.modalHeading}>
+                  Your Order Request{" "}
+                  <Text style={{ color: styleSVG(item) }}>
+                    {modalResponse(item)}
+                  </Text>
+                </Text>
+
+                <Text style={styles.errText}>{item?.reason || "An agent will reach out to you shortly"}</Text>
+              </View>
+            </View>
+          </Modal>
+        </View>
+      );
+    };
+      useEffect(() => {
+        fetchOrderRequestContext();
+      }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -109,8 +195,8 @@ export default function History({ navigation, route }: Props) {
       </View>
 
       <View style={styles.main}>
-        <Text style={styles.name}>{"History"}</Text>
-        {showLoader ? (
+        <Text style={styles.name}>Order Request</Text>
+        {showLoader2 ? (
           <Image
             source={require("../assets/gifs/loader.gif")}
             style={styles.image2}
@@ -119,28 +205,20 @@ export default function History({ navigation, route }: Props) {
           <View
             style={{
               backgroundColor: "#fff",
-              marginBottom: 100,
+              // marginBottom: 60,
             }}
           >
-            {refreshing ? <ActivityIndicator /> : null}
-            {orders?.length > 0 ? (
+            {orderRequest?.length > 0 ? (
               <FlatList
                 scrollEnabled={true}
-                data={orders}
+                data={orderRequest}
                 keyExtractor={(item) => item.id}
-                extraData={orders}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={fetchOrder}
-                  />
-                }
                 renderItem={({ item }) => (
                   <View style={{ backgroundColor: "#fff" }}>
                     <Pressable onPress={() => viewDetail(item)}>
                       <View style={styles.order}>
                         <View style={styles.details}>
-                          <ELoan color={styleSVG(item)} />
+                          <FolderPlus color={styleSVG(item)} />
                           <View style={styles.title}>
                             <Text
                               style={{
@@ -150,10 +228,10 @@ export default function History({ navigation, route }: Props) {
                               numberOfLines={1}
                               ellipsizeMode={"tail"}
                             >
-                              {item.included.product.name}{" "}
+                              {item.order_type}{" "}
                             </Text>
                             <Text style={{ color: "#000", fontSize: 12 }}>
-                              Order ID: {item?.attributes?.order_number}
+                              Status: {item?.status}
                             </Text>
                           </View>
                         </View>
@@ -161,10 +239,9 @@ export default function History({ navigation, route }: Props) {
                           style={{
                             color: "#000",
                             fontSize: 13,
-                            marginRight: 59,
                           }}
                         >
-                          {item?.attributes?.order_date}
+                          {new Date(item?.created_at).toLocaleDateString()}
                         </Text>
                       </View>
                     </Pressable>
@@ -174,7 +251,7 @@ export default function History({ navigation, route }: Props) {
             ) : (
               <View
                 style={{
-                  backgroundColor: "#EFF5F9",
+                  backgroundColor: "#fff",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
@@ -184,9 +261,10 @@ export default function History({ navigation, route }: Props) {
                   source={require("../assets/images/zerostate2.png")}
                   style={styles.image}
                 />
-                <Text style={{ color: "black" }}>No History</Text>
+                <Text style={{ color: "black" }}>No Requests</Text>
               </View>
             )}
+            <OrderDetails item={pressedOrder} />
           </View>
         )}
       </View>
@@ -222,18 +300,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    backgroundColor: "#fff",
+    backgroundColor: "#F9FBFC",
     marginLeft: 10,
     width: "65%",
   },
   details: {
-    backgroundColor: "#fff",
+    backgroundColor: "#F9FBFC",
     flexDirection: "row",
     alignItems: "center",
-    
   },
   order: {
-    backgroundColor: "#fff",
+    backgroundColor: "#F9FBFC",
     flexDirection: "row",
     marginLeft: 26,
     marginRight: 20,
@@ -241,7 +318,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginVertical: 10,
     padding: 7,
-    paddingRight: 30,
+    paddingRight: 20,
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -259,12 +336,13 @@ const styles = StyleSheet.create({
     flex: 3,
     backgroundColor: "#fff",
   },
+
   name: {
     marginHorizontal: 30,
     fontSize: 25,
     color: "#074A74",
     fontFamily: "Montserrat_700Bold",
-    marginBottom: 60,
+    marginBottom: 30,
   },
   message: {
     fontFamily: "Montserrat_400Regular",
@@ -291,6 +369,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
+    flexDirection: "column",
+    alignItems: "center",
   },
   modalHeading: {
     fontFamily: "Montserrat_700Bold",
@@ -312,5 +392,12 @@ const styles = StyleSheet.create({
     height: "100%",
     width: 1,
     backgroundColor: "#909090",
+  },
+  errText: {
+    fontSize: 15,
+    marginTop: 20,
+    paddingHorizontal: 15,
+    textAlign: "center",
+    color: "#000",
   },
 });

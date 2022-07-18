@@ -12,3 +12,4 @@ web-build/
 .vscode/
 # macOS
 .DS_Store
+newrelic_agent.log

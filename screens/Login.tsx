@@ -11,7 +11,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/Header";
 import React, { useState, createRef } from "react";
 import { post } from "../utilities/api";
-
 import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
