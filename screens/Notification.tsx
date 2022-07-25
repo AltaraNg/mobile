@@ -1,48 +1,44 @@
 import {
   Pressable,
-  StyleSheet,
-  TextInput,
-  ActivityIndicator,
-  ToastAndroid,
-  BackHandler,
-  Platform,
+  StyleSheet, 
   TouchableOpacity,
   FlatList,
   Image,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 
-import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header';
 import React, { useState, createRef, useEffect, useContext } from 'react';
 import Hamburger from '../assets/svgs/hamburger.svg';
 import { Text, View } from '../components/Themed';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList, RootTabParamList } from '../types';
-import Cards from '../components/Cards';
-import SideMenu from './SideMenu';
-import {ZeroState} from '../assets/svgs/svg'
+
 import Constants from 'expo-constants';
 
 import { AuthContext } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import axios from 'axios';
-import { Loader } from '../assets/svgs/svg';
+import { Entypo } from '@expo/vector-icons';
 
-type Props = NativeStackScreenProps<RootTabParamList, 'Notification'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'ViewNotification'>;
 
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
 export default function Notification({ navigation, route }: Props) {
+  const [refreshing, setRefreshing] = useState(true);
 	const { authData } = useContext(AuthContext);
-	const [exitApp, setExitApp] = useState(1);
-	const [showMenu, setShowMenu] = useState(false);
+	
   const [showLoader, setShowLoader] = useState(false);
 	const [notifications, setNotifications] = useState(null);
 	const toggleSideMenu = async () => {
 		navigation.toggleDrawer();
 	};
+
+  const viewDetail = (notification) => {
+    navigation.navigate('ViewNotification', notification);
+  };
 
 	const fetchNotification = async () => {
     setShowLoader(true)
@@ -53,6 +49,8 @@ export default function Notification({ navigation, route }: Props) {
 				headers: { 'Authorization': `Bearer ${authData.token}` },
 			});
       setShowLoader(false)
+      setRefreshing(false);
+
 			const notification = response?.data?.data?.notifications?.data;
 			setNotifications(notification);
 		} catch (error: any) {
@@ -93,17 +91,27 @@ export default function Notification({ navigation, route }: Props) {
               <FlatList
                 data={notifications}
                 keyExtractor={(item) => item.id}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={fetchNotification}
+                  />
+                }
                 renderItem={({ item }) => (
-                  <Pressable>
+                  <Pressable  onPress={() => viewDetail(item)}>
                     <View style={styles.order}>
                       <Text
-                        style={{
+                        style={item.read_at ? {
+                          fontFamily: "Montserrat_500Medium",
+                          fontSize: 18,
+                          color: "#074A74",
+                        } : {
                           fontFamily: "Montserrat_700Bold",
                           fontSize: 18,
                           color: "#074A74",
                         }}
                       >
-                        {JSON.parse(item.data).subject}
+                        {!item.read_at ? (<Entypo name="dot-single" size={24} color="#074A74"/>) : ""}{JSON.parse(item.data).subject}
                       </Text>
                       <Text style={{ color: "#777", fontSize: 12 }}>
                         {item.created_at}
@@ -116,6 +124,7 @@ export default function Notification({ navigation, route }: Props) {
                           marginVertical: 8,
                           color: "black",
                         }}
+                      numberOfLines={1}
                       >
                         {JSON.parse(item.data).message}
                       </Text>
@@ -152,6 +161,8 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     position: "relative",
+    backgroundColor: "#EFF5F9",
+
   },
   image: {
     width: Dimensions.get("window").height * 0.46,
@@ -175,7 +186,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   header: {
-    flex: 1,
+   
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "#EFF5F9",
@@ -183,6 +194,8 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#EFF5F9",
+    marginTop:40
+
   },
   name: {
     marginHorizontal: 30,
@@ -221,4 +234,13 @@ const styles = StyleSheet.create({
     borderColor: "#074A74",
     borderBottomWidth: 1,
   },
+  orderRead: {
+    backgroundColor: "#888888",
+    marginTop: 10,
+    marginLeft: 26,
+    marginRight: 20,
+    alignItems: "flex-start",
+    borderColor: "#074A74",
+    borderBottomWidth: 1,
+  }
 });

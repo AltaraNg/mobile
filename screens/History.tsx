@@ -7,16 +7,13 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
-import { Button, Overlay, Icon } from "react-native-elements";
-import { LinearGradient } from "expo-linear-gradient";
+
 import Header from "../components/Header";
 import React, { useState, createRef, useEffect, useContext } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
-import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, RootTabParamList } from "../types";
-import Cards from "../components/Cards";
-import SideMenu from "./SideMenu";
+
 import { ELoan, Rental, ProductLoan } from "../assets/svgs/svg";
 import { AuthContext } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -100,7 +97,7 @@ export default function History({ navigation, route }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Header></Header>
+        <Header navigation={navigation}></Header>
         <TouchableOpacity>
           <Pressable onPress={toggleSideMenu}>
             <Hamburger style={styles.hamburger} />
@@ -199,6 +196,8 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     position: "relative",
+    backgroundColor: "white",
+
   },
   image: {
     width: Dimensions.get("window").height * 0.46,
@@ -250,7 +249,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   header: {
-    flex: 1,
+    
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "#fff",
@@ -258,6 +257,8 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#fff",
+    marginTop:40
+
   },
   name: {
     marginHorizontal: 30,
