@@ -232,7 +232,7 @@ export default function Dashboard({ navigation, route }: Props) {
     <View style={styles.container}>
       {showMenu && <SideMenu Logout="Logout" />}
       <View style={styles.header}>
-        <Header></Header>
+        <Header navigation={navigation}></Header>
         <TouchableOpacity>
           <Pressable onPress={toggleSideMenu}>
             <Hamburger style={styles.hamburger} />
@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   header: {
-    flex: 1,
+    
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "#fff",
@@ -648,6 +648,8 @@ const styles = StyleSheet.create({
   main: {
     flex: 4,
     backgroundColor: "#fff",
+    marginTop:40
+
   },
   title: {
     marginHorizontal: 15,

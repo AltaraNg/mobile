@@ -186,7 +186,7 @@ export default function History({ navigation, route }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Header></Header>
+        <Header navigation={navigation}></Header>
         <TouchableOpacity>
           <Pressable onPress={toggleSideMenu}>
             <Hamburger style={styles.hamburger} />
@@ -277,6 +277,8 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     position: "relative",
+    backgroundColor: "white",
+
   },
   image: {
     width: Dimensions.get("window").height * 0.46,
@@ -327,7 +329,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   header: {
-    flex: 1,
+    
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "#fff",
@@ -335,6 +337,8 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#fff",
+    marginTop:40
+
   },
 
   name: {

@@ -22,6 +22,7 @@ export type RootStackParamList = {
   Modal: undefined;
   NotFound: undefined;
   OrderDetails: { order: object };
+  ViewNotification: { notification: any}
   Main: undefined;
   OTP: { phone_number: string };
   Login: undefined;

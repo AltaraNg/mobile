@@ -20,6 +20,7 @@ import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../modals/ModalScreen';
 import Cards from '../components/Cards'
 import { createStackNavigator } from '@react-navigation/stack';
+import { Badge } from 'react-native-paper';
 import {
 	getFocusedRouteNameFromRoute,
 	NavigationContainer,
@@ -42,6 +43,7 @@ import Dashboard from '../screens/Dashboard';
 import OrderRequest from '../screens/OrderRequest'
 import ViewProfile from '../screens/ViewProfile';
 import { AuthProvider, useAuth } from '../context/AuthContext';
+import { NotificationContext, NotificationDispatchContext, NotificationProvider } from "../context/NotificationContext";
 import { OrderProvider, useOrder } from "../context/OrderContext";
 import Constants from 'expo-constants';
 import axios from 'axios';
@@ -55,6 +57,7 @@ import RequestModal from '../modals/requestModal';
 import { Loading } from '../components/Loading';
 import { FlagsProvider } from 'flagged';
 import OrderDetails from '../screens/OrderDetails';
+import ViewNotification from "../screens/ViewNotification";
 let url = Constants?.manifest?.extra?.URL;
 
 axios.defaults.baseURL = url;
@@ -95,6 +98,7 @@ export default function Navigation({
 	return (
 		<AuthProvider>
 			<OrderProvider>
+				<NotificationProvider>
 			<NavigationContainer
 				linking={LinkingConfiguration}
 				ref={navigationRef}
@@ -121,6 +125,7 @@ export default function Navigation({
 			>
 				<RootNavigator />
 			</NavigationContainer>
+			</NotificationProvider>
 			</OrderProvider>
 		</AuthProvider>
 	);
@@ -182,6 +187,11 @@ function RootNavigator() {
         <Stack.Screen
           name="OrderDetails"
           component={OrderDetails}
+          options={{ headerShown: false }}
+        />
+		 <Stack.Screen
+          name="ViewNotification"
+          component={ViewNotification}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -316,8 +326,13 @@ function TabBarIcon(props: {
 const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
 function BottomTabNavigator() {
+	const totalUnread = useContext(NotificationContext);
+	const setTotalUnread = useContext(NotificationDispatchContext);
+	console.log(totalUnread);
+	
 	const colorScheme = useColorScheme();
 	return (
+		
     <BottomTab.Navigator
       initialRouteName="Dashboard"
       screenOptions={{
@@ -362,6 +377,12 @@ function BottomTabNavigator() {
         component={Notification}
         options={{
           headerShown: false,
+		  tabBarBadge: totalUnread.unread === 0 ? false : totalUnread.unread,
+		  tabBarBadgeStyle: {
+			color: '#074A74',
+			backgroundColor: '#EFF5F9',
+			fontWeight: "bold"
+		  },
           tabBarLabel: "",
           tabBarIcon: ({ color, size }) => (
             <FontAwesome
@@ -369,7 +390,10 @@ function BottomTabNavigator() {
               color={color}
               name="bell"
               style={{ marginBottom: -16 }}
-            />
+            >
+				
+			</FontAwesome>
+			
           ),
         }}
       />
@@ -385,6 +409,7 @@ function BottomTabNavigator() {
         }}
       />
     </BottomTab.Navigator>
+	
   );
 }
 
