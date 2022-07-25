@@ -25,6 +25,7 @@ export type RootStackParamList = {
   Main: undefined;
   OTP: { phone_number: string };
   Login: undefined;
+  LoginPassword: undefined;
   Cards: { order: string };
   OrderRequest: { order: string };
 };

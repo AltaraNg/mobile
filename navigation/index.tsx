@@ -37,6 +37,7 @@ import {
 import LinkingConfiguration from './LinkingConfiguration';
 import { Intro } from '../screens/Intro';
 import Login from '../screens/Login';
+import LoginPassword from "../screens/LoginPassword";
 import Otp from '../screens/Otp';
 import Dashboard from '../screens/Dashboard';
 import OrderRequest from '../screens/OrderRequest'
@@ -161,6 +162,11 @@ function RootNavigator() {
             />
             <Stack.Screen
               options={{ headerShown: false }}
+              name="LoginPassword"
+              component={LoginPassword}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
               name="OTP"
               component={Otp}
             />
@@ -189,7 +195,7 @@ function RootNavigator() {
           component={Cards}
           options={{ headerShown: false }}
         />
-        
+
         <Stack.Group
           screenOptions={{
             presentation: "transparentModal",
