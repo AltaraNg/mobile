@@ -1,11 +1,19 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { useFeatures } from 'flagged';
+import axios from 'axios';
+import Constants from 'expo-constants';
+
+
 
 import { AuthData, authService } from '../services/authService';
+let url = Constants?.manifest?.extra?.URL;
+axios.defaults.baseURL = url;
 
 type AuthContextData = {
 	setAuthData;
+	setTotalUnread;
+	totalUnread: object;
 	isAdmin: boolean;
 	showLoader;
 	setShowLoader;
@@ -27,6 +35,9 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 const AuthProvider: React.FC = ({ children }) => {
 	const [authData, setAuthData] = useState<AuthData>();
 	const [showLoader, setShowLoader] = useState(false);
+	const [totalUnread, setTotalUnread] = useState({
+		unread: 0,
+	});
 	//the AuthContext start with loading equals true
 	//and stay like this, until the data be load from Async Storage
 	const [loading, setLoading] = useState(true);
@@ -48,6 +59,7 @@ const AuthProvider: React.FC = ({ children }) => {
 				const _authData: AuthData = JSON.parse(authDataSerialized);
 
 				setAuthData(_authData);
+				// fetchNotification();
 				if (_authData.user.attributes.staff_id === 999999) {
 					setIsAdmin(true);
 				}
@@ -86,6 +98,31 @@ const AuthProvider: React.FC = ({ children }) => {
 		//to be recovered in the next user session.
 	};
 
+	const fetchNotification = async () => {
+		try {
+			await loadStorageData();
+			let response = await axios({
+				method: 'GET',
+				url: `/customers/${authData.user.id}/notifications`,
+				headers: { 'Authorization': `Bearer ${authData.token}` },
+			});
+
+			const notification = response?.data?.data?.notifications?.data;
+			let unread = notification.filter((item) => {
+				return item.read_at === null;
+			});
+			console.log(unread);
+
+			setTotalUnread({
+				unread: unread.length,
+			});
+		} catch (error: any) {}
+
+		finally{
+			
+		}
+	};
+
 	const saveProfile = async (user: object) => {
 		try {
 			const authDataSerialized = await SecureStore.getItemAsync('AuthData');
@@ -119,6 +156,8 @@ const AuthProvider: React.FC = ({ children }) => {
 		//so all components will have access to the Context
 		<AuthContext.Provider
 			value={{
+				totalUnread,
+				setTotalUnread,
 				authData,
 				setAuthData,
 				loading,

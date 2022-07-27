@@ -4,11 +4,11 @@
  *
  */
 import {
-  AntDesign,
-  EvilIcons,
-  FontAwesome,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+	AntDesign,
+	EvilIcons,
+	FontAwesome,
+	MaterialCommunityIcons,
+} from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useContext, useEffect, useState, useRef } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -18,7 +18,7 @@ import { AuthContext } from '../context/AuthContext';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../modals/ModalScreen';
-import Cards from '../components/Cards'
+import Cards from '../components/Cards';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Badge } from 'react-native-paper';
 import {
@@ -40,11 +40,15 @@ import { Intro } from '../screens/Intro';
 import Login from '../screens/Login';
 import Otp from '../screens/Otp';
 import Dashboard from '../screens/Dashboard';
-import OrderRequest from '../screens/OrderRequest'
+import OrderRequest from '../screens/OrderRequest';
 import ViewProfile from '../screens/ViewProfile';
 import { AuthProvider, useAuth } from '../context/AuthContext';
-import { NotificationContext, NotificationDispatchContext, NotificationProvider } from "../context/NotificationContext";
-import { OrderProvider, useOrder } from "../context/OrderContext";
+import {
+	NotificationContext,
+	NotificationDispatchContext,
+	NotificationProvider,
+} from '../context/NotificationContext';
+import { OrderProvider, useOrder } from '../context/OrderContext';
 import Constants from 'expo-constants';
 import axios from 'axios';
 import Notification from '../screens/Notification';
@@ -57,7 +61,7 @@ import RequestModal from '../modals/requestModal';
 import { Loading } from '../components/Loading';
 import { FlagsProvider } from 'flagged';
 import OrderDetails from '../screens/OrderDetails';
-import ViewNotification from "../screens/ViewNotification";
+import ViewNotification from '../screens/ViewNotification';
 let url = Constants?.manifest?.extra?.URL;
 
 axios.defaults.baseURL = url;
@@ -98,34 +102,32 @@ export default function Navigation({
 	return (
 		<AuthProvider>
 			<OrderProvider>
-				<NotificationProvider>
-			<NavigationContainer
-				linking={LinkingConfiguration}
-				ref={navigationRef}
-				onReady={() => {
-					routeNameRef.current = navigationRef.getCurrentRoute()?.name;
-					//when you switch routes set the name of the current screen to the name of the screen
-				}}
-				onStateChange={async () => {
-					const previousRouteName = routeNameRef.current;
-					const currentRouteName = navigationRef.getCurrentRoute()?.name;
+				<NavigationContainer
+					linking={LinkingConfiguration}
+					ref={navigationRef}
+					onReady={() => {
+						routeNameRef.current = navigationRef.getCurrentRoute()?.name;
+						//when you switch routes set the name of the current screen to the name of the screen
+					}}
+					onStateChange={async () => {
+						const previousRouteName = routeNameRef.current;
+						const currentRouteName = navigationRef.getCurrentRoute()?.name;
 
-					if (previousRouteName !== currentRouteName) {
-						axios.post(`https://app.nativenotify.com/api/analytics`, {
-							app_id: app_id,
-							app_token: app_token,
-							screenName: currentRouteName,
-						});
-					}
+						if (previousRouteName !== currentRouteName) {
+							axios.post(`https://app.nativenotify.com/api/analytics`, {
+								app_id: app_id,
+								app_token: app_token,
+								screenName: currentRouteName,
+							});
+						}
 
-					// Save the current route name for later comparison
-					routeNameRef.current = currentRouteName;
-				}}
-				theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-			>
-				<RootNavigator />
-			</NavigationContainer>
-			</NotificationProvider>
+						// Save the current route name for later comparison
+						routeNameRef.current = currentRouteName;
+					}}
+					theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+				>
+					<RootNavigator />
+				</NavigationContainer>
 			</OrderProvider>
 		</AuthProvider>
 	);
@@ -145,74 +147,74 @@ function RootNavigator() {
 	}
 
 	return (
-    <FlagsProvider features={{ admin: isAdmin }}>
-      <Stack.Navigator
-        screenOptions={{
-          headerTintColor: "green",
-          headerStyle: { backgroundColor: "tomato" },
-        }}
-      >
-        {authData === undefined ? (
-          <Stack.Group>
-            <Stack.Screen
-              options={{ headerShown: false }}
-              name="Intro"
-              component={Intro}
-            />
-            <Stack.Screen
-              options={{ headerShown: false }}
-              name="Login"
-              component={Login}
-            />
-            <Stack.Screen
-              options={{ headerShown: false }}
-              name="OTP"
-              component={Otp}
-            />
-          </Stack.Group>
-        ) : (
-          <Stack.Group>
-            <Stack.Screen
-              name="Main"
-              component={DrawerNavigator}
-              options={{ headerShown: false }}
-            />
-          </Stack.Group>
-        )}
-        <Stack.Screen
-          name="NotFound"
-          component={NotFoundScreen}
-          options={{ title: "Oops!" }}
-        />
-        <Stack.Screen
-          name="OrderDetails"
-          component={OrderDetails}
-          options={{ headerShown: false }}
-        />
-		 <Stack.Screen
-          name="ViewNotification"
-          component={ViewNotification}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Cards"
-          component={Cards}
-          options={{ headerShown: false }}
-        />
-        
-        <Stack.Group
-          screenOptions={{
-            presentation: "transparentModal",
-            headerShown: true,
-            animation: "fade_from_bottom",
-          }}
-        >
-          <Stack.Screen name="Modal" component={ModalScreen} />
-          <Stack.Screen name="RequestModal" component={RequestModal} />
-        </Stack.Group>
-      </Stack.Navigator>
-    </FlagsProvider>
-  );
+		<FlagsProvider features={{ admin: isAdmin }}>
+			<Stack.Navigator
+				screenOptions={{
+					headerTintColor: 'green',
+					headerStyle: { backgroundColor: 'tomato' },
+				}}
+			>
+				{authData === undefined ? (
+					<Stack.Group>
+						<Stack.Screen
+							options={{ headerShown: false }}
+							name="Intro"
+							component={Intro}
+						/>
+						<Stack.Screen
+							options={{ headerShown: false }}
+							name="Login"
+							component={Login}
+						/>
+						<Stack.Screen
+							options={{ headerShown: false }}
+							name="OTP"
+							component={Otp}
+						/>
+					</Stack.Group>
+				) : (
+					<Stack.Group>
+						<Stack.Screen
+							name="Main"
+							component={DrawerNavigator}
+							options={{ headerShown: false }}
+						/>
+					</Stack.Group>
+				)}
+				<Stack.Screen
+					name="NotFound"
+					component={NotFoundScreen}
+					options={{ title: 'Oops!' }}
+				/>
+				<Stack.Screen
+					name="OrderDetails"
+					component={OrderDetails}
+					options={{ headerShown: false }}
+				/>
+				<Stack.Screen
+					name="ViewNotification"
+					component={ViewNotification}
+					options={{ headerShown: false }}
+				/>
+				<Stack.Screen
+					name="Cards"
+					component={Cards}
+					options={{ headerShown: false }}
+				/>
+
+				<Stack.Group
+					screenOptions={{
+						presentation: 'transparentModal',
+						headerShown: true,
+						animation: 'fade_from_bottom',
+					}}
+				>
+					<Stack.Screen name="Modal" component={ModalScreen} />
+					<Stack.Screen name="RequestModal" component={RequestModal} />
+				</Stack.Group>
+			</Stack.Navigator>
+		</FlagsProvider>
+	);
 }
 
 const DrawerNav = createDrawerNavigator<DrawerParamList>();
@@ -223,10 +225,11 @@ function DrawerNavigator({ route, navigation }) {
 	const [user, setUser] = useState(null);
 	const [uploaded, setUploaded] = useState(null);
 	const fetchUser = async () => {
-			setUser(authData.user);
-			 const upload = Object.values(authData.user?.included?.verification || {}).every(val => val );
-	   setUploaded(upload)
-
+		setUser(authData.user);
+		const upload = Object.values(
+			authData.user?.included?.verification || {}
+		).every((val) => val);
+		setUploaded(upload);
 	};
 	useEffect(() => {
 		fetchUser();
@@ -326,91 +329,90 @@ function TabBarIcon(props: {
 const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
 function BottomTabNavigator() {
-	const totalUnread = useContext(NotificationContext);
-	const setTotalUnread = useContext(NotificationDispatchContext);
-	console.log(totalUnread);
-	
+	const { totalUnread, setTotalUnread, isAdmin } = useAuth();
+
+
 	const colorScheme = useColorScheme();
 	return (
-		
-    <BottomTab.Navigator
-      initialRouteName="Dashboard"
-      screenOptions={{
-        tabBarActiveTintColor: "#074A74",
-        tabBarStyle: { backgroundColor: "#EFF5F9" },
-      }}
-    >
-      <BottomTab.Screen
-        name="Dashboard"
-        component={Dashboard}
-        options={{
-          headerShown: false,
-          tabBarLabel: "",
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome
-              size={size}
-              color={color}
-              name="home"
-              style={{ marginBottom: -16 }}
-            />
-          ),
-        }}
-      />
-      <BottomTab.Screen
-        name="History"
-        component={History}
-        options={{
-          headerShown: false,
-          tabBarLabel: "",
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome
-              size={size}
-              color={color}
-              name="folder-open"
-              style={{ marginBottom: -16 }}
-            />
-          ),
-        }}
-      />
-      <BottomTab.Screen
-        name="Notification"
-        component={Notification}
-        options={{
-          headerShown: false,
-		  tabBarBadge: totalUnread.unread === 0 ? false : totalUnread.unread,
-		  tabBarBadgeStyle: {
-			color: '#074A74',
-			backgroundColor: '#EFF5F9',
-			fontWeight: "bold"
-		  },
-          tabBarLabel: "",
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome
-              size={size}
-              color={color}
-              name="bell"
-              style={{ marginBottom: -16 }}
-            >
-				
-			</FontAwesome>
-			
-          ),
-        }}
-      />
-      <BottomTab.Screen
-        name="OrderRequest"
-        component={OrderRequest}
-        options={{
-          headerShown: false,
-          tabBarLabel: "",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="folder-plus" size={29} color={color} style={{ marginBottom: -16 }} />
-          ),
-        }}
-      />
-    </BottomTab.Navigator>
-	
-  );
+		<BottomTab.Navigator
+			initialRouteName="Dashboard"
+			screenOptions={{
+				tabBarActiveTintColor: '#074A74',
+				tabBarStyle: { backgroundColor: '#EFF5F9' },
+			}}
+		>
+			<BottomTab.Screen
+				name="Dashboard"
+				component={Dashboard}
+				options={{
+					headerShown: false,
+					tabBarLabel: '',
+					tabBarIcon: ({ color, size }) => (
+						<FontAwesome
+							size={size}
+							color={color}
+							name="home"
+							style={{ marginBottom: -16 }}
+						/>
+					),
+				}}
+			/>
+			<BottomTab.Screen
+				name="History"
+				component={History}
+				options={{
+					headerShown: false,
+					tabBarLabel: '',
+					tabBarIcon: ({ color, size }) => (
+						<FontAwesome
+							size={size}
+							color={color}
+							name="folder-open"
+							style={{ marginBottom: -16 }}
+						/>
+					),
+				}}
+			/>
+			<BottomTab.Screen
+				name="Notification"
+				component={Notification}
+				options={{
+					headerShown: false,
+					tabBarBadge: totalUnread.unread === 0 ? false : totalUnread.unread,
+					tabBarBadgeStyle: {
+						color: '#074A74',
+						backgroundColor: '#EFF5F9',
+						fontWeight: 'bold',
+					},
+					tabBarLabel: '',
+					tabBarIcon: ({ color, size }) => (
+						<FontAwesome
+							size={size}
+							color={color}
+							name="bell"
+							style={{ marginBottom: -16 }}
+						></FontAwesome>
+					),
+				}}
+			/>
+			<BottomTab.Screen
+				name="OrderRequest"
+				component={OrderRequest}
+				options={{
+					headerShown: false,
+					tabBarLabel: '',
+					tabBarIcon: ({ color, size }) => (
+						<MaterialCommunityIcons
+							name="folder-plus"
+							size={29}
+							color={color}
+							style={{ marginBottom: -16 }}
+						/>
+					),
+				}}
+			/>
+		</BottomTab.Navigator>
+	);
 }
 
 /**

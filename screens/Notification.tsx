@@ -36,7 +36,17 @@ export default function Notification({ navigation, route }: Props) {
 		navigation.toggleDrawer();
 	};
 
-  const viewDetail = (notification) => {
+  const viewDetail = async (notification) => {
+    if(notification.read_at === null){
+      let read = await axios({
+        method: 'PATCH',
+        url: `/notification/${notification.id}`,
+        headers: { 'Authorization': `Bearer ${authData.token}` },
+      });
+      fetchNotification();
+    }
+    
+        
     navigation.navigate('ViewNotification', notification);
   };
 
@@ -102,24 +112,29 @@ export default function Notification({ navigation, route }: Props) {
                     <View style={styles.order}>
                       <Text
                         style={item.read_at ? {
-                          fontFamily: "Montserrat_500Medium",
+                          fontFamily: "Montserrat_700Bold",
                           fontSize: 18,
-                          color: "#074A74",
+                          color: "rgba(7, 74,116, 0.34)",
                         } : {
                           fontFamily: "Montserrat_700Bold",
                           fontSize: 18,
                           color: "#074A74",
                         }}
                       >
-                        {!item.read_at ? (<Entypo name="dot-single" size={24} color="#074A74"/>) : ""}{JSON.parse(item.data).subject}
+                        {JSON.parse(item.data).subject}
                       </Text>
                       <Text style={{ color: "#777", fontSize: 12 }}>
                         {item.created_at}
                       </Text>
 
                       <Text
-                        style={{
-                          fontSize: 12,
+                        style={item.read_at ? {
+                          fontSize: 13,
+                          fontFamily: "Montserrat_500Medium",
+                          marginVertical: 8,
+                          color: "#7B7A7A",
+                        }: {
+                          fontSize: 13,
                           fontFamily: "Montserrat_500Medium",
                           marginVertical: 8,
                           color: "black",
