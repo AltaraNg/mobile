@@ -12,6 +12,7 @@ import { RootStackParamList } from '../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { AntDesign } from '@expo/vector-icons';
+import { BackButton } from '../assets/svgs/svg';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ViewNotification'>;
 
@@ -23,69 +24,45 @@ export default function ViewNotification({ navigation, route }: Props) {
 
 	return (
 		<View style={styles.container}>
-			<View
-				style={{
-					backgroundColor: '#ccc',
-					alignSelf: 'flex-start',
-					marginTop: 20,
-					flexDirection: "row",
-					marginLeft:10,
-					padding: 10,
-					borderRadius: 5
-
-					
-					
-
-					// marginLeft:
-				}}
-			>
-				<Pressable onPress={goBack} style={{flexDirection: "row"}}>
-				
-				<Text style={{color: "#074A74", fontFamily: 'Montserrat_400Regular', fontWeight: 'bold'}}>Go Back</Text>
-				</Pressable>
-			</View>
-			<View
-				style={{
-					backgroundColor: 'white',
-
-					// marginLeft:
-				}}
-			>
-				<Text
+			<View style={styles.header}>
+				<View
 					style={{
-                    marginHorizontal: 10,
-
-                        color:  '#074A74',
-                        fontSize: 16,
-						marginTop: 20,
-						textAlign: 'left',
-						paddingVertical: 10,
-						fontFamily: 'Montserrat_400Regular',
+						backgroundColor: '#074A74',
+						alignSelf: 'center',
+						// marginLeft:
 					}}
 				>
-					Subject: {JSON.parse(notification.data).subject}
-				</Text>
-				<Text style={{
-						fontFamily: 'Montserrat_400Regular',
-
-                    marginHorizontal: 10,
-                    marginVertical: 10,
-                    paddingVertical: 10,
-                    fontSize: 12,
-                    color:  '#074A74',
-                    borderColor: "#074A74",
-                    borderBottomWidth: 1,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between'
-                }}>From: <Text style={{fontWeight: 'bold', color:  '#074A74',}}>{JSON.parse(notification.data).sender.name}</Text>
-                </Text>
-				<Text style={{
-                     color:  '#074A74',
-                    marginVertical: 10,
-                    marginHorizontal: 10,
-                }}>{JSON.parse(notification.data).message}</Text>
+					<Pressable onPress={goBack}>
+						<BackButton />
+					</Pressable>
+				</View>
+				<Text style={styles.headerText}>Message Details</Text>
 			</View>
+
+			<View style={styles.messageDetail}>
+				<View style={styles.title}>
+					<Text style={{color: "#7B7A7A", fontFamily: "Montserrat_400Regular", fontSize: 13,}}>From: <Text style={{color: "#000", fontWeight: "600", fontFamily: "Montserrat_600SemiBold", fontSize: 13,}}>{JSON.parse(notification.data).sender.name}</Text></Text>
+					<Text style={{color: "#7B7A7A", fontFamily: "Montserrat_400Regular", fontSize: 13,}}>{notification.created_at}</Text>
+				</View>
+				<View style={styles.detail}>
+					<Text style={{color: "#074A74",
+					fontFamily: "Montserrat_700Bold",
+					fontSize: 18,
+					lineHeight: 22
+					
+				
+				}}>{JSON.parse(notification.data).subject}</Text>
+					<Text style={{color: "#18191F",
+					fontFamily: "Montserrat_700Bold",
+					fontSize: 13,
+					lineHeight: 16,
+					marginTop: 20			
+				}}>
+					{JSON.parse(notification.data).message}
+				</Text>
+				</View>
+			</View>
+			
 		</View>
 	);
 }
@@ -93,7 +70,7 @@ export default function ViewNotification({ navigation, route }: Props) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#CDDBE3',
 		paddingTop: 23,
 	},
 	totalText: {
@@ -110,18 +87,18 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		lineHeight: 35,
 	},
-	total: {
-		position: 'absolute',
-		bottom: 0,
-		marginHorizontal: -15,
-		zIndex: 1000,
-		height: 75,
-		backgroundColor: '#F9FBFC',
-		flexDirection: 'row',
-		alignItems: 'center',
+	title: {
+		flexDirection: "row",
+		backgroundColor: "white",
+		borderBottomColor: "#888C96",
+		borderBottomWidth: 2,
+		borderRadius: 6,
+		
+		justifyContent: "space-between",
 		paddingHorizontal: 10,
-		justifyContent: 'space-between',
+		paddingVertical: 20
 	},
+	
 	header: {
 		backgroundColor: '#074A74',
 		padding: 20,
@@ -129,21 +106,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		alignItems: 'center',
 	},
-	toggle: {
-		flexDirection: 'row',
-		width: 326,
-		height: 50,
-		borderRadius: 19,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.8,
-		shadowRadius: 2,
-		elevation: 5,
-		backgroundColor: '#EEEFF0',
-		alignItems: 'center',
-		paddingHorizontal: 1,
-		justifyContent: 'space-evenly',
-	},
+	
 	headerText: {
 		color: 'white',
 		textTransform: 'uppercase',
@@ -171,107 +134,26 @@ const styles = StyleSheet.create({
 		width: 162,
 		height: 40,
 	},
-	button: {
-		flex: 1,
-		marginHorizontal: 8,
-		borderRadius: 24,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	buttonText: {
-		color: '#ffffff',
-		fontWeight: 'bold',
-		textAlign: 'center',
-		fontSize: 14,
-	},
-	orderDetail: {
-		flex: 1,
-		backgroundColor: '#fff',
-	},
-	orderStatus: {
-		flex: 1,
-		backgroundColor: '#fff',
-	},
-	leaf: {
-		position: 'absolute',
-		right: 0,
-	},
+	
 
 	statusText: {
 		textAlign: 'right',
 		paddingVertical: 10,
 		marginHorizontal: 10,
 	},
-	cardContainer: {
-		height: 200,
-		width: 350,
-		backgroundColor: '#074A74',
-		borderRadius: 5,
-		marginBottom: 10,
-		marginTop: 10,
-		padding: 10,
-		alignSelf: 'center',
-		paddingLeft: 15,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.8,
-		shadowRadius: 2,
-		elevation: 5,
-	},
-	amortizationContainer: {
-		backgroundColor: '#fff',
-		marginHorizontal: 15,
+	messageDetail: {
+		backgroundColor: "white",
 		flex: 1,
+		margin: 10,
+		borderRadius: 6,
 	},
-	amorHeader: {
-		fontFamily: 'Montserrat_700Bold',
-		color: '#074A74',
-		fontSize: 19,
-		marginVertical: 10,
-	},
-	statusBar: {
-		height: 15,
-		width: '100%',
-		backgroundColor: '#EFF5F9',
-		opacity: 0.7,
-		borderWidth: 2,
-		borderRadius: 10,
-		marginVertical: 15,
-	},
-	repaymentStatus: {
-		backgroundColor: '#074A74',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-	},
-	modalContainer: {
-		height: Dimensions.get('screen').height / 2.1,
-		alignItems: 'center',
-		marginTop: 'auto',
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		backgroundColor: 'white',
-	},
-	modalContent: {
-		paddingVertical: 20,
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		alignItems: 'center',
-		backgroundColor: 'white',
-	},
-	modalHeading: {
-		fontFamily: 'Montserrat_700Bold',
-		fontSize: 30,
-		textAlign: 'center',
-		color: 'black',
-		marginTop: 20,
-	},
-	modalHeaderCloseText: {
-		backgroundColor: 'white',
-		textAlign: 'center',
-		paddingLeft: 5,
-		paddingRight: 5,
-		width: 30,
-		fontSize: 15,
-		borderRadius: 50,
-	},
+	detail: {
+		backgroundColor: "white",
+		paddingHorizontal: 10,
+		paddingVertical: 20
+
+	}
+	
+	
+	
 });
