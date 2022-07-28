@@ -22,7 +22,8 @@ type AuthContextData = {
 	signIn(
 		phone_number: string,
 		otp: string,
-		device_name: string | null
+		device_name: string | null,
+		login_type: string
 	): Promise<void>;
 	signOut(): void;
 	saveProfile(user: object): void;
@@ -74,29 +75,30 @@ const AuthProvider: React.FC = ({ children }) => {
 	}
 
 	const signIn = async (
-		phone_number: string,
-		otp: string,
-		device_name: string
-	) => {
-		setShowLoader(true);
-		//call the service passing credential (email and password).
-		//In a real App this data will be provided by the user from some InputText components.
-		const _authData = await authService.signIn(phone_number, otp, device_name);
+    phone_number: string,
+    otp: string,
+    device_name: string,
+    login_type: string
+  ) => {
+    setShowLoader(true);
+    //call the service passing credential (email and password).
+    //In a real App this data will be provided by the user from some InputText components.
+    const _authData = await authService.signIn(phone_number, otp, device_name, login_type);
 
-		//Set the data in the context, so the App can be notified
-		//and send the user to the AuthStack
-		if (_authData !== undefined) {
-			setAuthData(_authData);
-			SecureStore.setItemAsync('AuthData', JSON.stringify(_authData));
-			if (_authData.user.attributes.staff_id === 999999) {
-				setIsAdmin(true);
-			}
-			setShowLoader(false);
-		}
+    //Set the data in the context, so the App can be notified
+    //and send the user to the AuthStack
+    if (_authData !== undefined) {
+      setAuthData(_authData);
+      SecureStore.setItemAsync("AuthData", JSON.stringify(_authData));
+      if (_authData.user.attributes.staff_id === 999999) {
+        setIsAdmin(true);
+      }
+      setShowLoader(false);
+    }
 
-		//Persist the data in the Async Storage
-		//to be recovered in the next user session.
-	};
+    //Persist the data in the Async Storage
+    //to be recovered in the next user session.
+  };
 
 	const fetchNotification = async () => {
 		try {

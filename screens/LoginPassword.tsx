@@ -93,16 +93,12 @@ export default function Login({ navigation }: Props) {
       <Header></Header>
 
       <Text style={styles.title}>
-        {SetCustomer(
-          "Enter phone number",
-          "Enter new password",
-          "Enter password"
-        )}
+        {SetCustomer("Enter phone number", "Welcome 😊", "Welcome Back 😊")}
       </Text>
       <Text style={styles.simple}>
         {SetCustomer(
           "",
-          "Password must contain a minimum length of 10 characters",
+          "Password must contain a minimum length of 6 characters",
           "Enter your password to login"
         )}
       </Text>
