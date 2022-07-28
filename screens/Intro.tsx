@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
 		margin: 16,
 		flexDirection: 'row',
 		justifyContent: 'center',
-        paddingBottom: 80
+        paddingBottom: 40
 	},
 	dot: {
 		width: 20,
