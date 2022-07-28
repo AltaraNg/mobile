@@ -292,7 +292,7 @@ export default function Dashboard({ navigation, route }: Props) {
         )}
       </Modal>
       <View style={styles.header}>
-        <Header></Header>
+        <Header navigation={navigation}></Header>
         <TouchableOpacity>
           <Pressable onPress={toggleSideMenu}>
             <Hamburger style={styles.hamburger} />

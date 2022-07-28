@@ -1,25 +1,19 @@
 import {
   Pressable,
-  StyleSheet,
-  TextInput,
-  ActivityIndicator,
+  StyleSheet,  
   Dimensions,
-  Image,
   Modal,
   TouchableHighlight,
   TouchableOpacity,
 } from "react-native";
 
 import { LinearGradient } from 'expo-linear-gradient';
-import Header from '../components/Header';
-import React, { useState, createRef } from 'react';
-import { post } from '../utilities/api';
-import { Button, Overlay, Icon } from "react-native-elements";
+import  { useState } from 'react';
+import { Overlay } from "react-native-elements";
 import { Text, View } from '../components/Themed';
 import { RootStackParamList } from '../types';
 import Leaf from '../assets/svgs/leaf.svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Cards from '../components/Cards';
 import { FlatList } from 'react-native-gesture-handler';
 import {
 	OrderStatusPass,
@@ -32,7 +26,6 @@ import Animated from 'react-native-reanimated';
 type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
 
 export default function OrderDetails({ navigation, route }: Props) {
-  const [lateFee, setLateFee] = useState(true);
   const [viewLateFee, setViewLateFee] = useState(null);
 	const order: object = route.params;
 	const amortization = order?.included?.amortizations;

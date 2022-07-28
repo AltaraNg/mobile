@@ -59,7 +59,7 @@ export default function ViewProfile({ navigation, route }: Props) {
 	return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Header></Header>
+        <Header navigation={navigation}></Header>
         <TouchableOpacity>
           <Pressable onPress={toggleSideMenu}>
             <Hamburger style={styles.hamburger} />
@@ -186,6 +186,8 @@ const styles = StyleSheet.create({
 		flex: 1,
 		height: '100%',
 		position: 'relative',
+		backgroundColor: '#EFF5F9'
+		
 	},
 	hamburger: {
 		marginTop: 80,
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	header: {
-		flex: 1,
+		
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		backgroundColor: '#EFF5F9',
@@ -205,6 +207,8 @@ const styles = StyleSheet.create({
 	main: {
 		flex: 3,
 		backgroundColor: '#EFF5F9',
+		marginTop:40
+
 	},
 	name: {
 		marginHorizontal: 30,
