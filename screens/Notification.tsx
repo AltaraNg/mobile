@@ -124,7 +124,7 @@ export default function Notification({ navigation, route }: Props) {
                         style={item.read_at ? {
                           fontFamily: "Montserrat_700Bold",
                           fontSize: 18,
-                          color: "rgba(7, 74,116, 0.34)",
+                          color: "#074A74",
                         } : {
                           fontFamily: "Montserrat_700Bold",
                           fontSize: 18,
