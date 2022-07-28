@@ -428,3 +428,76 @@ export const FolderPlus = function(props:any){
     </Svg>
   );
 }
+
+export const EyeOpen =function(){
+	return (
+    <Svg
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+    >
+      <Path
+        d="M16 6.99902C6 6.99902 2 16 2 16C2 16 6 24.999 16 24.999C26 24.999 30 16 30 16C30 16 26 6.99902 16 6.99902Z"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M16 21C18.7614 21 21 18.7614 21 16C21 13.2386 18.7614 11 16 11C13.2386 11 11 13.2386 11 16C11 18.7614 13.2386 21 16 21Z"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export const EyeClose = function(){
+	return (
+    <Svg
+      width="32"
+      height="33"
+      viewBox="0 0 32 33"
+      fill="none"
+    >
+      <Path
+        d="M6 5.10889L26 27.1089"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M19.3633 19.8086C18.3821 20.7005 17.0867 21.1661 15.7622 21.103C14.4377 21.0398 13.1925 20.4532 12.3006 19.472C11.4086 18.4908 10.9429 17.1955 11.0059 15.871C11.0689 14.5465 11.6555 13.3012 12.6366 12.4092"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M9.24931 8.68311C4.15315 11.2638 2 16.1089 2 16.1089C2 16.1089 6 25.1079 16 25.1079C18.343 25.1266 20.6567 24.5869 22.7497 23.5336"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M26.0763 21.2463C28.8015 18.8054 30.0001 16.1089 30.0001 16.1089C30.0001 16.1089 26.0001 7.10793 16.0001 7.10793C15.134 7.10651 14.2693 7.17693 13.4148 7.31845"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M16.9409 11.1973C18.0036 11.4013 18.9715 11.9445 19.6994 12.7452C20.4274 13.5459 20.876 14.5611 20.9781 15.6384"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </Svg>
+  );
+}

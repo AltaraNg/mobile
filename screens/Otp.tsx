@@ -43,12 +43,13 @@ export default function Otp({ navigation, route }: Props) {
 			setOtpArray(otpArrayCopy);
 			if (index === 3) {
 				const data = {
-					otp: otpArrayCopy.join(''),
-					phone_number: phone?.phone_number,
-					device_name: Device.deviceName,
-				};
+          otp: otpArrayCopy.join(""),
+          phone_number: phone?.phone_number,
+          device_name: Device.deviceName,
+          login_type: "otp",
+        };
 				
-				let res = auth.signIn(data.phone_number, data.otp, data.device_name).then(res => {
+				let res = auth.signIn(data.phone_number, data.otp, data.device_name, data.login_type).then(res => {
 					const error = 'OTP is incorrect';
 					setTimeout(() => {
 						setErrorText(error);
