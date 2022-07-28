@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
 	text: {
 		color: '#5E5C5C',
 		textAlign: 'center',
-		marginHorizontal: 62,
+		marginHorizontal: 52,
         marginVertical: 5,
 		fontFamily: 'Montserrat_400Regular',
 
