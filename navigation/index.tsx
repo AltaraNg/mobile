@@ -148,74 +148,80 @@ function RootNavigator() {
 	}
 
 	return (
-		<FlagsProvider features={{ admin: isAdmin }}>
-			<Stack.Navigator
-				screenOptions={{
-					headerTintColor: 'green',
-					headerStyle: { backgroundColor: 'tomato' },
-				}}
-			>
-				{authData === undefined ? (
-					<Stack.Group>
-						<Stack.Screen
-							options={{ headerShown: false }}
-							name="Intro"
-							component={Intro}
-						/>
-						<Stack.Screen
-							options={{ headerShown: false }}
-							name="Login"
-							component={Login}
-						/>
-						<Stack.Screen
-							options={{ headerShown: false }}
-							name="OTP"
-							component={Otp}
-						/>
-					</Stack.Group>
-				) : (
-					<Stack.Group>
-						<Stack.Screen
-							name="Main"
-							component={DrawerNavigator}
-							options={{ headerShown: false }}
-						/>
-					</Stack.Group>
-				)}
-				<Stack.Screen
-					name="NotFound"
-					component={NotFoundScreen}
-					options={{ title: 'Oops!' }}
-				/>
-				<Stack.Screen
-					name="OrderDetails"
-					component={OrderDetails}
-					options={{ headerShown: false }}
-				/>
-				<Stack.Screen
-					name="ViewNotification"
-					component={ViewNotification}
-					options={{ headerShown: false }}
-				/>
-				<Stack.Screen
-					name="Cards"
-					component={Cards}
-					options={{ headerShown: false }}
-				/>
+    <FlagsProvider features={{ admin: isAdmin }}>
+      <Stack.Navigator
+        screenOptions={{
+          headerTintColor: "green",
+          headerStyle: { backgroundColor: "tomato" },
+        }}
+      >
+        {authData === undefined ? (
+          <Stack.Group>
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Intro"
+              component={Intro}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Login"
+              component={Login}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="LoginPassword"
+              component={LoginPassword}
+            />
 
-				<Stack.Group
-					screenOptions={{
-						presentation: 'transparentModal',
-						headerShown: true,
-						animation: 'fade_from_bottom',
-					}}
-				>
-					<Stack.Screen name="Modal" component={ModalScreen} />
-					<Stack.Screen name="RequestModal" component={RequestModal} />
-				</Stack.Group>
-			</Stack.Navigator>
-		</FlagsProvider>
-	);
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="OTP"
+              component={Otp}
+            />
+          </Stack.Group>
+        ) : (
+          <Stack.Group>
+            <Stack.Screen
+              name="Main"
+              component={DrawerNavigator}
+              options={{ headerShown: false }}
+            />
+          </Stack.Group>
+        )}
+        <Stack.Screen
+          name="NotFound"
+          component={NotFoundScreen}
+          options={{ title: "Oops!" }}
+        />
+        <Stack.Screen
+          name="OrderDetails"
+          component={OrderDetails}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ViewNotification"
+          component={ViewNotification}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Cards"
+          component={Cards}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Group
+          screenOptions={{
+            presentation: "transparentModal",
+            headerShown: true,
+            animation: "fade_from_bottom",
+          }}
+        >
+          <Stack.Screen name="Modal" component={ModalScreen} />
+          <Stack.Screen name="RequestModal" component={RequestModal} />
+        </Stack.Group>
+      </Stack.Navigator>
+    </FlagsProvider>
+  );
 }
 
 const DrawerNav = createDrawerNavigator<DrawerParamList>();
