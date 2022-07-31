@@ -65,6 +65,7 @@ export default function OrderDetails({ navigation, route }: Props) {
 	};
 
 	const progressBar = ((totalPaid - order?.attributes?.down_payment) / order?.attributes?.repayment) * 100;
+  
 
 	const orderStatusChi = (props) => {
 		const totalDebt =
@@ -349,7 +350,7 @@ export default function OrderDetails({ navigation, route }: Props) {
           <Animated.View
             style={[
               StyleSheet.absoluteFill,
-              { backgroundColor: "#007AFF", width: `${progressBar}%` },
+              { backgroundColor: "#007AFF", width: `${progressBar < 0 ? 0 : progressBar > 100 ? 100 : progressBar}%` },
             ]}
           />
         </View>
