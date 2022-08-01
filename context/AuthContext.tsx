@@ -30,7 +30,8 @@ type AuthContextData = {
     phone_number: string,
     password: string,
     device_name: string | null,
-    login_type: string
+    login_type: string,
+    customer:string
   ): Promise<void>;
   signOut(): void;
   saveProfile(user: object): void;
@@ -86,7 +87,8 @@ const AuthProvider: React.FC = ({ children }) => {
     phone_number: string,
     otp: string,
     device_name: string,
-    login_type: string
+    login_type: string,
+	
   ) => {
     setShowLoader(true);
     //call the service passing credential (email and password).
@@ -111,7 +113,8 @@ const AuthProvider: React.FC = ({ children }) => {
     phone_number: string,
     password: string,
     device_name: string,
-    login_type: string
+    login_type: string,
+	customer:string
   ) => {
     setShowLoader(true);
     //call the service passing credential (email and password).
@@ -120,7 +123,8 @@ const AuthProvider: React.FC = ({ children }) => {
       phone_number,
       password,
       device_name,
-      login_type
+      login_type,
+      customer
     );
 
     //Set the data in the context, so the App can be notified
@@ -133,7 +137,6 @@ const AuthProvider: React.FC = ({ children }) => {
       }
       setShowLoader(false);
     }
-
     //Persist the data in the Async Storage
     //to be recovered in the next user session.
   };

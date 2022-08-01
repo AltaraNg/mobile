@@ -55,21 +55,23 @@ export default function LoginPassword({ navigation }: Props) {
       password: Password,
       device_name: Device.deviceName,
       login_type: "password",
+      customer: customer,
     };
    let res = auth
      .signInPassword(
        data.phone_number,
        data.password,
        data.device_name,
-       data.login_type
+       data.login_type,
+       data.customer
      )
      .then((res) => {
-       console.log(res);
-      //  const error = "OTP is incorrect";
-      //  setTimeout(() => {
-      //    setErrorText(error);
-      //  }, 3000);
-     });
+        const error = "Password is incorrect";
+        setTimeout(() => {
+          setErrorText(error);
+        }, 6000);
+        setLoading(false);
+     })
 };
 
     const checkPhoneNumber = async () => {
@@ -92,6 +94,7 @@ export default function LoginPassword({ navigation }: Props) {
         })
         .finally(() => {
           setLoading(false);
+          setIsDisabled(true)
           SetCustomer();
         });
     };
@@ -137,6 +140,11 @@ export default function LoginPassword({ navigation }: Props) {
                 <Text style={styles.label}>New Password</Text>
                 <TextInput
                   onChangeText={(password) => {
+                     if (password.length >= 6) {
+                       setIsDisabled(false);
+                     } else {
+                       setIsDisabled(true);
+                     }
                     setPassword(password);
                   }}
                   value={Password}
@@ -160,9 +168,9 @@ export default function LoginPassword({ navigation }: Props) {
                 <TextInput
                   onChangeText={(password) => {
                     setConfirmPassword(password);
-                    password !== Password
-                      ? setWarning("notMatch")
-                      : setWarning("match");
+                   ( password !== Password && customer=='new')
+                      ? [setWarning("notMatch"), setIsDisabled(true)]
+                      : [setWarning("match"), setIsDisabled(false)];
                   }}
                   value={confirmPassword}
                   style={styles.input}
@@ -198,6 +206,11 @@ export default function LoginPassword({ navigation }: Props) {
               <Text style={styles.label}>Password</Text>
               <TextInput
                 onChangeText={(password) => {
+                  if (password.length >= 6) {
+                    setIsDisabled(false);
+                  } else {
+                    setIsDisabled(true);
+                  }
                   setPassword(password);
                 }}
                 value={Password}

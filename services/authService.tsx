@@ -40,7 +40,8 @@ const SignPassword = (
     phone_number: string,
     password: string,
     device_name: string,
-    login_type: string
+    login_type: string,
+    customer:string
   ): Promise<AuthData> => {
     // this is a mock of an API call, in a real app
     // will be need connect with some real API,
@@ -55,9 +56,15 @@ const SignPassword = (
     return post(url, data)
       .then((res) => {
         let loginInfo = res.data.data;
+        
         return loginInfo;
       })
       .catch((err) => {
+        if(customer == 'old'){
+          return undefined
+        }else return err
+        // console.log(err, "errrrrr");
+        
         return err;
       })
       .finally(() => {});
