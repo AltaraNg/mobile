@@ -11,6 +11,7 @@ let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
 type AuthContextData = {
+  fetchNotification;
   setAuthData;
   setTotalUnread;
   totalUnread: object;
@@ -54,6 +55,7 @@ const AuthProvider: React.FC = ({ children }) => {
 		//Every time the App is opened, this provider is rendered
 		//and call de loadStorage function.
 		loadStorageData();
+		
 	}, []);
 
 	async function loadStorageData(): Promise<void> {
@@ -66,7 +68,7 @@ const AuthProvider: React.FC = ({ children }) => {
 				const _authData: AuthData = JSON.parse(authDataSerialized);
 
 				setAuthData(_authData);
-				// fetchNotification();
+				fetchNotification();
 				if (_authData.user.attributes.staff_id === 999999) {
 					setIsAdmin(true);
 				}
@@ -138,7 +140,6 @@ const AuthProvider: React.FC = ({ children }) => {
 
 	const fetchNotification = async () => {
 		try {
-			await loadStorageData();
 			let response = await axios({
 				method: 'GET',
 				url: `/customers/${authData.user.id}/notifications`,
@@ -149,7 +150,6 @@ const AuthProvider: React.FC = ({ children }) => {
 			let unread = notification.filter((item) => {
 				return item.read_at === null;
 			});
-			console.log(unread);
 
 			setTotalUnread({
 				unread: unread.length,
@@ -205,7 +205,8 @@ const AuthProvider: React.FC = ({ children }) => {
 				isAdmin,
 				setShowLoader,
 				showLoader,
-				saveProfile
+				saveProfile,
+				fetchNotification,
 			}}
 		>
 			{children}

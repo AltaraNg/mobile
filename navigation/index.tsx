@@ -336,9 +336,9 @@ function TabBarIcon(props: {
 const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
 function BottomTabNavigator() {
-	const { totalUnread, setTotalUnread, isAdmin } = useAuth();
+	const { totalUnread, setTotalUnread, isAdmin, fetchNotification } = useAuth();
 
-
+	fetchNotification();
 	const colorScheme = useColorScheme();
 	return (
 		<BottomTab.Navigator
@@ -387,8 +387,8 @@ function BottomTabNavigator() {
 					headerShown: false,
 					tabBarBadge: totalUnread.unread === 0 ? false : totalUnread.unread,
 					tabBarBadgeStyle: {
-						color: '#074A74',
-						backgroundColor: '#EFF5F9',
+						color: 'white',
+						backgroundColor: totalUnread.unread === 0 ? '#EFF5F9' :'red',
 						fontWeight: 'bold',
 					},
 					tabBarLabel: '',

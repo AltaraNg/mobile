@@ -16,7 +16,7 @@ import { RootStackParamList, RootTabParamList } from '../types';
 
 import Constants from 'expo-constants';
 
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext, useAuth } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import axios from 'axios';
 import { Entypo } from '@expo/vector-icons';
@@ -28,6 +28,8 @@ axios.defaults.baseURL = url;
 
 export default function Notification({ navigation, route }: Props) {
   const [refreshing, setRefreshing] = useState(true);
+	const { totalUnread, setTotalUnread, isAdmin, fetchNotification } = useAuth();
+
 	const { authData } = useContext(AuthContext);
 	
   const [showLoader, setShowLoader] = useState(false);
@@ -38,19 +40,25 @@ export default function Notification({ navigation, route }: Props) {
 
   const viewDetail = async (notification) => {
     if(notification.read_at === null){
-      let read = await axios({
-        method: 'PATCH',
-        url: `/notification/${notification.id}`,
-        headers: { 'Authorization': `Bearer ${authData.token}` },
-      });
-      fetchNotification();
+      try{
+        let read = await axios({
+          method: 'PATCH',
+          url: `/notification/${notification.id}`,
+          headers: { 'Authorization': `Bearer ${authData.token}` },
+        });
+        fetchNotificationNorm();
+        fetchNotification();
+      }catch(err){
+        console.log(err.message);
+      }
+     
     }
     
         
     navigation.navigate('ViewNotification', notification);
   };
 
-	const fetchNotification = async () => {
+	const fetchNotificationNorm = async () => {
     setShowLoader(true)
 		try {
 			let response = await axios({
@@ -63,12 +71,14 @@ export default function Notification({ navigation, route }: Props) {
 
 			const notification = response?.data?.data?.notifications?.data;
 			setNotifications(notification);
+      // fetchNotification();
+
 		} catch (error: any) {
 		}
 	};
 
 	useEffect(() => {
-		fetchNotification();
+		fetchNotificationNorm();
 	}, []);
 
 	return (
@@ -104,7 +114,7 @@ export default function Notification({ navigation, route }: Props) {
                 refreshControl={
                   <RefreshControl
                     refreshing={refreshing}
-                    onRefresh={fetchNotification}
+                    onRefresh={fetchNotificationNorm}
                   />
                 }
                 renderItem={({ item }) => (
@@ -114,7 +124,7 @@ export default function Notification({ navigation, route }: Props) {
                         style={item.read_at ? {
                           fontFamily: "Montserrat_700Bold",
                           fontSize: 18,
-                          color: "#074A74",
+                          color: "rgba(7, 74, 116, 0.72)",
                         } : {
                           fontFamily: "Montserrat_700Bold",
                           fontSize: 18,
