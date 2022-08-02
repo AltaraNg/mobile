@@ -140,12 +140,11 @@ export default function LoginPassword({ navigation }: Props) {
                 <Text style={styles.label}>New Password</Text>
                 <TextInput
                   onChangeText={(password) => {
-                     if (password.length >= 6) {
-                       setIsDisabled(false);
-                     } else {
-                       setIsDisabled(true);
-                     }
                     setPassword(password);
+                    password == confirmPassword && password.length >= 6
+                      ? setIsDisabled(false)
+                      : setIsDisabled(true)
+                    
                   }}
                   value={Password}
                   style={styles.input}
@@ -168,9 +167,9 @@ export default function LoginPassword({ navigation }: Props) {
                 <TextInput
                   onChangeText={(password) => {
                     setConfirmPassword(password);
-                   ( password !== Password && customer=='new')
-                      ? [setWarning("notMatch"), setIsDisabled(true)]
-                      : [setWarning("match"), setIsDisabled(false)];
+                   (password == Password && password.length >= 6)
+                     ? [setWarning("match"), setIsDisabled(false)]
+                     : [setWarning("notMatch"), setIsDisabled(true)];
                   }}
                   value={confirmPassword}
                   style={styles.input}
