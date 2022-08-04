@@ -17,12 +17,13 @@ declare global {
 }
 
 export type RootStackParamList = {
+  Dashboard: { user: object };
   Intro: undefined;
   RequestModal: undefined;
   Modal: undefined;
   NotFound: undefined;
   OrderDetails: { order: object };
-  ViewNotification: { notification: any}
+  ViewNotification: { notification: any };
   Main: undefined;
   OTP: { phone_number: string };
   Login: undefined;

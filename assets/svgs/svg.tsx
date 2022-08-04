@@ -501,3 +501,53 @@ export const EyeClose = function(){
     </Svg>
   );
 }
+export const SmallCancel = function(){
+	return (
+    <Svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <Path
+        d="M18.75 5.25L5.25 18.75"
+        stroke="#DB2721"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M18.75 18.75L5.25 5.25"
+        stroke="#DB2721"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </Svg>
+  );
+}
+export const DoubleCheck = function(){
+	return (
+    <Svg
+      width="24"
+      height="24"
+      viewBox="0 0 32 32"
+      fill="none"
+    >
+      <Path
+        d="M18.5 10.5L7.5 21.5L2 16.0002"
+        stroke="green"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M30 10.5L19 21.5L16.0784 18.5785"
+        stroke="green"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </Svg>
+  );
+}

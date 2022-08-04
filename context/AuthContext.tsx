@@ -11,23 +11,30 @@ let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
 type AuthContextData = {
-	fetchNotification,
-	setAuthData;
-	setTotalUnread;
-	totalUnread: object;
-	isAdmin: boolean;
-	showLoader;
-	setShowLoader;
-	authData?: AuthData;
-	loading: boolean;
-	signIn(
-		phone_number: string,
-		otp: string,
-		device_name: string | null,
-		login_type: string
-	): Promise<void>;
-	signOut(): void;
-	saveProfile(user: object): void;
+  fetchNotification;
+  setAuthData;
+  setTotalUnread;
+  totalUnread: object;
+  isAdmin: boolean;
+  showLoader;
+  setShowLoader;
+  authData?: AuthData;
+  loading: boolean;
+  signIn(
+    phone_number: string,
+    otp: string,
+    device_name: string | null,
+    login_type: string
+  ): Promise<void>;
+  signInPassword(
+    phone_number: string,
+    password: string,
+    device_name: string | null,
+    login_type: string,
+    customer:string
+  ): Promise<void>;
+  signOut(): void;
+  saveProfile(user: object): void;
 };
 
 //Create the Auth Context with the data type specified
@@ -80,7 +87,8 @@ const AuthProvider: React.FC = ({ children }) => {
     phone_number: string,
     otp: string,
     device_name: string,
-    login_type: string
+    login_type: string,
+	
   ) => {
     setShowLoader(true);
     //call the service passing credential (email and password).
@@ -98,6 +106,37 @@ const AuthProvider: React.FC = ({ children }) => {
       setShowLoader(false);
     }
 
+    //Persist the data in the Async Storage
+    //to be recovered in the next user session.
+  };
+  const signInPassword = async (
+    phone_number: string,
+    password: string,
+    device_name: string,
+    login_type: string,
+	customer:string
+  ) => {
+    setShowLoader(true);
+    //call the service passing credential (email and password).
+    //In a real App this data will be provided by the user from some InputText components.
+    const _authData = await authService.SignPassword(
+      phone_number,
+      password,
+      device_name,
+      login_type,
+      customer
+    );
+
+    //Set the data in the context, so the App can be notified
+    //and send the user to the AuthStack
+    if (_authData !== undefined) {
+      setAuthData(_authData);
+      SecureStore.setItemAsync("AuthData", JSON.stringify(_authData));
+      if (_authData.user.attributes.staff_id === 999999) {
+        setIsAdmin(true);
+      }
+      setShowLoader(false);
+    }
     //Persist the data in the Async Storage
     //to be recovered in the next user session.
   };
@@ -164,6 +203,7 @@ const AuthProvider: React.FC = ({ children }) => {
 				setAuthData,
 				loading,
 				signIn,
+				signInPassword,
 				signOut,
 				isAdmin,
 				setShowLoader,

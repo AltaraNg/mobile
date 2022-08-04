@@ -6,27 +6,38 @@ import {
   Dimensions,
   Image,
 } from "react-native";
-
+import * as Device from "expo-device";
 import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/Header";
 import React, { useState, createRef, useEffect } from "react";
-import {EyeClose, EyeOpen} from '../assets/svgs/svg'
-import { post } from "../utilities/api";
+import {
+  EyeClose,
+  EyeOpen,
+  SmallCancel,
+  DoubleCheck,
+} from "../assets/svgs/svg";
+import { post,get } from "../utilities/api";
 import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
+import { useAuth } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { ScrollView } from "react-native-gesture-handler";
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
-export default function Login({ navigation }: Props) {
+export default function LoginPassword({ navigation }: Props) {
   const [userPhone, setUserPhone] = useState("");
-  const [password, setPassword] = useState("");
+  const [Password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [warning, setWarning] = useState(null);
   const [loading, setLoading] = useState(false);
   const [customer, setCustomer] = useState('default');
   const [isDisabled, setIsDisabled] = useState(true);
-  const [click, setClick] = useState(false);
+  const [click, setClick] = useState(true);
   const toggleClick = () => setClick((value) => !value);
   let [errorText, setErrorText] = useState("");
-  let url = "otp/send";
+  let url = `customer/exists/${userPhone}`;
+  let login = "/auth/login"
+  const auth = useAuth();
 
   const SetCustomer = (onDefault, NewCustomer, OldCustomer,)=>{
     return customer == 'default'
@@ -38,53 +49,57 @@ export default function Login({ navigation }: Props) {
       : onDefault;
   }
   const handleLogin = async () => {
-    setErrorText("");
-    if (!userPhone) {
-      alert("Please fill phone");
-      return;
-    }
     setLoading(true);
-    let data = {
+    const data = {
       phone_number: userPhone,
+      password: Password,
+      device_name: Device.deviceName,
+      login_type: "password",
+      customer: customer,
     };
-    post(url, data)
-      .then((res) => {
-        navigation.navigate("OTP", { phone_number: userPhone });
-      })
-      .catch((err) => {
-        let message = err?.response?.data?.data.errors?.phone_number[0];
-        setErrorText(message);
-        if (message !== "The selected phone number is invalid.") {
-          navigation.navigate("OTP", { phone_number: userPhone });
-        }
-      })
-      .finally(() => {
+   let res = auth
+     .signInPassword(
+       data.phone_number,
+       data.password,
+       data.device_name,
+       data.login_type,
+       data.customer
+     )
+     .then((res) => {
+        const error = "Password is incorrect";
+        setTimeout(() => {
+          setErrorText(error);
+        }, 6000);
         setLoading(false);
-        setIsDisabled(true);
-      });
-  };
-    const handleLogin2 = async () => {
+     })
+};
+
+    const checkPhoneNumber = async () => {
     
       setLoading(true);
       let data = {
         phone_number: userPhone,
       };
-      post(url, data)
+      get(url)
         .then((res) => {
-            setCustomer('new');
-            SetCustomer();
+          res.data.data.has_password ? setCustomer('old') :setCustomer('new')
+            
         })
         .catch((err) => {
-          let message = err?.response?.data?.data.errors?.phone_number[0];
-          setErrorText(message);
+          if (err.response.data.code == 404){
+            setCustomer('new')
+          }
+          
+          // setErrorText(message);
         })
         .finally(() => {
           setLoading(false);
-          setIsDisabled(true);
+          setIsDisabled(true)
+          SetCustomer();
         });
     };
         useEffect(() => {
-          setCustomer('default')
+          
         }, []);
 
   return (
@@ -102,125 +117,149 @@ export default function Login({ navigation }: Props) {
           "Enter your password to login"
         )}
       </Text>
-
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Phone Number</Text>
-        <TextInput
-          editable={customer !== "default" ? false : true}
-          keyboardType="phone-pad"
-          onChangeText={(userPhone) => {
-            setUserPhone(userPhone);
-            if (userPhone.length === 11 || customer !== "default") {
-              setIsDisabled(false);
-            } else {
-              setIsDisabled(true);
-            }
-          }}
-          value={userPhone}
-          style={customer == "default" ? styles.input : styles.notDefault}
-        />
-        {customer == "new" && (
-          <View style={{ backgroundColor: "#EFF5F9" }}>
-            <View style={{ backgroundColor: "#EFF5F9", marginTop: 30 }}>
-              <Text style={styles.label}>New Password</Text>
-              <TextInput
-                onChangeText={(password) => {
-                  setPassword(password);
-                }}
-                value={password}
-                style={styles.input}
-                secureTextEntry={click ? true : false}
-              />
-              <Pressable
-                style={{
-                  backgroundColor: "#EFF5F9",
-                  position: "absolute",
-                  right: 8,
-                  top: 35,
-                }}
-                onPress={toggleClick}
-              >
-                {click ? <EyeClose /> : <EyeOpen />}
-              </Pressable>
+      <ScrollView>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Phone Number</Text>
+          <TextInput
+            editable={customer !== "default" ? false : true}
+            keyboardType="phone-pad"
+            onChangeText={(userPhone) => {
+              setUserPhone(userPhone);
+              if (userPhone.length === 11) {
+                setIsDisabled(false);
+              } else {
+                setIsDisabled(true);
+              }
+            }}
+            value={userPhone}
+            style={customer == "default" ? styles.input : styles.notDefault}
+          />
+          {customer == "new" && (
+            <View style={{ backgroundColor: "#EFF5F9" }}>
+              <View style={{ backgroundColor: "#EFF5F9", marginTop: 30 }}>
+                <Text style={styles.label}>New Password</Text>
+                <TextInput
+                  onChangeText={(password) => {
+                    setPassword(password);
+                    password == confirmPassword && password.length >= 6
+                      ? setIsDisabled(false)
+                      : setIsDisabled(true)
+                    
+                  }}
+                  value={Password}
+                  style={styles.input}
+                  secureTextEntry={click ? true : false}
+                />
+                <Pressable
+                  style={{
+                    backgroundColor: "#EFF5F9",
+                    position: "absolute",
+                    right: 8,
+                    top: 35,
+                  }}
+                  onPress={toggleClick}
+                >
+                  {click ? <EyeClose /> : <EyeOpen />}
+                </Pressable>
+              </View>
+              <View style={{ backgroundColor: "#EFF5F9", marginTop: 30 }}>
+                <Text style={styles.label}>Confirm Password</Text>
+                <TextInput
+                  onChangeText={(password) => {
+                    setConfirmPassword(password);
+                   (password == Password && password.length >= 6)
+                     ? [setWarning("match"), setIsDisabled(false)]
+                     : [setWarning("notMatch"), setIsDisabled(true)];
+                  }}
+                  value={confirmPassword}
+                  style={styles.input}
+                  secureTextEntry={click ? true : false}
+                />
+                <View
+                  style={{
+                    backgroundColor: "#EFF5F9",
+                    position: "absolute",
+                    right: -30,
+                    top: 35,
+                  }}
+                >
+                  {warning &&
+                    (warning == "notMatch" ? <SmallCancel /> : <DoubleCheck />)}
+                </View>
+                <Pressable
+                  style={{
+                    backgroundColor: "#EFF5F9",
+                    position: "absolute",
+                    right: 8,
+                    top: 35,
+                  }}
+                  onPress={toggleClick}
+                >
+                  {click ? <EyeClose /> : <EyeOpen />}
+                </Pressable>
+              </View>
             </View>
-            <View style={{ backgroundColor: "#EFF5F9", marginTop: 30 }}>
-              <Text style={styles.label}>Confirm Password</Text>
-              <TextInput
-                onChangeText={(password) => {
-                  setPassword(password);
-                }}
-                value={password}
-                style={styles.input}
-                secureTextEntry={click ? true : false}
-              />
-              <Pressable
-                style={{
-                  backgroundColor: "#EFF5F9",
-                  position: "absolute",
-                  right: 8,
-                  top: 35,
-                }}
-                onPress={toggleClick}
-              >
-                {click ? <EyeClose /> : <EyeOpen />}
-              </Pressable>
-            </View>
-          </View>
-        )}
-        {customer == "old" && (
-          <View style={{ backgroundColor: "#EFF5F9", marginTop: 30 }}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              onChangeText={(password) => {
-                setPassword(password);
-              }}
-              value={password}
-              style={styles.input}
-              secureTextEntry={click ? true : false}
-            />
-            <Pressable
-              style={{
-                backgroundColor: "#EFF5F9",
-                position: "absolute",
-                right: 8,
-                top: 35,
-              }}
-              onPress={toggleClick}
-            >
-              {click ? <EyeClose /> : <EyeOpen />}
-            </Pressable>
-          </View>
-        )}
-        {errorText != "" ? (
-          <Text style={styles.errorText}>{errorText}</Text>
-        ) : null}
-      </View>
-      <LinearGradient
-        colors={["#074A74", "#089CA4"]}
-        style={[
-          isDisabled ? styles.disabled : styles.buttonContainer,
-          customer !== "default" ? { marginTop: 60 } : {},
-        ]}
-        start={{ x: 1, y: 0.5 }}
-        end={{ x: 0, y: 0.5 }}
-      >
-        <Pressable
-          style={[styles.button]}
-          onPress={handleLogin2}
-          disabled={isDisabled}
-        >
-          {loading ? (
-            <Image
-              source={require("../assets/gifs/loader.gif")}
-              style={styles.image}
-            />
-          ) : (
-            <Text style={styles.buttonText}>
-              {SetCustomer("Continue", "Register", "Login")}
-            </Text>
           )}
-        </Pressable>
-      </LinearGradient>
+          {customer == "old" && (
+            <View style={{ backgroundColor: "#EFF5F9", marginTop: 30 }}>
+              <Text style={styles.label}>Password</Text>
+              <TextInput
+                onChangeText={(password) => {
+                  if (password.length >= 6) {
+                    setIsDisabled(false);
+                  } else {
+                    setIsDisabled(true);
+                  }
+                  setPassword(password);
+                }}
+                value={Password}
+                style={styles.input}
+                secureTextEntry={click ? true : false}
+              />
+              <Pressable
+                style={{
+                  backgroundColor: "#EFF5F9",
+                  position: "absolute",
+                  right: 8,
+                  top: 35,
+                }}
+                onPress={toggleClick}
+              >
+                {click ? <EyeClose /> : <EyeOpen />}
+              </Pressable>
+            </View>
+          )}
+          {errorText != "" ? (
+            <Text style={styles.errorText}>{errorText}</Text>
+          ) : null}
+        </View>
+        <LinearGradient
+          colors={["#074A74", "#089CA4"]}
+          style={[
+            isDisabled ? styles.disabled : styles.buttonContainer,
+            customer !== "default" ? { marginTop: 60 } : {},
+          ]}
+          start={{ x: 1, y: 0.5 }}
+          end={{ x: 0, y: 0.5 }}
+        >
+          <Pressable
+            style={[styles.button]}
+            onPress={customer == "default" ? checkPhoneNumber : handleLogin}
+            disabled={isDisabled}
+          >
+            {loading ? (
+              <Image
+                source={require("../assets/gifs/loader.gif")}
+                style={styles.image}
+              />
+            ) : (
+              <Text style={styles.buttonText}>
+                {SetCustomer("Continue", "Register", "Login")}
+              </Text>
+            )}
+          </Pressable>
+        </LinearGradient>
+      </ScrollView>
       {/* </View>)} */}
     </View>
   );
