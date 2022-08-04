@@ -229,8 +229,8 @@ export default function OrderDetails({ navigation, route }: Props) {
                     <Text style={styles.modalText}>
                       Your loan repayment is{" "}
                       <Text style={{ color: "red" }}>overdue</Text> and it has
-                      led to an extended repayment. Please pay up all your debt
-                      completely to avoid further extension
+                      led to additional charges. Please pay up all your debt
+                      completely to avoid further charges
                     </Text>
                   </View>
                 </View>

@@ -119,12 +119,12 @@ export default function Notification({ navigation, route }: Props) {
                 }
                 renderItem={({ item }) => (
                   <Pressable  onPress={() => viewDetail(item)}>
-                    <View style={styles.order}>
+                    <View style={item.read_at ? styles.order : styles.orderRead}>
                       <Text
                         style={item.read_at ? {
                           fontFamily: "Montserrat_700Bold",
                           fontSize: 18,
-                          color: "rgba(7, 74, 116, 0.72)",
+                          color: "rgba(7, 74, 116, 0.36)",
                         } : {
                           fontFamily: "Montserrat_700Bold",
                           fontSize: 18,
@@ -250,22 +250,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  orderRead: {
+    backgroundColor: "white",
+  
+    alignItems: "flex-start",
+    borderColor: "#074A74",
+    borderBottomWidth: 1,
+    paddingLeft: 20,
+    paddingRight: 20,
+    padding: 10
+  },
   order: {
     backgroundColor: "#EFF5F9",
-    marginTop: 10,
-    marginLeft: 26,
-    marginRight: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
     alignItems: "flex-start",
     borderColor: "#074A74",
     borderBottomWidth: 1,
-  },
-  orderRead: {
-    backgroundColor: "#888888",
-    marginTop: 10,
-    marginLeft: 26,
-    marginRight: 20,
-    alignItems: "flex-start",
-    borderColor: "#074A74",
-    borderBottomWidth: 1,
+    padding: 10
+
   }
 });
