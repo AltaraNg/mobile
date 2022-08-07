@@ -44,7 +44,11 @@ export default function Cards({
   }
 
   async function doSome() {
-    setLoader(true);
+    if(type === 'cash'){
+      navigation.navigate('Calculator');
+    }
+    else{
+      setLoader(true);
     try {
       let res = await axios({
         method: "POST",
@@ -64,6 +68,8 @@ export default function Cards({
       setLoader(false);
       onRequest(error.response.data, "failed", type);
     }
+    }
+    
   }
     const checkOrder = () => {
        const isPending = orderRequest?.some(

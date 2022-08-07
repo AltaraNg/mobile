@@ -63,6 +63,7 @@ import { Loading } from '../components/Loading';
 import { FlagsProvider } from 'flagged';
 import OrderDetails from '../screens/OrderDetails';
 import ViewNotification from '../screens/ViewNotification';
+import Calculator from '../screens/Calculator';
 let url = Constants?.manifest?.extra?.URL;
 
 axios.defaults.baseURL = url;
@@ -201,6 +202,11 @@ function RootNavigator() {
         <Stack.Screen
           name="ViewNotification"
           component={ViewNotification}
+          options={{ headerShown: false }}
+        />
+		 <Stack.Screen
+          name="Calculator"
+          component={Calculator}
           options={{ headerShown: false }}
         />
         <Stack.Screen
