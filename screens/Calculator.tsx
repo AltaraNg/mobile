@@ -3,16 +3,26 @@ import { Dimensions, Pressable, StyleSheet, Switch } from 'react-native';
 import { Text, View } from '../components/Themed';
 import { RootStackParamList } from '../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { TextInput } from 'react-native-gesture-handler';
 import CurrencyInput from 'react-native-currency-input';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Slider } from '@miblanchard/react-native-slider';
+import { AuthContext } from '../context/AuthContext';
+import axios from "axios";
+import Constants from 'expo-constants';
+
+
+let url = Constants?.manifest?.extra?.URL;
+axios.defaults.baseURL = url;
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
 
 export default function Calculator({ navigation, route }: Props) {
+    const { authData, setAuthData, showLoader, setShowLoader } =
+    useContext(AuthContext);
 	const [value, setValue] = useState(null);
 	const [sliderValue, setSliderValue] = useState(3);
+    const [calculator, setCalculator] = useState([]);
 
 	const [isMonthly, setIsMonthly] = useState(false);
 	const [isCollateral, setIsCollateral] = useState(false);
@@ -22,6 +32,19 @@ export default function Calculator({ navigation, route }: Props) {
 
     const minMonth = 3;
     const maxMonth = 12;
+
+    const fetchCalculator = async () => {
+        setShowLoader(true);
+    try {
+      let response = await axios({
+        method: "GET",
+        url: `/price-calculators`,
+        headers: { Authorization: `Bearer ${authData.token}` },
+      });
+      setCalculator(response?.data?.data?.price_calculator?.data)  
+     
+    } catch (error: any) {}
+    }
 
 	return (
 		<View style={styles.container}>
