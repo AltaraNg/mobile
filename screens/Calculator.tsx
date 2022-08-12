@@ -1,16 +1,17 @@
-import { Dimensions, Pressable, StyleSheet, Switch } from 'react-native';
+import { Dimensions, Image, Pressable, StyleSheet, Switch } from 'react-native';
 
 import { Text, View } from '../components/Themed';
 import { RootStackParamList } from '../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import CurrencyInput from 'react-native-currency-input';
 import { useContext, useEffect, useState } from 'react';
-import { Slider } from '@miblanchard/react-native-slider';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import businessTypes from '../lib/calculator.json';
 import repaymentDurations from '../lib/repaymentDuration.json';
+// import Slider from '@react-native-community/slider';
+import Slider from 'react-native-slider';
 // import {cashLoan, calculate} from '../lib/calculator';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
@@ -20,18 +21,20 @@ type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
 export default function Calculator({ navigation, route }: Props) {
 	const { authData, setAuthData, showLoader, setShowLoader } =
 		useContext(AuthContext);
-	const [value, setValue] = useState(null);
-	const [sliderValue, setSliderValue] = useState([3]);
+		const [loader, setLoader] = useState(false);
+
+	const [inputValue, setInputValue] = useState(null);
+	const [sliderValue, setSliderValue] = useState(3);
 	const [calculator, setCalculator] = useState([]);
-	const [downPayment, setDownPayment] = useState();
-	const [repayment, setRepayment] = useState();
+	const [downPayment, setDownPayment] = useState('');
+	const [repayment, setRepayment] = useState('');
 
 
 
-	const [isMonthly, setIsMonthly] = useState(false);
+	const [isBiMonthly, setIsBiMonthly] = useState(false);
 	const [isCollateral, setIsCollateral] = useState(false);
 
-	const toggleSwitchM = () => setIsMonthly((previousState) => !previousState);
+	const toggleSwitchM = () => setIsBiMonthly((previousState) => !previousState);
 	const toggleSwitchC = () =>
 		setIsCollateral((previousState) => !previousState);
 
@@ -46,6 +49,7 @@ export default function Calculator({ navigation, route }: Props) {
 	});
 
 	const selectBusinessType = (amount) => {
+		console.log(amount);
 		let res = cashBusinessTypes.find(item => {
 			if(amount >= 500000){
 				return item.slug == 'ap_super_loan-new'
@@ -63,10 +67,46 @@ export default function Calculator({ navigation, route }: Props) {
 		return res;
 	}
 
-	const getCalc = () => {
+	const onSliderChange = (value) => {
+		if(inputValue >= 70000){
+			console.log(value, inputValue);
+			getCalc(value);
+		}
+		else{
+			setRepayment("₦0.00");
+			setDownPayment("₦0.00");
+		}
+		
+	}
+
+	async function doSome() {
+		
+		
+		  setLoader(true);
+		try {
+		  let res = await axios({
+			method: "POST",
+			data: {
+			  order_type: 'cash',
+			},
+			url: "/submit/request",
+			headers: { Authorization: `Bearer ${authData.token}` },
+		  });
+		  if (res.status === 200) {
+			
+			navigation.navigate('Dashboard');
+		  }
+		} catch (error) {
+		  
+		}
+		
+		
+	  }
+
+	const getCalc = (val) => {
 		try {
 			let rDur = repaymentDurations.find((item)=>{
-				return item.numeral === sliderValue[0];
+				return item.numeral === val;
 			})
 			let data = {
 				repayment_duration_id: rDur,
@@ -74,24 +114,34 @@ export default function Calculator({ navigation, route }: Props) {
 
 			};
 			const params = calculator.find((x) => {
-				console.log(selectBusinessType(value), downPaymentRate, rDur)
-				return x.business_type_id === selectBusinessType(value).id &&
+				return x.business_type_id === selectBusinessType(inputValue).id &&
 				x.down_payment_rate_id === downPaymentRate.id && 
-				x.repayment_duration_id ===  rDur
+				x.repayment_duration_id ===  rDur.id
 			});
-			const { total, actualDownpayment } = cashLoan(
-                value,
+			const { total, actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(
+                inputValue,
                 data,
                 params,
                 0
               );
+			  setDownPayment("₦"+actualDownpayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+			  if(!isBiMonthly){
+				setRepayment("₦"+(rePayment / val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))
+			  }else{
+				setRepayment("₦"+(biMonthlyRepayment).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))
+			  }
 
-			  console.log(total, actualDownpayment);
+			  console.log(total, actualDownpayment, rePayment / val, biMonthlyRepayment );
+			  setSliderValue(val);
 			
 		} catch (error) {
 			console.log(error);
+			setRepayment("₦0.00");
+			setDownPayment("₦0.00");
 		}
 	}
+
+	
 	const downPaymentRate = {
 		id: 2,
 		name: 'twenty',
@@ -101,7 +151,7 @@ export default function Calculator({ navigation, route }: Props) {
 	
 
 	const cashLoan = (productPrice, data, params, percentage_discount) => {
-		console.log(params);
+		console.log('here',params);
 		const count = repaymentCount(data.repayment_duration_id.value, 14);
 		const actualDownpayment = (data.payment_type_id.percent / 100) * productPrice;
 		const residual = productPrice - actualDownpayment;
@@ -117,7 +167,7 @@ export default function Calculator({ navigation, route }: Props) {
 		  var rePayment = actualRepayment;
 		}
 		total = actualRepayment + actualDownpayment;
-		return { total, actualDownpayment, rePayment };
+		return { total, actualDownpayment, rePayment, biMonthlyRepayment };
 	  };
 
 	  const repaymentCount = (days, cycle) => {
@@ -161,8 +211,15 @@ export default function Calculator({ navigation, route }: Props) {
 						styles.input,
 						{ width: Dimensions.get('window').width * 0.92 },
 					]}
-					value={value}
-					onChangeValue={setValue}
+					value={inputValue}
+					onChangeValue={(value) => {
+						
+						setInputValue(value);
+						if(inputValue >= 70000){
+							
+							getCalc(sliderValue);
+						}
+					}}
 					prefix="₦"
 					delimiter=","
 					separator="."
@@ -186,10 +243,10 @@ export default function Calculator({ navigation, route }: Props) {
 					>
 						<Switch
 							trackColor={{ false: '#767577', true: '#81b0ff' }}
-							thumbColor={isMonthly ? '#074A74' : '#f4f3f4'}
+							thumbColor={isBiMonthly ? '#074A74' : '#f4f3f4'}
 							ios_backgroundColor="#3e3e3e"
 							onValueChange={toggleSwitchM}
-							value={isMonthly}
+							value={isBiMonthly}
 						/>
 						<Text style={{ color: '#074A74' }}>Bi-Monthly</Text>
 					</View>
@@ -226,7 +283,7 @@ export default function Calculator({ navigation, route }: Props) {
 						<Text style={styles.label}>For how long?</Text>
 						<Text style={styles.label}>Months</Text>
 					</View>
-					<Slider
+					{/* <Slider
 						value={sliderValue}
 						onValueChange={(value: []) => {
 							setValue(value);
@@ -237,7 +294,23 @@ export default function Calculator({ navigation, route }: Props) {
 						minimumValue={minMonth}
 						maximumValue={maxMonth}
 						step={3}
-					/>
+					/> */}
+					<Slider
+  style={{width: "100%", height: 60}}
+  value={sliderValue}
+  minimumValue={minMonth}
+						maximumValue={maxMonth}
+  step={3}
+  minimumTrackTintColor="#074A74"
+  maximumTrackTintColor="#dddddd"
+  onSlidingComplete={()=> {
+	// setSliderValue(value);
+	
+  }}
+ onValueChange={(value) => {
+		onSliderChange(value);
+	}}
+/>
 					<View
 						style={{
 							flexDirection: 'row',
@@ -324,10 +397,25 @@ export default function Calculator({ navigation, route }: Props) {
 						borderRadius: 5,
 						marginVertical: 10,
 					}}
+					onPress={doSome}
 				>
-					<Text style={{ fontSize: 16, fontFamily: 'Montserrat_600SemiBold' }}>
-						Apply
-					</Text>
+					{loader ? (
+						<View
+						style={{
+						  alignItems: "center",
+						  justifyContent: "center",
+						  backgroundColor: "transparent",
+						}}
+					  >
+						<Image
+						  source={require("../assets/gifs/loader.gif")}
+						  style={{ width: 60, height: 27 }}
+						/>
+					  </View>
+					): (<Text style={{ fontSize: 16, fontFamily: 'Montserrat_600SemiBold' }}>
+					Apply
+				</Text>)}
+					
 				</Pressable>
 			</View>
 		</View>

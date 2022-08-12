@@ -49,7 +49,7 @@ const calculate = (productPrice, data, params, percentage_discount) => {
     const principal = residual / count;
     const interest = (params.interest / 100) * residual;
     const tempActualRepayment = (principal + interest) * count;
-    var biMonthlyRepayment = Math.round(tempActualRepayment / count / 100) * 100;
+    const biMonthlyRepayment = Math.round(tempActualRepayment / count / 100) * 100;
     const actualRepayment = biMonthlyRepayment * count;
     let total = Math.ceil((actualDownpayment + actualRepayment) / 100) * 100;
     if (percentage_discount > 0) {
@@ -58,9 +58,10 @@ const calculate = (productPrice, data, params, percentage_discount) => {
       var rePayment = actualRepayment;
     }
     total = actualRepayment + actualDownpayment;
-    return { total, actualDownpayment, rePayment };
+    console.log(biMonthlyRepayment)
+    return { biMonthlyRepayment, total, actualDownpayment, rePayment };
   };
   
   
-  export {calculate, cashLoan};
+  export {calculate, cashLoan, repaymentCount};
   
