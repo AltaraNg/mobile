@@ -1,0 +1,106 @@
+[
+    {
+        "id": 1,
+        "name": "Altara Credit Products",
+        "status": 1,
+        "created_at": "2020-06-19T10:05:40.000000Z",
+        "updated_at": "2020-06-19T10:05:40.000000Z",
+        "slug": "ac_products"
+    },
+    {
+        "id": 2,
+        "name": "Altara Pay Products",
+        "status": 1,
+        "created_at": "2020-06-19T10:05:40.000000Z",
+        "updated_at": "2020-06-19T10:05:40.000000Z",
+        "slug": "ap_products"
+    },
+    {
+        "id": 3,
+        "name": "Altara Pay Cash Loan",
+        "status": 0,
+        "created_at": "2020-06-19T10:05:40.000000Z",
+        "updated_at": "2020-06-19T10:05:40.000000Z",
+        "slug": "ap_cash_loan"
+    },
+    {
+        "id": 4,
+        "name": "Altara Credit Cash Loan",
+        "status": 0,
+        "created_at": "2020-06-19T10:05:40.000000Z",
+        "updated_at": "2020-06-19T10:05:40.000000Z",
+        "slug": "ac_cash_loan"
+    },
+    {
+        "id": 5,
+        "name": "Cash Loan (Collateral)",
+        "status": 1,
+        "created_at": "2021-02-20T11:50:42.000000Z",
+        "updated_at": "2021-02-20T11:50:42.000000Z",
+        "slug": "ap_cash_loan-product"
+    },
+    {
+        "id": 6,
+        "name": "Employee",
+        "status": 1,
+        "created_at": "2020-06-19T10:05:40.000000Z",
+        "updated_at": "2020-06-19T10:05:40.000000Z",
+        "slug": "ap_employee_cash_loan"
+    },
+    {
+        "id": 7,
+        "name": "Starter (Collateral)",
+        "status": 1,
+        "created_at": "2020-06-19T10:05:40.000000Z",
+        "updated_at": "2020-06-19T10:05:40.000000Z",
+        "slug": "ap_starter_cash_loan"
+    },
+    {
+        "id": 8,
+        "name": "Rent",
+        "status": 1,
+        "created_at": "2020-06-19T10:05:40.000000Z",
+        "updated_at": "2020-06-19T10:05:40.000000Z",
+        "slug": "ap_rentals"
+    },
+    {
+        "id": 9,
+        "name": "Starter (No Collateral)",
+        "status": 1,
+        "created_at": "2020-06-19T10:05:40.000000Z",
+        "updated_at": "2020-06-19T10:05:40.000000Z",
+        "slug": "ap_starter_cash_loan-no_collateral"
+    },
+    {
+        "id": 10,
+        "name": "Cash Loan (No Collateral)",
+        "status": 1,
+        "created_at": "2021-02-20T11:50:42.000000Z",
+        "updated_at": "2021-02-20T11:50:42.000000Z",
+        "slug": "ap_cash_loan-no_collateral"
+    },
+    {
+        "id": 11,
+        "name": "Super Loan (New)",
+        "status": 1,
+        "created_at": "2021-02-20T11:50:42.000000Z",
+        "updated_at": "2021-02-20T11:50:42.000000Z",
+        "slug": "ap_super_loan-new"
+    },
+    {
+        "id": 12,
+        "name": "Super Loan (Renewal)",
+        "status": 1,
+        "created_at": "2021-02-20T11:50:42.000000Z",
+        "updated_at": "2021-02-20T11:50:42.000000Z",
+        "slug": "ap_super_loan-renewal"
+    },
+    {
+        "id": 13,
+        "name": "Starter (9 months)",
+        "status": 1,
+        "created_at": "2020-06-19T10:05:40.000000Z",
+        "updated_at": "2020-06-19T10:05:40.000000Z",
+        "slug": "ap_starter_cash_nine_months"
+    }
+]

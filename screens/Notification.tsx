@@ -19,7 +19,6 @@ import Constants from 'expo-constants';
 import { AuthContext, useAuth } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import axios from 'axios';
-import { Entypo } from '@expo/vector-icons';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ViewNotification'>;
 
