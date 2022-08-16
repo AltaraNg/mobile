@@ -1,4 +1,4 @@
-import { Dimensions, Image, Pressable, StyleSheet, Switch } from 'react-native';
+import { Dimensions, Image, Pressable, StyleSheet, Switch, ToastAndroid } from 'react-native';
 
 import { Text, View } from '../components/Themed';
 import { RootStackParamList } from '../types';
@@ -21,24 +21,23 @@ type Props = NativeStackScreenProps<RootStackParamList, 'OrderDetails'>;
 export default function Calculator({ navigation, route }: Props) {
 	const { authData, setAuthData, showLoader, setShowLoader } =
 		useContext(AuthContext);
-		const [loader, setLoader] = useState(false);
+	const [loader, setLoader] = useState(false);
+	const [sliderDisabled, setSliderDisabled] = useState(false);
 
-	const [inputValue, setInputValue] = useState(null);
-	const [sliderValue, setSliderValue] = useState(3);
+	const [inputValue, setInputValue] = useState(0);
+	const [sliderValue, setSliderValue] = useState(6);
 	const [calculator, setCalculator] = useState([]);
-	const [downPayment, setDownPayment] = useState('');
-	const [repayment, setRepayment] = useState('');
+	const [downPayment, setDownPayment] = useState(null);
+	const [repayment, setRepayment] = useState(null);
 
 
 
 	const [isBiMonthly, setIsBiMonthly] = useState(false);
 	const [isCollateral, setIsCollateral] = useState(false);
 
-	const toggleSwitchM = () => setIsBiMonthly((previousState) => !previousState);
-	const toggleSwitchC = () =>
-		setIsCollateral((previousState) => !previousState);
 
-	const minMonth = 3;
+
+	const minMonth = 6;
 	const maxMonth = 12;
 	const cashBusinessTypes = businessTypes.filter((item) => {
 		return !(
@@ -49,63 +48,61 @@ export default function Calculator({ navigation, route }: Props) {
 	});
 
 	const selectBusinessType = (amount) => {
-		console.log(amount);
 		let res = cashBusinessTypes.find(item => {
-			if(amount >= 500000){
+			if (amount >= 500000) {
 				return item.slug == 'ap_super_loan-new'
-			  }else if(amount > 120000 && amount < 500000 && !isCollateral){
-				  return item.slug == 'ap_cash_loan-no_collateral'
-			  }else if(amount >= 70000 && amount <= 120000 && !isCollateral){
-				 return item.slug =='ap_starter_cash_loan-no_collateral'
-			  }else if(amount > 120000 && amount < 500000 && isCollateral){
-				  return item.slug == 'ap_cash_loan-product'
-			  }else if(amount >= 70000 && amount <= 120000 && isCollateral){
-				 return item.slug =='ap_starter_cash_loan'
-			  }
+			} else if (amount > 120000 && amount < 500000 && !isCollateral) {
+				return item.slug == 'ap_cash_loan-no_collateral'
+			} else if (amount >= 70000 && amount <= 120000 && !isCollateral) {
+				return item.slug == 'ap_starter_cash_loan-no_collateral'
+			} else if (amount > 120000 && amount < 500000 && isCollateral) {
+				return item.slug == 'ap_cash_loan-product'
+			} else if (amount >= 70000 && amount <= 120000 && isCollateral) {
+				return item.slug == 'ap_starter_cash_loan'
+			}
 		});
-		// console.log(res, amount);
 		return res;
 	}
 
 	const onSliderChange = (value) => {
-		if(inputValue >= 70000){
-			console.log(value, inputValue);
-			getCalc(value);
+		if (inputValue >= 70000) {
+			getCalc(value, inputValue);
 		}
-		else{
+		else {
 			setRepayment("₦0.00");
 			setDownPayment("₦0.00");
 		}
-		
+		setSliderValue(value);
+
 	}
 
 	async function doSome() {
-		
-		
-		  setLoader(true);
-		try {
-		  let res = await axios({
-			method: "POST",
-			data: {
-			  order_type: 'cash',
-			},
-			url: "/submit/request",
-			headers: { Authorization: `Bearer ${authData.token}` },
-		  });
-		  if (res.status === 200) {
-			
-			navigation.navigate('Dashboard');
-		  }
-		} catch (error) {
-		  
-		}
-		
-		
-	  }
 
-	const getCalc = (val) => {
+
+		setLoader(true);
 		try {
-			let rDur = repaymentDurations.find((item)=>{
+			let res = await axios({
+				method: "POST",
+				data: {
+					order_type: 'cash',
+				},
+				url: "/submit/request",
+				headers: { Authorization: `Bearer ${authData.token}` },
+			});
+			if (res.status === 200) {
+
+				navigation.navigate('Dashboard');
+			}
+		} catch (error) {
+
+		}
+
+
+	}
+
+	const getCalc = (val = sliderValue, input = inputValue) => {
+		try {
+			let rDur = repaymentDurations.find((item) => {
 				return item.numeral === val;
 			})
 			let data = {
@@ -114,44 +111,53 @@ export default function Calculator({ navigation, route }: Props) {
 
 			};
 			const params = calculator.find((x) => {
-				return x.business_type_id === selectBusinessType(inputValue).id &&
-				x.down_payment_rate_id === downPaymentRate.id && 
-				x.repayment_duration_id ===  rDur.id
+				return x.business_type_id === selectBusinessType(input).id &&
+					x.down_payment_rate_id === downPaymentRate.id &&
+					x.repayment_duration_id === rDur.id
 			});
-			const { total, actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(
-                inputValue,
-                data,
-                params,
-                0
-              );
-			  setDownPayment("₦"+actualDownpayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-			  if(!isBiMonthly){
-				setRepayment("₦"+(rePayment / val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))
-			  }else{
-				setRepayment("₦"+(biMonthlyRepayment).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))
-			  }
+			if (params) {
+				const { total, actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(
+					input,
+					data,
+					params,
+					0
+				);
+				setDownPayment("₦" + actualDownpayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+				if (!isBiMonthly) {
+					setRepayment("₦" + (rePayment / val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))
+				} else {
+					setRepayment("₦" + (biMonthlyRepayment).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))
+				}
 
-			  console.log(total, actualDownpayment, rePayment / val, biMonthlyRepayment );
-			  setSliderValue(val);
-			
+			}
+			else {
+				setDownPayment("Not");
+				setRepayment("Applicable");
+			}
+
+			setSliderValue(val);
+
 		} catch (error) {
-			console.log(error);
+			// ToastAndroid.showWithGravity(
+			// 	"Unable to fetch calculator. Please try again later",
+			// 	ToastAndroid.SHORT,
+			// 	ToastAndroid.CENTER
+			// );
 			setRepayment("₦0.00");
 			setDownPayment("₦0.00");
 		}
 	}
 
-	
+
 	const downPaymentRate = {
 		id: 2,
 		name: 'twenty',
 		percent: 20,
 		status: 1,
 	};
-	
+
 
 	const cashLoan = (productPrice, data, params, percentage_discount) => {
-		console.log('here',params);
 		const count = repaymentCount(data.repayment_duration_id.value, 14);
 		const actualDownpayment = (data.payment_type_id.percent / 100) * productPrice;
 		const residual = productPrice - actualDownpayment;
@@ -162,28 +168,28 @@ export default function Calculator({ navigation, route }: Props) {
 		const actualRepayment = biMonthlyRepayment * count;
 		let total = Math.ceil((actualDownpayment + actualRepayment) / 100) * 100;
 		if (percentage_discount > 0) {
-		  var rePayment = actualRepayment - (actualRepayment * percentage_discount) / 100;
+			var rePayment = actualRepayment - (actualRepayment * percentage_discount) / 100;
 		} else {
-		  var rePayment = actualRepayment;
+			var rePayment = actualRepayment;
 		}
 		total = actualRepayment + actualDownpayment;
 		return { total, actualDownpayment, rePayment, biMonthlyRepayment };
-	  };
+	};
 
-	  const repaymentCount = (days, cycle) => {
+	const repaymentCount = (days, cycle) => {
 		const result = days / cycle;
 		if (result >= 24) {
-		  return 24;
+			return 24;
 		} else if (result >= 18) {
-		  return 18;
+			return 18;
 		} else if (result >= 12) {
-		  return 12;
-		} 
+			return 12;
+		}
 		if (result >= 6) {
-		  return 6;
+			return 6;
 		}
 		return 3;
-	  };
+	};
 
 	const fetchCalculator = async () => {
 		setShowLoader(true);
@@ -194,10 +200,42 @@ export default function Calculator({ navigation, route }: Props) {
 				headers: { Authorization: `Bearer ${authData.token}` },
 			});
 			setCalculator(response?.data?.data?.price_calculator);
-		} catch (error: any) {}
+			// console.log(response.data.data.price_calculator);
+		} catch (error: any) {
+			ToastAndroid.showWithGravity(
+				"Unable to fetch calculator. Please try again later",
+				ToastAndroid.SHORT,
+				ToastAndroid.CENTER
+			);
+		}
 	};
+
+	const onInputValueChange = async (value: number) => {
+		setInputValue(value);
+		if (value >= 500000) {
+			setSliderValue(12);
+			setSliderDisabled(true);
+			getCalc(12, value);
+			return
+		}
+		else {
+			setSliderDisabled(false);
+
+		}
+		getCalc(sliderValue, value);
+	}
+	const toggleSwitchM = () => {
+		setIsBiMonthly((previousState) => !previousState);
+		getCalc();
+	}
+	const toggleSwitchC = () => {
+		setIsCollateral((previousState) => !previousState);
+		getCalc();
+	}
+
 	useEffect(() => {
 		fetchCalculator();
+		getCalc(sliderValue, inputValue);
 	}, []);
 
 	return (
@@ -212,19 +250,12 @@ export default function Calculator({ navigation, route }: Props) {
 						{ width: Dimensions.get('window').width * 0.92 },
 					]}
 					value={inputValue}
-					onChangeValue={(value) => {
-						
-						setInputValue(value);
-						if(inputValue >= 70000){
-							
-							getCalc(sliderValue);
-						}
-					}}
+					onChangeValue={onInputValueChange}
 					prefix="₦"
 					delimiter=","
 					separator="."
 					precision={2}
-					onChangeText={(formattedValue) => {}}
+					onChangeText={(formattedValue) => { }}
 				></CurrencyInput>
 				<View
 					style={{
@@ -296,21 +327,22 @@ export default function Calculator({ navigation, route }: Props) {
 						step={3}
 					/> */}
 					<Slider
-  style={{width: "100%", height: 60}}
-  value={sliderValue}
-  minimumValue={minMonth}
+						style={{ width: "100%", height: 60 }}
+						value={sliderValue}
+						minimumValue={minMonth}
 						maximumValue={maxMonth}
-  step={3}
-  minimumTrackTintColor="#074A74"
-  maximumTrackTintColor="#dddddd"
-  onSlidingComplete={()=> {
-	// setSliderValue(value);
-	
-  }}
- onValueChange={(value) => {
-		onSliderChange(value);
-	}}
-/>
+						step={3}
+						minimumTrackTintColor="#074A74"
+						maximumTrackTintColor="#dddddd"
+						disabled={sliderDisabled}
+						onSlidingComplete={() => {
+							// setSliderValue(value);
+
+						}}
+						onValueChange={(value) => {
+							onSliderChange(value);
+						}}
+					/>
 					<View
 						style={{
 							flexDirection: 'row',
@@ -319,7 +351,6 @@ export default function Calculator({ navigation, route }: Props) {
 						}}
 					>
 						<Text style={styles.label}>{minMonth}</Text>
-						<Text style={styles.label}>6</Text>
 						<Text style={styles.label}>9</Text>
 						<Text style={styles.label}>{maxMonth}</Text>
 					</View>
@@ -348,7 +379,7 @@ export default function Calculator({ navigation, route }: Props) {
 								marginBottom: 10,
 							}}
 						>
-							Your Downpayment
+							{downPayment === "Not" ? "" : "Your Downpayment"}
 						</Text>
 						<Text
 							style={{
@@ -376,7 +407,7 @@ export default function Calculator({ navigation, route }: Props) {
 								marginBottom: 10,
 							}}
 						>
-							Your Monthly Repayment
+							{repayment === "Applicable" ? "" : "Your Monthly Repayment"}
 						</Text>
 						<Text
 							style={{
@@ -390,7 +421,13 @@ export default function Calculator({ navigation, route }: Props) {
 					</View>
 				</View>
 				<Pressable
-					style={{
+					style={downPayment === "Not" ? {
+						backgroundColor: 'rgba(7, 74, 116, 0.63)',
+						alignItems: 'center',
+						paddingVertical: 15,
+						borderRadius: 5,
+						marginVertical: 10,
+					} :{
 						backgroundColor: '#074A74',
 						alignItems: 'center',
 						paddingVertical: 15,
@@ -398,24 +435,25 @@ export default function Calculator({ navigation, route }: Props) {
 						marginVertical: 10,
 					}}
 					onPress={doSome}
+					disabled={downPayment === "Not"}
 				>
 					{loader ? (
 						<View
-						style={{
-						  alignItems: "center",
-						  justifyContent: "center",
-						  backgroundColor: "transparent",
-						}}
-					  >
-						<Image
-						  source={require("../assets/gifs/loader.gif")}
-						  style={{ width: 60, height: 27 }}
-						/>
-					  </View>
-					): (<Text style={{ fontSize: 16, fontFamily: 'Montserrat_600SemiBold' }}>
-					Apply
-				</Text>)}
-					
+							style={{
+								alignItems: "center",
+								justifyContent: "center",
+								backgroundColor: "transparent",
+							}}
+						>
+							<Image
+								source={require("../assets/gifs/loader.gif")}
+								style={{ width: 60, height: 27 }}
+							/>
+						</View>
+					) : (<Text style={{ fontSize: 16, fontFamily: 'Montserrat_600SemiBold' }}>
+						Apply
+					</Text>)}
+
 				</Pressable>
 			</View>
 		</View>
