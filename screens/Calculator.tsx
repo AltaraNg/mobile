@@ -22,7 +22,7 @@ export default function Calculator({ navigation, route }: Props) {
 	const { authData, setAuthData, showLoader, setShowLoader } =
 		useContext(AuthContext);
 	const [loader, setLoader] = useState(false);
-	const [sliderDisabled, setSliderDisabled] = useState(false);
+	const [sliderDisabled, setSliderDisabled] = useState(true);
 
 	const [inputValue, setInputValue] = useState(0);
 	const [sliderValue, setSliderValue] = useState(6);
@@ -47,17 +47,17 @@ export default function Calculator({ navigation, route }: Props) {
 		);
 	});
 
-	const selectBusinessType = (amount) => {
+	const selectBusinessType = (amount, collateral = isCollateral) => {
 		let res = cashBusinessTypes.find(item => {
 			if (amount >= 500000) {
 				return item.slug == 'ap_super_loan-new'
-			} else if (amount > 120000 && amount < 500000 && !isCollateral) {
+			} else if (amount > 120000 && amount < 500000 && !collateral) {
 				return item.slug == 'ap_cash_loan-no_collateral'
-			} else if (amount >= 70000 && amount <= 120000 && !isCollateral) {
+			} else if (amount >= 70000 && amount <= 120000 && !collateral) {
 				return item.slug == 'ap_starter_cash_loan-no_collateral'
-			} else if (amount > 120000 && amount < 500000 && isCollateral) {
+			} else if (amount > 120000 && amount < 500000 && collateral) {
 				return item.slug == 'ap_cash_loan-product'
-			} else if (amount >= 70000 && amount <= 120000 && isCollateral) {
+			} else if (amount >= 70000 && amount <= 120000 && collateral) {
 				return item.slug == 'ap_starter_cash_loan'
 			}
 		});
@@ -100,7 +100,7 @@ export default function Calculator({ navigation, route }: Props) {
 
 	}
 
-	const getCalc = (val = sliderValue, input = inputValue) => {
+	const getCalc = (val = sliderValue, input = inputValue, biMonthly = isBiMonthly, collateral = isCollateral) => {
 		try {
 			let rDur = repaymentDurations.find((item) => {
 				return item.numeral === val;
@@ -111,7 +111,7 @@ export default function Calculator({ navigation, route }: Props) {
 
 			};
 			const params = calculator.find((x) => {
-				return x.business_type_id === selectBusinessType(input).id &&
+				return x.business_type_id === selectBusinessType(input, collateral).id &&
 					x.down_payment_rate_id === downPaymentRate.id &&
 					x.repayment_duration_id === rDur.id
 			});
@@ -123,7 +123,7 @@ export default function Calculator({ navigation, route }: Props) {
 					0
 				);
 				setDownPayment("₦" + actualDownpayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-				if (!isBiMonthly) {
+				if (!biMonthly) {
 					setRepayment("₦" + (rePayment / val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))
 				} else {
 					setRepayment("₦" + (biMonthlyRepayment).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))
@@ -132,19 +132,14 @@ export default function Calculator({ navigation, route }: Props) {
 			}
 			else {
 				setDownPayment("Not");
-				setRepayment("Applicable");
+				setRepayment("Available");
 			}
 
 			setSliderValue(val);
 
 		} catch (error) {
-			// ToastAndroid.showWithGravity(
-			// 	"Unable to fetch calculator. Please try again later",
-			// 	ToastAndroid.SHORT,
-			// 	ToastAndroid.CENTER
-			// );
-			setRepayment("₦0.00");
-			setDownPayment("₦0.00");
+			setDownPayment("Not");
+			setRepayment("Available");
 		}
 	}
 
@@ -212,25 +207,41 @@ export default function Calculator({ navigation, route }: Props) {
 
 	const onInputValueChange = async (value: number) => {
 		setInputValue(value);
-		if (value >= 500000) {
-			setSliderValue(12);
-			setSliderDisabled(true);
-			getCalc(12, value);
-			return
-		}
-		else {
+		if (value >= 70000) {
 			setSliderDisabled(false);
 
+			if (value < 120000) {
+				setSliderValue(6);
+				getCalc(6, value);
+				return;
+			}
+			else if (value < 500000) {
+				setSliderValue(6);
+				getCalc(6, value);
+				return;
+			}
+			else {
+				setSliderValue(12);
+				getCalc(12, value);
+				setSliderDisabled(true);
+
+				return;
+			}
+		}
+
+		else {
+			setSliderDisabled(true);
 		}
 		getCalc(sliderValue, value);
 	}
-	const toggleSwitchM = () => {
+	const toggleSwitchM = (value) => {
+		console.log(value);
 		setIsBiMonthly((previousState) => !previousState);
-		getCalc();
+		getCalc(sliderValue, inputValue, value);
 	}
-	const toggleSwitchC = () => {
+	const toggleSwitchC = (value) => {
 		setIsCollateral((previousState) => !previousState);
-		getCalc();
+		getCalc(sliderValue, inputValue, isBiMonthly, value);
 	}
 
 	useEffect(() => {
@@ -407,7 +418,7 @@ export default function Calculator({ navigation, route }: Props) {
 								marginBottom: 10,
 							}}
 						>
-							{repayment === "Applicable" ? "" : "Your Monthly Repayment"}
+							{repayment === "Available" ? "" : isBiMonthly ? "Your Bimonthly Repayment" : "Your Monthly Repayment"}
 						</Text>
 						<Text
 							style={{
@@ -427,7 +438,7 @@ export default function Calculator({ navigation, route }: Props) {
 						paddingVertical: 15,
 						borderRadius: 5,
 						marginVertical: 10,
-					} :{
+					} : {
 						backgroundColor: '#074A74',
 						alignItems: 'center',
 						paddingVertical: 15,
