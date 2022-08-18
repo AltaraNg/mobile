@@ -1,4 +1,4 @@
-import { Dimensions, Image, Pressable, StyleSheet, Switch, ToastAndroid } from 'react-native';
+import { Dimensions, Image, Modal, Pressable, StyleSheet, Switch, ToastAndroid, TouchableHighlight, TouchableOpacity } from 'react-native';
 
 import { Text, View } from '../components/Themed';
 import { RootStackParamList } from '../types';
@@ -12,6 +12,8 @@ import businessTypes from '../lib/calculator.json';
 import repaymentDurations from '../lib/repaymentDuration.json';
 // import Slider from '@react-native-community/slider';
 import Slider from 'react-native-slider';
+import { Overlay } from 'react-native-elements';
+import { SuccessSvg } from '../assets/svgs/svg';
 // import {cashLoan, calculate} from '../lib/calculator';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
@@ -29,6 +31,10 @@ export default function Calculator({ navigation, route }: Props) {
 	const [calculator, setCalculator] = useState([]);
 	const [downPayment, setDownPayment] = useState(null);
 	const [repayment, setRepayment] = useState(null);
+	const [modalResponse, setModalResponse] = useState(null);
+	const [modalVisible, setModalVisible] = useState(false);
+	const [isError, setIsError] = useState(false);
+
 
 
 
@@ -89,11 +95,21 @@ export default function Calculator({ navigation, route }: Props) {
 				url: "/submit/request",
 				headers: { Authorization: `Bearer ${authData.token}` },
 			});
-			if (res.status === 200) {
+			
+			res.status === 200 ? setIsError(false) : setIsError(true);
+			setModalResponse(res);
+			setModalVisible(true);
 
-				navigation.navigate('Dashboard');
-			}
 		} catch (error) {
+			ToastAndroid.showWithGravity(
+				"Unable to submit request. Please try again later",
+				ToastAndroid.SHORT,
+				ToastAndroid.CENTER
+			);
+		setLoader(false);
+
+		}finally{
+		setLoader(false);
 
 		}
 
@@ -251,6 +267,145 @@ export default function Calculator({ navigation, route }: Props) {
 
 	return (
 		<View style={styles.container}>
+			<Overlay
+				isVisible={modalVisible}
+				onBackdropPress={() => {
+					setModalVisible(!modalVisible);
+				}}
+			/>
+			<Modal
+				animationType="slide"
+				transparent={true}
+				visible={modalVisible}
+				onRequestClose={() => {
+					setModalVisible(!modalVisible);
+				}}
+				style={{ justifyContent: "flex-end", margin: 0, position: "relative" }}
+			>
+				<TouchableHighlight
+					onPress={() => setModalVisible(!modalVisible)}
+					style={{
+						borderRadius:
+							Math.round(
+								Dimensions.get("window").width + Dimensions.get("window").height
+							) / 2,
+						width: Dimensions.get("window").width * 0.13,
+						height: Dimensions.get("window").width * 0.13,
+						backgroundColor: "#fff",
+						position: "absolute",
+						//   top: 1 / 2,
+						marginHorizontal: Dimensions.get("window").width * 0.43,
+						marginVertical: Dimensions.get("window").width * 0.76,
+						justifyContent: "center",
+						alignItems: "center",
+					}}
+					underlayColor="#ccc"
+				>
+					<Text
+						style={{
+							fontSize: 20,
+							color: "#000",
+							fontFamily: "Montserrat_900Black",
+						}}
+					>
+						&#x2715;
+					</Text>
+				</TouchableHighlight>
+				{!isError ? (
+					<View style={styles.modalContainer}>
+						<TouchableOpacity
+							style={{ alignItems: "center" }}
+							onPress={() => setModalVisible(!modalVisible)}
+						>
+							<Text style={styles.modalHeaderCloseText}>X</Text>
+						</TouchableOpacity>
+						<View style={styles.modalContainer}>
+							<View style={styles.modalContent}>
+								<SuccessSvg />
+								<Text style={styles.modalHeading}>
+									You have{" "}
+									<Text style={{ color: "#074A74" }}>successfully</Text> applied
+									for {"Cash Loan"}
+								</Text>
+
+								{modalResponse && (
+									<Text
+										style={{
+											color: "#474A57",
+											fontFamily: "Montserrat_500Medium",
+											marginTop: 30,
+											marginHorizontal: 30,
+											fontSize: 12,
+											textAlign: "center",
+										}}
+									>
+										{modalResponse.message}
+									</Text>
+								)}
+							</View>
+						</View>
+					</View>
+				) : (
+					<View style={styles.modalContainer}>
+						<TouchableOpacity
+							style={{ alignItems: "center" }}
+							onPress={() => setModalVisible(!modalVisible)}
+						>
+							<Text style={styles.modalHeaderCloseText}>X</Text>
+						</TouchableOpacity>
+						<View style={styles.modalContainer}>
+							<View style={styles.modalContent}>
+								<TouchableHighlight
+									style={{
+										borderRadius:
+											Math.round(
+												Dimensions.get("window").width +
+												Dimensions.get("window").height
+											) / 2,
+										width: Dimensions.get("window").width * 0.3,
+										height: Dimensions.get("window").width * 0.3,
+										backgroundColor: "#DB2721",
+										justifyContent: "center",
+										alignItems: "center",
+									}}
+									underlayColor="#ccc"
+								>
+									<Text
+										style={{
+											fontSize: 68,
+											color: "#fff",
+											fontFamily: "Montserrat_900Black",
+										}}
+									>
+										&#x2715;
+									</Text>
+								</TouchableHighlight>
+								<Text style={styles.modalHeading}>
+									Sorry! Your Order is{" "}
+									<Text style={{ color: "red" }}>unsuccessful</Text>
+								</Text>
+
+								<Text style={styles.errText}>
+									{modalResponse?.error_message}
+								</Text>
+							</View>
+						</View>
+					</View>
+				)}
+			</Modal>
+
+
+
+
+
+
+
+
+
+
+
+
+
 			<View style={styles.calculator}>
 				<Text style={styles.header}>Calculator</Text>
 
@@ -507,4 +662,43 @@ const styles = StyleSheet.create({
 	label: {
 		color: '#074A74',
 	},
+	modalContainer: {
+		height: Dimensions.get("screen").height / 2.1,
+		alignItems: "center",
+		marginTop: "auto",
+		borderTopLeftRadius: 30,
+		borderTopRightRadius: 30,
+		backgroundColor: "white",
+	  },
+	  modalContent: {
+		paddingVertical: 20,
+		borderTopLeftRadius: 30,
+		borderTopRightRadius: 30,
+		alignItems: "center",
+		backgroundColor: "white",
+	  },
+	  modalHeading: {
+		fontFamily: "Montserrat_700Bold",
+		fontSize: 30,
+		textAlign: "center",
+		color: "black",
+		marginTop: 20,
+	  },
+	  modalHeaderCloseText: {
+		backgroundColor: "white",
+		textAlign: "center",
+		paddingLeft: 5,
+		paddingRight: 5,
+		width: 30,
+		fontSize: 15,
+		borderRadius: 50,
+	  },
+	  errText: {
+		fontSize: 15,
+		marginTop: 20,
+		paddingHorizontal: 15,
+		textAlign: "center",
+		color: "#000",
+	  },
+	
 });
