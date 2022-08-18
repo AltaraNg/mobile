@@ -1,4 +1,4 @@
-import { Dimensions, Image, Pressable, StyleSheet, Switch, ToastAndroid } from 'react-native';
+import { Dimensions, Image, Modal, Pressable, StyleSheet, Switch, ToastAndroid, TouchableHighlight, TouchableOpacity } from 'react-native';
 
 import { Text, View } from '../components/Themed';
 import { RootStackParamList } from '../types';
@@ -12,6 +12,9 @@ import businessTypes from '../lib/calculator.json';
 import repaymentDurations from '../lib/repaymentDuration.json';
 // import Slider from '@react-native-community/slider';
 import Slider from 'react-native-slider';
+import { Overlay } from 'react-native-elements';
+import { SuccessSvg } from '../assets/svgs/svg';
+import { OrderContext } from '../context/OrderContext';
 // import {cashLoan, calculate} from '../lib/calculator';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
@@ -22,13 +25,22 @@ export default function Calculator({ navigation, route }: Props) {
 	const { authData, setAuthData, showLoader, setShowLoader } =
 		useContext(AuthContext);
 	const [loader, setLoader] = useState(false);
-	const [sliderDisabled, setSliderDisabled] = useState(false);
+	const [sliderDisabled, setSliderDisabled] = useState(true);
 
 	const [inputValue, setInputValue] = useState(0);
 	const [sliderValue, setSliderValue] = useState(6);
 	const [calculator, setCalculator] = useState([]);
 	const [downPayment, setDownPayment] = useState(null);
 	const [repayment, setRepayment] = useState(null);
+	const [modalResponse, setModalResponse] = useState(null);
+	const [modalVisible, setModalVisible] = useState(false);
+	const [isError, setIsError] = useState(false);
+	const {
+
+		fetchOrderRequestContext,
+
+	} = useContext(OrderContext);
+
 
 
 
@@ -47,17 +59,17 @@ export default function Calculator({ navigation, route }: Props) {
 		);
 	});
 
-	const selectBusinessType = (amount) => {
+	const selectBusinessType = (amount, collateral = isCollateral) => {
 		let res = cashBusinessTypes.find(item => {
 			if (amount >= 500000) {
 				return item.slug == 'ap_super_loan-new'
-			} else if (amount > 120000 && amount < 500000 && !isCollateral) {
+			} else if (amount > 120000 && amount < 500000 && !collateral) {
 				return item.slug == 'ap_cash_loan-no_collateral'
-			} else if (amount >= 70000 && amount <= 120000 && !isCollateral) {
+			} else if (amount >= 70000 && amount <= 120000 && !collateral) {
 				return item.slug == 'ap_starter_cash_loan-no_collateral'
-			} else if (amount > 120000 && amount < 500000 && isCollateral) {
+			} else if (amount > 120000 && amount < 500000 && collateral) {
 				return item.slug == 'ap_cash_loan-product'
-			} else if (amount >= 70000 && amount <= 120000 && isCollateral) {
+			} else if (amount >= 70000 && amount <= 120000 && collateral) {
 				return item.slug == 'ap_starter_cash_loan'
 			}
 		});
@@ -89,18 +101,30 @@ export default function Calculator({ navigation, route }: Props) {
 				url: "/submit/request",
 				headers: { Authorization: `Bearer ${authData.token}` },
 			});
-			if (res.status === 200) {
 
-				navigation.navigate('Dashboard');
-			}
+			res.status === 200 ? setIsError(false) : setIsError(true);
+			setModalResponse(res);
+			setModalVisible(true);
+			fetchOrderRequestContext();
+
+
 		} catch (error) {
+			ToastAndroid.showWithGravity(
+				"Unable to submit request. Please try again later",
+				ToastAndroid.SHORT,
+				ToastAndroid.CENTER
+			);
+			setLoader(false);
+
+		} finally {
+			setLoader(false);
 
 		}
 
 
 	}
 
-	const getCalc = (val = sliderValue, input = inputValue) => {
+	const getCalc = (val = sliderValue, input = inputValue, biMonthly = isBiMonthly, collateral = isCollateral) => {
 		try {
 			let rDur = repaymentDurations.find((item) => {
 				return item.numeral === val;
@@ -111,7 +135,7 @@ export default function Calculator({ navigation, route }: Props) {
 
 			};
 			const params = calculator.find((x) => {
-				return x.business_type_id === selectBusinessType(input).id &&
+				return x.business_type_id === selectBusinessType(input, collateral).id &&
 					x.down_payment_rate_id === downPaymentRate.id &&
 					x.repayment_duration_id === rDur.id
 			});
@@ -123,7 +147,7 @@ export default function Calculator({ navigation, route }: Props) {
 					0
 				);
 				setDownPayment("₦" + actualDownpayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-				if (!isBiMonthly) {
+				if (!biMonthly) {
 					setRepayment("₦" + (rePayment / val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))
 				} else {
 					setRepayment("₦" + (biMonthlyRepayment).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))
@@ -132,19 +156,14 @@ export default function Calculator({ navigation, route }: Props) {
 			}
 			else {
 				setDownPayment("Not");
-				setRepayment("Applicable");
+				setRepayment("Available");
 			}
 
 			setSliderValue(val);
 
 		} catch (error) {
-			// ToastAndroid.showWithGravity(
-			// 	"Unable to fetch calculator. Please try again later",
-			// 	ToastAndroid.SHORT,
-			// 	ToastAndroid.CENTER
-			// );
-			setRepayment("₦0.00");
-			setDownPayment("₦0.00");
+			setDownPayment("Not");
+			setRepayment("Available");
 		}
 	}
 
@@ -212,25 +231,41 @@ export default function Calculator({ navigation, route }: Props) {
 
 	const onInputValueChange = async (value: number) => {
 		setInputValue(value);
-		if (value >= 500000) {
-			setSliderValue(12);
-			setSliderDisabled(true);
-			getCalc(12, value);
-			return
-		}
-		else {
+		if (value >= 70000) {
 			setSliderDisabled(false);
 
+			if (value < 120000) {
+				setSliderValue(6);
+				getCalc(6, value);
+				return;
+			}
+			else if (value < 500000) {
+				setSliderValue(6);
+				getCalc(6, value);
+				return;
+			}
+			else {
+				setSliderValue(12);
+				getCalc(12, value);
+				setSliderDisabled(true);
+
+				return;
+			}
+		}
+
+		else {
+			setSliderDisabled(true);
 		}
 		getCalc(sliderValue, value);
 	}
-	const toggleSwitchM = () => {
+	const toggleSwitchM = (value) => {
+		console.log(value);
 		setIsBiMonthly((previousState) => !previousState);
-		getCalc();
+		getCalc(sliderValue, inputValue, value);
 	}
-	const toggleSwitchC = () => {
+	const toggleSwitchC = (value) => {
 		setIsCollateral((previousState) => !previousState);
-		getCalc();
+		getCalc(sliderValue, inputValue, isBiMonthly, value);
 	}
 
 	useEffect(() => {
@@ -240,6 +275,145 @@ export default function Calculator({ navigation, route }: Props) {
 
 	return (
 		<View style={styles.container}>
+			<Overlay
+				isVisible={modalVisible}
+				onBackdropPress={() => {
+					setModalVisible(!modalVisible);
+				}}
+			/>
+			<Modal
+				animationType="slide"
+				transparent={true}
+				visible={modalVisible}
+				onRequestClose={() => {
+					setModalVisible(!modalVisible);
+				}}
+				style={{ justifyContent: "flex-end", margin: 0, position: "relative" }}
+			>
+				<TouchableHighlight
+					onPress={() => setModalVisible(!modalVisible)}
+					style={{
+						borderRadius:
+							Math.round(
+								Dimensions.get("window").width + Dimensions.get("window").height
+							) / 2,
+						width: Dimensions.get("window").width * 0.13,
+						height: Dimensions.get("window").width * 0.13,
+						backgroundColor: "#fff",
+						position: "absolute",
+						//   top: 1 / 2,
+						marginHorizontal: Dimensions.get("window").width * 0.43,
+						marginVertical: Dimensions.get("window").width * 0.76,
+						justifyContent: "center",
+						alignItems: "center",
+					}}
+					underlayColor="#ccc"
+				>
+					<Text
+						style={{
+							fontSize: 20,
+							color: "#000",
+							fontFamily: "Montserrat_900Black",
+						}}
+					>
+						&#x2715;
+					</Text>
+				</TouchableHighlight>
+				{!isError ? (
+					<View style={styles.modalContainer}>
+						<TouchableOpacity
+							style={{ alignItems: "center" }}
+							onPress={() => setModalVisible(!modalVisible)}
+						>
+							<Text style={styles.modalHeaderCloseText}>X</Text>
+						</TouchableOpacity>
+						<View style={styles.modalContainer}>
+							<View style={styles.modalContent}>
+								<SuccessSvg />
+								<Text style={styles.modalHeading}>
+									You have{" "}
+									<Text style={{ color: "#074A74" }}>successfully</Text> applied
+									for {"Cash Loan"}
+								</Text>
+
+								{modalResponse && (
+									<Text
+										style={{
+											color: "#474A57",
+											fontFamily: "Montserrat_500Medium",
+											marginTop: 30,
+											marginHorizontal: 30,
+											fontSize: 12,
+											textAlign: "center",
+										}}
+									>
+										{modalResponse.message}
+									</Text>
+								)}
+							</View>
+						</View>
+					</View>
+				) : (
+					<View style={styles.modalContainer}>
+						<TouchableOpacity
+							style={{ alignItems: "center" }}
+							onPress={() => setModalVisible(!modalVisible)}
+						>
+							<Text style={styles.modalHeaderCloseText}>X</Text>
+						</TouchableOpacity>
+						<View style={styles.modalContainer}>
+							<View style={styles.modalContent}>
+								<TouchableHighlight
+									style={{
+										borderRadius:
+											Math.round(
+												Dimensions.get("window").width +
+												Dimensions.get("window").height
+											) / 2,
+										width: Dimensions.get("window").width * 0.3,
+										height: Dimensions.get("window").width * 0.3,
+										backgroundColor: "#DB2721",
+										justifyContent: "center",
+										alignItems: "center",
+									}}
+									underlayColor="#ccc"
+								>
+									<Text
+										style={{
+											fontSize: 68,
+											color: "#fff",
+											fontFamily: "Montserrat_900Black",
+										}}
+									>
+										&#x2715;
+									</Text>
+								</TouchableHighlight>
+								<Text style={styles.modalHeading}>
+									Sorry! Your Order is{" "}
+									<Text style={{ color: "red" }}>unsuccessful</Text>
+								</Text>
+
+								<Text style={styles.errText}>
+									{modalResponse?.error_message}
+								</Text>
+							</View>
+						</View>
+					</View>
+				)}
+			</Modal>
+
+
+
+
+
+
+
+
+
+
+
+
+
 			<View style={styles.calculator}>
 				<Text style={styles.header}>Calculator</Text>
 
@@ -407,7 +581,7 @@ export default function Calculator({ navigation, route }: Props) {
 								marginBottom: 10,
 							}}
 						>
-							{repayment === "Applicable" ? "" : "Your Monthly Repayment"}
+							{repayment === "Available" ? "" : isBiMonthly ? "Your Bimonthly Repayment" : "Your Monthly Repayment"}
 						</Text>
 						<Text
 							style={{
@@ -427,7 +601,7 @@ export default function Calculator({ navigation, route }: Props) {
 						paddingVertical: 15,
 						borderRadius: 5,
 						marginVertical: 10,
-					} :{
+					} : {
 						backgroundColor: '#074A74',
 						alignItems: 'center',
 						paddingVertical: 15,
@@ -496,4 +670,43 @@ const styles = StyleSheet.create({
 	label: {
 		color: '#074A74',
 	},
+	modalContainer: {
+		height: Dimensions.get("screen").height / 2.1,
+		alignItems: "center",
+		marginTop: "auto",
+		borderTopLeftRadius: 30,
+		borderTopRightRadius: 30,
+		backgroundColor: "white",
+	},
+	modalContent: {
+		paddingVertical: 20,
+		borderTopLeftRadius: 30,
+		borderTopRightRadius: 30,
+		alignItems: "center",
+		backgroundColor: "white",
+	},
+	modalHeading: {
+		fontFamily: "Montserrat_700Bold",
+		fontSize: 30,
+		textAlign: "center",
+		color: "black",
+		marginTop: 20,
+	},
+	modalHeaderCloseText: {
+		backgroundColor: "white",
+		textAlign: "center",
+		paddingLeft: 5,
+		paddingRight: 5,
+		width: 30,
+		fontSize: 15,
+		borderRadius: 50,
+	},
+	errText: {
+		fontSize: 15,
+		marginTop: 20,
+		paddingHorizontal: 15,
+		textAlign: "center",
+		color: "#000",
+	},
+
 });
