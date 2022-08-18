@@ -14,6 +14,7 @@ import repaymentDurations from '../lib/repaymentDuration.json';
 import Slider from 'react-native-slider';
 import { Overlay } from 'react-native-elements';
 import { SuccessSvg } from '../assets/svgs/svg';
+import { OrderContext } from '../context/OrderContext';
 // import {cashLoan, calculate} from '../lib/calculator';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
@@ -34,6 +35,11 @@ export default function Calculator({ navigation, route }: Props) {
 	const [modalResponse, setModalResponse] = useState(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [isError, setIsError] = useState(false);
+	const {
+
+		fetchOrderRequestContext,
+
+	} = useContext(OrderContext);
 
 
 
@@ -95,10 +101,12 @@ export default function Calculator({ navigation, route }: Props) {
 				url: "/submit/request",
 				headers: { Authorization: `Bearer ${authData.token}` },
 			});
-			
+
 			res.status === 200 ? setIsError(false) : setIsError(true);
 			setModalResponse(res);
 			setModalVisible(true);
+			fetchOrderRequestContext();
+
 
 		} catch (error) {
 			ToastAndroid.showWithGravity(
@@ -106,10 +114,10 @@ export default function Calculator({ navigation, route }: Props) {
 				ToastAndroid.SHORT,
 				ToastAndroid.CENTER
 			);
-		setLoader(false);
+			setLoader(false);
 
-		}finally{
-		setLoader(false);
+		} finally {
+			setLoader(false);
 
 		}
 
@@ -669,22 +677,22 @@ const styles = StyleSheet.create({
 		borderTopLeftRadius: 30,
 		borderTopRightRadius: 30,
 		backgroundColor: "white",
-	  },
-	  modalContent: {
+	},
+	modalContent: {
 		paddingVertical: 20,
 		borderTopLeftRadius: 30,
 		borderTopRightRadius: 30,
 		alignItems: "center",
 		backgroundColor: "white",
-	  },
-	  modalHeading: {
+	},
+	modalHeading: {
 		fontFamily: "Montserrat_700Bold",
 		fontSize: 30,
 		textAlign: "center",
 		color: "black",
 		marginTop: 20,
-	  },
-	  modalHeaderCloseText: {
+	},
+	modalHeaderCloseText: {
 		backgroundColor: "white",
 		textAlign: "center",
 		paddingLeft: 5,
@@ -692,13 +700,13 @@ const styles = StyleSheet.create({
 		width: 30,
 		fontSize: 15,
 		borderRadius: 50,
-	  },
-	  errText: {
+	},
+	errText: {
 		fontSize: 15,
 		marginTop: 20,
 		paddingHorizontal: 15,
 		textAlign: "center",
 		color: "#000",
-	  },
-	
+	},
+
 });
