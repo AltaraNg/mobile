@@ -132,10 +132,7 @@ export default function ViewProfile({ navigation, route }: Props) {
                 {displayDate(user.attributes.date_of_birth)}
               </Text>
             </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Gender:</Text>
-              <Text style={styles.input}>{user.attributes.gender}</Text>
-            </View>
+           
           </View>
         </View>
       )}
