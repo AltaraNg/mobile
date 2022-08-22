@@ -153,9 +153,10 @@ export default function LoginPassword({ navigation }: Props) {
                 <Pressable
                   style={{
                     backgroundColor: "#EFF5F9",
-                    position: "absolute",
+                  position: "absolute",
+
                     right: 8,
-                    top: 35,
+                    top: 45,
                   }}
                   onPress={toggleClick}
                 >
@@ -191,7 +192,7 @@ export default function LoginPassword({ navigation }: Props) {
                     backgroundColor: "#EFF5F9",
                     position: "absolute",
                     right: 8,
-                    top: 35,
+                    top: 45,
                   }}
                   onPress={toggleClick}
                 >
@@ -201,7 +202,7 @@ export default function LoginPassword({ navigation }: Props) {
             </View>
           )}
           {customer == "old" && (
-            <View style={{ backgroundColor: "#EFF5F9", marginTop: 30 }}>
+            <View style={{ backgroundColor: "#EFF5F9", marginTop: 30, flex: 1 , position:"relative"}}> 
               <Text style={styles.label}>Password</Text>
               <TextInput
                 onChangeText={(password) => {
@@ -221,7 +222,7 @@ export default function LoginPassword({ navigation }: Props) {
                   backgroundColor: "#EFF5F9",
                   position: "absolute",
                   right: 8,
-                  top: 35,
+                  top: 45,
                 }}
                 onPress={toggleClick}
               >
@@ -233,7 +234,9 @@ export default function LoginPassword({ navigation }: Props) {
             <Text style={styles.errorText}>{errorText}</Text>
           ) : null}
         </View>
-        <LinearGradient
+       
+      </ScrollView>
+      <LinearGradient
           colors={["#074A74", "#089CA4"]}
           style={[
             isDisabled ? styles.disabled : styles.buttonContainer,
@@ -259,7 +262,6 @@ export default function LoginPassword({ navigation }: Props) {
             )}
           </Pressable>
         </LinearGradient>
-      </ScrollView>
       {/* </View>)} */}
     </View>
   );
@@ -309,6 +311,7 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   inputContainer: {
+    flex: 1,
     marginHorizontal: 40,
     marginTop: 45,
     backgroundColor: "#EFF5F9",
@@ -322,14 +325,15 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    marginBottom: 4,
+    marginBottom: 16,
     color: "#72788D",
     fontFamily: "Montserrat_700Bold",
   },
   buttonContainer: {
     flexDirection: "row",
     marginHorizontal: 40,
-    marginTop: 320,
+    position: "relative",
+    bottom: 30,
     borderColor: "#074A74",
     borderWidth: 1,
     borderRadius: 10,
@@ -338,7 +342,8 @@ const styles = StyleSheet.create({
   disabled: {
     flexDirection: "row",
     marginHorizontal: 40,
-    marginTop: 320,
+    position: "relative",
+    bottom: 30,
     borderColor: "#074A74",
     borderWidth: 1,
     borderRadius: 10,

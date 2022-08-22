@@ -291,7 +291,9 @@ export default function Calculator({ navigation, route }: Props) {
 				style={{ justifyContent: "flex-end", margin: 0, position: "relative" }}
 			>
 				<TouchableHighlight
-					onPress={() => setModalVisible(!modalVisible)}
+					onPress={() => {setModalVisible(!modalVisible);
+						navigation.navigate('Dashboard')
+					}}
 					style={{
 						borderRadius:
 							Math.round(
