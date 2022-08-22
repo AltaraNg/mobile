@@ -35,7 +35,7 @@ let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 type Props = NativeStackScreenProps<RootTabParamList, "OrderRequest">;
 
-export default function History({ navigation, route }: Props) {
+export default function OrderRequest({ navigation, route }: Props) {
   const { authData } = useContext(AuthContext);
   const {
     setOrderRequest,

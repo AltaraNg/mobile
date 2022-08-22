@@ -43,7 +43,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
-export default function Dashboard({ navigation, route }: Props) {
+export default function EditProfile({ navigation, route }: Props) {
 	const auth = useAuth();
 
   const { authData, setAuthData } = useContext(AuthContext);
