@@ -8,7 +8,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "start:wsl": "REACT_NATIVE_PACKAGER_HOSTNAME=$(netsh.exe interface ip show address 'Wi-Fi' | grep '192.168.96.242' | sed -r 's/^.*IP Address:\\W*//') expo start"
   },
   "jest": {
     "preset": "jest-expo"
@@ -48,16 +49,19 @@
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
     "react-native-app-intro-slider": "^4.0.4",
+    "react-native-currency-input": "^1.0.1",
     "react-native-date-picker": "^4.2.0",
     "react-native-element-dropdown": "^1.8.7",
     "react-native-elements": "^3.4.2",
     "react-native-gesture-handler": "~2.1.0",
-    "react-native-pusher-push-notifications": "^2.5.2",
     "react-native-image-picker": "^4.7.3",
+    "react-native-paper": "^4.12.3",
+    "react-native-pusher-push-notifications": "^2.5.2",
     "react-native-reanimated": "~2.3.1",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
     "react-native-simple-radio-button": "^2.7.4",
+    "react-native-slider": "^0.11.0",
     "react-native-svg": "^12.1.1",
     "react-native-svg-transformer": "^1.0.0",
     "react-native-web": "0.17.1"

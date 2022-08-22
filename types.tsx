@@ -17,34 +17,48 @@ declare global {
 }
 
 export type RootStackParamList = {
-	Intro: undefined;
-	RequestModal: undefined;
-	Modal: undefined;
-	NotFound: undefined;
-	Main: undefined;
-	OTP: { phone_number: string };
-	Login: undefined;
+  Dashboard: { user: object };
+  Intro: undefined;
+  RequestModal: undefined;
+  Modal: undefined;
+  NotFound: undefined;
+  OrderDetails: { order: object };
+  ViewNotification: { notification: any };
+  Main: undefined;
+  OTP: { phone_number: string };
+  Login: undefined;
+  LoginPassword: undefined;
+  Cards: { order: string };
+  OrderRequest: { order: string };
+  Calculator: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
 	NativeStackScreenProps<RootStackParamList, Screen>;
 
 export type RootTabParamList = {
-	Dashboard: {user:object};
-	History: undefined;
-	Notification: undefined;
+  Dashboard: { user: object };
+  History: { order: undefined };
+  Notification: undefined;
+  Home: { user: object };
+  ViewProfile: { user: object };
+  EditProfile: { user: object };
+  CreateProfile: { user: object };
+  UploadDocument: { user: object };
+  OrderRequest: { order: string };
+  OrderDetails: { order: object };
 };
 
 export type DrawerParamList = {
-  Home: {user:object};
-	
-	"View Profile": { user: object };
-	"Edit Profile": { user: object };
-	"Create Profile" :{user: object};
-	"Upload Document" : {user: object}
-
-
-}
+  Home: { user: object };
+  ViewProfile: { user: object };
+  EditProfile: { user: object };
+  CreateProfile: { user: object };
+  UploadDocument: { user: object };
+  OrderRequest: { order: string };
+  History: { order: undefined };
+  OrderDetails: { order: object };
+};
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> =
 	CompositeScreenProps<
 		BottomTabScreenProps<RootTabParamList, Screen>,

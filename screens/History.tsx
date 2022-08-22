@@ -2,48 +2,37 @@ import {
   Pressable,
   StyleSheet,
   TouchableOpacity,
-  Touchable,
-  TextInput,
-  ActivityIndicator,
-  ToastAndroid,
-  BackHandler,
-  Platform,
-  ScrollView,
-  Modal,
-  TouchableHighlight,
-  Alert,
+  RefreshControl,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
-import { Button, Overlay, Icon } from "react-native-elements";
-import { LinearGradient } from "expo-linear-gradient";
+
 import Header from "../components/Header";
 import React, { useState, createRef, useEffect, useContext } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
-import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, RootTabParamList } from "../types";
-import Cards from "../components/Cards";
-import SideMenu from "./SideMenu";
+
 import { ELoan, Rental, ProductLoan } from "../assets/svgs/svg";
 import { AuthContext } from "../context/AuthContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Constants from "expo-constants";
 import axios from "axios";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList } from "react-native";
 
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 type Props = NativeStackScreenProps<RootTabParamList, "History">;
 
 export default function History({ navigation, route }: Props) {
+  const [refreshing, setRefreshing] = useState(true)
   const { authData } = useContext(AuthContext);
-  const [orders, setOrders] = useState(null);
-  const [exitApp, setExitApp] = useState(1);
+  const [orders, setOrders] = useState([]);
   const [pressedOrder, setPressedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [OrderStatus, setOrderStatus] = useState("")
   const [showLoader, setShowLoader] = useState(false);
+  let mounted = true;
   const styleSVG = (item: any) => {
     const totalDebt =
       item?.included?.amortizations.reduce(
@@ -86,418 +75,29 @@ export default function History({ navigation, route }: Props) {
         headers: { Authorization: `Bearer ${authData.token}` },
       });
       setShowLoader(false);
+      setRefreshing(false);
       const order = response.data.data[0].included.orders;
       setOrders(order);
 
-    } catch (error: any) { }
+    } catch (error: any) {
+     }
   };
-  const viewDetail = (item) => {
-    setModalVisible(true);
-    setPressedOrder(item);
+  const viewDetail = (order) => {
+    navigation.navigate('OrderDetails', order);
   };
-  const monthlyRepayment = (props) => {
 
-    return props?.item?.included?.amortizations[0].expected_amount
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-  const orderStatus = (props) => {
-    const totalDebt = props?.item?.included?.amortizations.reduce(
-      (accumulator, object) => {
-        return accumulator + object.expected_amount;
-      },
-      0
-    ) - props?.item?.included?.amortizations.reduce((accumulator, object) => {
-      return accumulator + object.actual_amount;
-    }, 0)
-    const Today = new Date()
-    const expiryDate = new Date(
-      props?.item?.included?.amortizations.find(
-        (item) => item.actual_amount == 0
-      )?.expected_payment_date
-    )
-
-    if (totalDebt <= 0) {
-      return "Completed";
-    }
-    if ((totalDebt > 0) && (Today < expiryDate)) {
-      return 'In Progress'
-    }
-    if ((totalDebt > 0 && Today > expiryDate)) {
-      return 'Overdue'
-    }
-
-
-  }
-  const styleStatus = (props) => {
-    if (orderStatus(props) == 'Completed') {
-      return {
-        backgroundColor: "#d0dce4",
-        color: "#074a74",
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 6,
-        fontFamily: "Montserrat_700Bold",
-      };
-    }
-    if (orderStatus(props) == "In Progress") {
-      return {
-        backgroundColor: "#fff4d4",
-        color: "#FDC228",
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 6,
-        fontFamily: "Montserrat_700Bold",
-      };
-    }
-    if (orderStatus(props) == "Overdue") {
-      return {
-        backgroundColor: "#ffd4d4",
-        color: "#DB2721",
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 6,
-        fontFamily: "Montserrat_700Bold",
-      };
-    }
-  }
-
-  const nextRepayment = (props: Object) => {
-    const nextDate = props?.item?.included?.amortizations.find((item) => item.actual_amount == 0)
-    return nextDate?.expected_payment_date || 'Completed'
-  }
-
-  const OrderDetails = function (props: any) {
-    return (
-      <View>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}
-          style={{
-            justifyContent: "flex-end",
-            margin: 0,
-            position: "relative",
-          }}
-        >
-          <TouchableHighlight
-            onPress={() => setModalVisible(!modalVisible)}
-            style={{
-              borderRadius:
-                Math.round(
-                  Dimensions.get("window").width +
-                  Dimensions.get("window").height
-                ) / 2,
-              width: Dimensions.get("window").width * 0.13,
-              height: Dimensions.get("window").width * 0.13,
-              backgroundColor: "#fff",
-              position: "absolute",
-              //   top: 1 / 2,
-              marginHorizontal: Dimensions.get("window").width * 0.43,
-              marginVertical: Dimensions.get("window").width * 0.76,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            underlayColor="#ccc"
-          >
-            <Text
-              style={{
-                fontSize: 20,
-                color: "#000",
-                fontFamily: "Montserrat_900Black",
-              }}
-            >
-              &#x2715;
-            </Text>
-          </TouchableHighlight>
-
-          <View style={styles.modalContainer}>
-            <View
-              style={{
-                backgroundColor: "white",
-                borderTopLeftRadius: 30,
-                borderTopRightRadius: 30,
-              }}
-            >
-              <View style={styles.modalContent}>
-                <View
-                  style={{
-                    backgroundColor: "#fff",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View style={{ backgroundColor: "#fff" }}>
-                    <Text style={{ color: "#000", fontSize: 11 }}>
-                      Order ID: {props?.item?.attributes?.order_number}
-                    </Text>
-                    <Text
-                      style={{
-                        color: "#000",
-                        fontFamily: "Montserrat_700Bold",
-                        width: 230,
-                        fontSize: 11,
-                      }}
-                    >
-                      {props?.item?.included?.product?.name}{" "}
-                    </Text>
-                  </View>
-                  <Text style={styleStatus(props)}>{orderStatus(props)}</Text>
-                </View>
-                <View
-                  style={{
-                    marginTop: 10,
-                    flexDirection: "row",
-                    backgroundColor: "#fff",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "#000",
-                      width: Dimensions.get("window").width * 0.25,
-                    }}
-                  >
-                    {props?.item?.included?.order_type?.name}{" "}
-                    {props?.item?.included?.down_payment_rate?.percent}% Rate @{" "}
-                    {props?.item?.included?.repayment_duration?.name}
-                  </Text>
-                  <View style={styles.verticleLine}></View>
-                  <View style={{ backgroundColor: "white", marginLeft: 5 }}>
-                    <View
-                      style={{
-                        backgroundColor: "white",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: Dimensions.get("window").width * 0.65,
-                        marginBottom: 25,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "#474a57",
-                          fontFamily: "Montserrat_400Regular",
-                          fontSize: 12,
-                        }}
-                      >
-                        Downpayment:{" "}
-                      </Text>
-                      <Text
-                        style={{
-                          color: "#000",
-                          fontFamily: "Montserrat_700Bold",
-                          fontSize: 14,
-                        }}
-                      >
-                        ₦
-                        {props?.item?.attributes?.down_payment
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        backgroundColor: "white",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: Dimensions.get("window").width * 0.65,
-                        marginBottom: 25,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "#474a57",
-                          fontFamily: "Montserrat_400Regular",
-                          fontSize: 12,
-                        }}
-                      >
-                        {props?.item?.included?.repayment_cycle?.name
-                          .charAt(0)
-                          .toUpperCase() +
-                          props?.item?.included?.repayment_cycle?.name.slice(
-                            1
-                          )}{" "}
-                        Repayment:{" "}
-                      </Text>
-                      <Text
-                        style={{
-                          color: "#000",
-                          fontFamily: "Montserrat_700Bold",
-                          fontSize: 14,
-                        }}
-                      >
-                        ₦{monthlyRepayment(props)}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        backgroundColor: "white",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: Dimensions.get("window").width * 0.65,
-                        marginBottom: 25,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "#474a57",
-                          fontFamily: "Montserrat_400Regular",
-                          fontSize: 12,
-                        }}
-                      >
-                        Product Price:{" "}
-                      </Text>
-                      <Text
-                        style={{
-                          color: "#000",
-                          fontFamily: "Montserrat_700Bold",
-                          fontSize: 14,
-                        }}
-                      >
-                        ₦
-                        {props?.item?.attributes?.product_price
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        backgroundColor: "white",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: Dimensions.get("window").width * 0.65,
-                        marginBottom: 25,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "#474a57",
-                          fontFamily: "Montserrat_400Regular",
-                          fontSize: 12,
-                        }}
-                      >
-                        Total Debt:{" "}
-                      </Text>
-                      <Text
-                        style={{
-                          color: "#000",
-                          fontFamily: "Montserrat_700Bold",
-                          fontSize: 14,
-                        }}
-                      >
-                        ₦
-                        {Math.floor(
-                          props?.item?.included?.amortizations.reduce(
-                            (accumulator, object) => {
-                              return accumulator + object.expected_amount;
-                            },
-                            0
-                          ) -
-                          props?.item?.included?.amortizations.reduce(
-                            (accumulator, object) => {
-                              return accumulator + object.actual_amount;
-                            },
-                            0
-                          )
-                        )
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        backgroundColor: "white",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: Dimensions.get("window").width * 0.65,
-                        marginBottom: 25,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "#474a57",
-                          fontFamily: "Montserrat_400Regular",
-                          fontSize: 12,
-                        }}
-                      >
-                        Total Amount Paid:{" "}
-                      </Text>
-                      <Text
-                        style={{
-                          color: "#000",
-                          fontFamily: "Montserrat_700Bold",
-                          fontSize: 14,
-                        }}
-                      >
-                        ₦
-                        {Math.floor(
-                          props?.item?.attributes?.down_payment +
-                          props?.item?.included?.amortizations.reduce(
-                            (accumulator, object) => {
-                              return accumulator + object.actual_amount;
-                            },
-                            0
-                          )
-                        )
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    borderBottomColor: "gray",
-                    borderBottomWidth: 1,
-                    marginTop: 3,
-                  }}
-                />
-                <View style={{ backgroundColor: "white" }}>
-                  <Text style={{ color: "black" }}>
-                    Next Repayment:{" "}
-                    <Text
-                      style={{
-                        color: "black",
-                        fontFamily: "Montserrat_700Bold",
-                      }}
-                    >
-                      {nextRepayment(props)}
-                    </Text>
-                    { }
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      </View>
-    );
-  };
 
   useEffect(() => {
+    // if(orders.length){
+    //   return;
+    // }
     fetchOrder();
+    // return () => mounted = false;
   }, []);
   return (
     <View style={styles.container}>
-      <Overlay
-        // ModalComponent={Modal}
-        isVisible={modalVisible}
-        onBackdropPress={() => {
-          setModalVisible(!modalVisible);
-        }}
-      />
-
       <View style={styles.header}>
-        <Header></Header>
+        <Header navigation={navigation}></Header>
         <TouchableOpacity>
           <Pressable onPress={toggleSideMenu}>
             <Hamburger style={styles.hamburger} />
@@ -510,22 +110,30 @@ export default function History({ navigation, route }: Props) {
         {showLoader ? (
           <Image
             source={require("../assets/gifs/loader.gif")}
-            style={styles.image}
+            style={styles.image2}
           />
         ) : (
           <View
             style={{
-              backgroundColor: "#EFF5F9",
-              marginBottom: 60,
+              backgroundColor: "#fff",
+              marginBottom: 100,
             }}
           >
+            {refreshing ? <ActivityIndicator /> : null}
             {orders?.length > 0 ? (
               <FlatList
                 scrollEnabled={true}
                 data={orders}
                 keyExtractor={(item) => item.id}
+                extraData={orders}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={fetchOrder}
+                  />
+                }
                 renderItem={({ item }) => (
-                  <View style={{ backgroundColor: "#EFF5F9" }}>
+                  <View style={{ backgroundColor: "#fff" }}>
                     <Pressable onPress={() => viewDetail(item)}>
                       <View style={styles.order}>
                         <View style={styles.details}>
@@ -546,12 +154,17 @@ export default function History({ navigation, route }: Props) {
                             </Text>
                           </View>
                         </View>
-                        <Text style={{ color: "#000", fontSize: 13 }}>
+                        <Text
+                          style={{
+                            color: "#000",
+                            fontSize: 13,
+                            marginRight: 59,
+                          }}
+                        >
                           {item?.attributes?.order_date}
                         </Text>
                       </View>
                     </Pressable>
-                    <OrderDetails item={pressedOrder} />
                   </View>
                 )}
               />
@@ -583,48 +196,69 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     position: "relative",
+    backgroundColor: "white",
+
   },
   image: {
     width: Dimensions.get("window").height * 0.46,
     height: Dimensions.get("window").height * 0.46,
+  },
+  image2: {
+    width: Dimensions.get("window").height * 0.2,
+    height: Dimensions.get("window").height * 0.2,
+    backgroundColor: "#fff",
+    position: "absolute",
+    top: Dimensions.get("window").height * 0.2,
+    left: Dimensions.get("window").width * 0.25,
   },
   hamburger: {
     marginTop: 80,
     marginRight: 24,
   },
   cards: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     flexDirection: "column",
     alignItems: "center",
   },
   title: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     marginLeft: 10,
     width: "65%",
   },
   details: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     flexDirection: "row",
     alignItems: "center",
+    
   },
   order: {
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
     flexDirection: "row",
     marginLeft: 26,
     marginRight: 20,
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 30,
+    marginVertical: 10,
+    padding: 7,
+    paddingRight: 30,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
   },
   header: {
-    flex: 1,
+    
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
   },
   main: {
     flex: 3,
-    backgroundColor: "#EFF5F9",
+    backgroundColor: "#fff",
+    marginTop:40
+
   },
   name: {
     marginHorizontal: 30,

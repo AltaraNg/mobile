@@ -1,8 +1,7 @@
 import {
   Pressable,
   StyleSheet,
-  TextInput,
-  ActivityIndicator,
+  ScrollView,
   ToastAndroid,
   BackHandler,
   Platform,
@@ -10,15 +9,15 @@ import {
   Modal,
   TouchableHighlight,
   Alert,
+  RefreshControl,
   Image,
   Dimensions,
 } from "react-native";
 import { Button, Overlay, Icon } from "react-native-elements";
 import { LinearGradient } from "expo-linear-gradient";
-import { SuccessSvg, FailSvg, LogOut, User } from "../assets/svgs/svg";
-
+import { SuccessSvg, FailSvg, LogOut, User, Warning } from "../assets/svgs/svg";
 import Header from "../components/Header";
-import React, { useState, createRef, useEffect, useContext } from "react";
+import React, { useState, createRef, useEffect, useContext, } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
 import {
@@ -29,6 +28,7 @@ import {
 import Cards from "../components/Cards";
 import SideMenu from "./SideMenu";
 import { AuthContext } from "../context/AuthContext";
+import {OrderContext} from "../context/OrderContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { DrawerScreenProps } from "@react-navigation/drawer";
@@ -39,19 +39,27 @@ import Upload from "../components/Upload";
 type Props = DrawerScreenProps<DrawerParamList, "Home">;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { authData } = useContext(AuthContext);
+  const { authData, setAuthData, showLoader, setShowLoader } =
+    useContext(AuthContext);
+  const {
+    setOrderRequest,
+    orderRequest,
+    fetchOrderRequestContext,
+    showLoader2,
+  } = useContext(OrderContext);
   const [exitApp, setExitApp] = useState(1);
   const [isError, setIsError] = useState(false);
   const [user, setUser] = useState(null);
+  const [refreshing, setRefreshing] = useState(true);
   const [modalResponse, setModalResponse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [onBoarded, setOnBoarded] = useState(null);
-  const [showLoader, setShowLoader] = useState(false);
   const [type, setType] = useState("");
+  const [latefee, setlateFee] = useState(null);
+  const [orders, setOrders] = useState(null)
   const [uploaded, setUploaded] = useState(null);
   const toggleSideMenu = async () => {
-    fetchUser()
     navigation.toggleDrawer();
   };
 
@@ -75,36 +83,50 @@ export default function Dashboard({ navigation, route }: Props) {
 
     return true;
   };
-
-  function handleRequest(res: object, status: String, type: string) {
-    status === "success" ? setIsError(false) : setIsError(true);
-    setModalResponse(res);
-    setType(type);
-    setModalVisible(true);
-  }
-  const fetchUser = async () => {
+  const fetchOrder = async () => {
     setShowLoader(true);
     try {
       let response = await axios({
         method: "GET",
-        url: `/auth/user`,
+        url: `/customers/${authData.user.id}/orders`,
         headers: { Authorization: `Bearer ${authData.token}` },
       });
-      setShowLoader(false);
-      const user = response.data.data[0];
-      setUser(user);
-      setOnBoarded(user?.attributes.on_boarded);
-      const upload = Object.values(user.included.verification).every(
-        (val) => val 
-      );
-      setUploaded(upload);
-    } catch (error: any) {
-      ToastAndroid.showWithGravity(
-        "Unable to fetch user",
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
-    }
+      const order = response.data.data[0].included.orders;
+      setOrders(order)
+      
+      const checkLateFee = order.some(function (item) {
+           const lateFees = item?.included?.late_fees;
+           const lateFeeDebt =
+             lateFees?.reduce((accumulator, object) => {
+               return accumulator + Number(object.amount_due);
+             }, 0) -
+             lateFees.reduce((accumulator, object) => {
+               return accumulator + Number(object.amount_paid);
+             }, 0);
+           return item?.included?.late_fees.length > 0 && lateFeeDebt != 0;
+      });
+      setlateFee(checkLateFee);
+    } catch (error: any) {}
+  };
+  function handleRequest(res: any, status: String, type: string) {
+    status === "success" ? setIsError(false) : setIsError(true);
+    setModalResponse(res);
+    setType(type);
+    
+    setModalVisible(true);
+  }
+
+  const settUser = async () => {
+    fetchOrder()
+    fetchOrderRequestContext();
+    setUser(authData?.user);
+    setOnBoarded(authData?.user?.attributes?.on_boarded);
+    const upload = Object?.values(authData?.user?.included?.verification || {'item': false}).every(
+      (val) => val
+    );
+    setUploaded(upload);
+    setShowLoader(true)
+    setRefreshing(false);
   };
   const navigating = (first_choice, second_choice) => {
     if (!onBoarded) {
@@ -114,13 +136,35 @@ export default function Dashboard({ navigation, route }: Props) {
       return second_choice;
     }
   };
+  const navigateHistory =()=>{
+    const lateOrder = orders.find((order) =>{
+      const lateFees = order?.included?.late_fees
+      const lateFeeDebt = lateFees?.reduce((accumulator, object) => {
+          return accumulator + Number(object.amount_due);
+        }, 0) -
+        lateFees.reduce((accumulator, object) => {
+          return accumulator + Number(object.amount_paid);
+        }, 0);
+      return order?.included?.late_fees.length > 0 && lateFeeDebt != 0;
+      });
+    navigation.navigate("OrderDetails", lateOrder );
+    
+  }
 
   useEffect(() => {
-    fetchUser();
-  }, [uploaded, ]);
+    settUser();
+  }, [authData,]);
+    useEffect(() => {
+      fetchOrder();
+    }, []);
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={settUser} />
+      }
+    >
       <Overlay
         isVisible={modalVisible}
         onBackdropPress={() => {
@@ -182,82 +226,81 @@ export default function Dashboard({ navigation, route }: Props) {
                   for {type}
                 </Text>
 
-								{modalResponse && (
-									<Text
-										style={{
-											color: '#474A57',
-											fontFamily: 'Montserrat_500Medium',
-											marginTop: 30,
-											marginHorizontal: 30,
-											fontSize: 12,
-											textAlign: 'center',
-										}}
-									>
-										{modalResponse.message}
-									</Text>
-								)}
-							</View>
-						</View>
-					</View>
-				) : (
-					<View style={styles.modalContainer}>
-						<TouchableOpacity
-							style={{ alignItems: 'center' }}
-							onPress={() => setModalVisible(!modalVisible)}
-						>
-							<Text style={styles.modalHeaderCloseText}>X</Text>
-						</TouchableOpacity>
-						<View style={styles.modalContainer}>
-							<View style={styles.modalContent}>
-								<TouchableHighlight
-									style={{
-										borderRadius:
-											Math.round(
-												Dimensions.get('window').width +
-													Dimensions.get('window').height
-											) / 2,
-										width: Dimensions.get('window').width * 0.3,
-										height: Dimensions.get('window').width * 0.3,
-										backgroundColor: '#DB2721',
-										justifyContent: 'center',
-										alignItems: 'center',
-									}}
-									underlayColor="#ccc"
-								>
-									<Text
-										style={{
-											fontSize: 68,
-											color: '#fff',
-											fontFamily: 'Montserrat_900Black',
-										}}
-									>
-										&#x2715;
-									</Text>
-								</TouchableHighlight>
-								<Text style={styles.modalHeading}>
-									Sorry! Your Order is{' '}
-									<Text style={{ color: 'red' }}>unsuccessful</Text>
-								</Text>
-								{modalResponse && (
-									<Text style={styles.errText}>
-										{modalResponse.error_message}
-									</Text>
-								)}
-							</View>
-						</View>
-					</View>
-				)}
-			</Modal>
-			<View style={styles.header}>
-				<Header></Header>
-				<TouchableOpacity>
-					<Pressable onPress={toggleSideMenu}>
-						<Hamburger style={styles.hamburger} />
-					</Pressable>
-				</TouchableOpacity>
-			</View>
+                {modalResponse && (
+                  <Text
+                    style={{
+                      color: "#474A57",
+                      fontFamily: "Montserrat_500Medium",
+                      marginTop: 30,
+                      marginHorizontal: 30,
+                      fontSize: 12,
+                      textAlign: "center",
+                    }}
+                  >
+                    {modalResponse.message}
+                  </Text>
+                )}
+              </View>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={{ alignItems: "center" }}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={styles.modalHeaderCloseText}>X</Text>
+            </TouchableOpacity>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <TouchableHighlight
+                  style={{
+                    borderRadius:
+                      Math.round(
+                        Dimensions.get("window").width +
+                          Dimensions.get("window").height
+                      ) / 2,
+                    width: Dimensions.get("window").width * 0.3,
+                    height: Dimensions.get("window").width * 0.3,
+                    backgroundColor: "#DB2721",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  underlayColor="#ccc"
+                >
+                  <Text
+                    style={{
+                      fontSize: 68,
+                      color: "#fff",
+                      fontFamily: "Montserrat_900Black",
+                    }}
+                  >
+                    &#x2715;
+                  </Text>
+                </TouchableHighlight>
+                <Text style={styles.modalHeading}>
+                  Sorry! Your Order is{" "}
+                  <Text style={{ color: "red" }}>unsuccessful</Text>
+                </Text>
 
-      {showLoader ? (
+                <Text style={styles.errText}>
+                  {modalResponse?.error_message}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+      </Modal>
+      <View style={styles.header}>
+        <Header navigation={navigation}></Header>
+        <TouchableOpacity>
+          <Pressable onPress={toggleSideMenu}>
+            <Hamburger style={styles.hamburger} />
+          </Pressable>
+        </TouchableOpacity>
+      </View>
+
+      {!showLoader || showLoader2  ? (
         <Image
           source={require("../assets/gifs/loader.gif")}
           style={styles.image}
@@ -265,7 +308,7 @@ export default function Dashboard({ navigation, route }: Props) {
       ) : (
         <View style={styles.main}>
           <Text style={styles.name}>
-            {navigating("Hello ☺️", user?.attributes.first_name)},
+            {navigating("Hello ☺️", user?.attributes?.first_name)},
           </Text>
           <Text style={styles.message}>Welcome to your altara dashboard </Text>
           {!uploaded && (
@@ -306,7 +349,7 @@ export default function Dashboard({ navigation, route }: Props) {
                 {!onBoarded && (
                   <Pressable
                     onPress={() =>
-                      navigation.navigate("Create Profile", {
+                      navigation.navigate("CreateProfile", {
                         user: authData.user,
                       })
                     }
@@ -325,7 +368,7 @@ export default function Dashboard({ navigation, route }: Props) {
                 {onBoarded && !uploaded && (
                   <Pressable
                     onPress={() => {
-                      navigation.navigate("Upload Document", {
+                      navigation.navigate("UploadDocument", {
                         user: authData.user,
                       });
                     }}
@@ -344,32 +387,80 @@ export default function Dashboard({ navigation, route }: Props) {
               </View>
             </View>
           )}
+          {latefee && (
+            <Pressable onPress={navigateHistory}>
+              <View
+                style={{
+                  alignItems: "center",
+                  backgroundColor: "#EFF5F9",
+                  marginBottom: 20,
+                }}
+              >
+                <View style={styles.activate}>
+                  <View
+                    style={{
+                      backgroundColor: "white",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-evenly",
+                    }}
+                  >
+                    <Warning />
+                    <Text style={{ color: "#474A57", fontSize: 14 }}>
+                      Your loan repayment is{" "}
+                      <Text style={{ color: "red" }}>overdue</Text>
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      height: 1,
+                      width: 250,
+                      backgroundColor: "#DADADA",
+                      marginVertical: 8,
+                      alignSelf: "center",
+                    }}
+                  ></View>
+                  <Text
+                    style={{
+                      color: "#074A74",
+                      fontFamily: "Montserrat_700Bold",
+                      fontSize: 12,
+                    }}
+                  >
+                    Check Order History
+                  </Text>
+                </View>
+              </View>
+            </Pressable>
+          )}
 
-					<View style={styles.cards}>
-						<Cards
-							title="Get a Loan Now!!!"
-							amount="Up to ₦500,000"
-							type="an E-Loan"
-							onRequest={handleRequest}
-							isDisabled={!onBoarded}
-							width={!onBoarded ? 300 : 0}
-							height={!onBoarded ? 150 : 0}
-						/>
+          <View style={styles.cards}>
+            <Cards
+              title="Get a Loan Now!!!"
+              amount="Up to ₦500,000"
+              type="cash"
+              onRequest={handleRequest}
+              isDisabled={!onBoarded}
+              width={!onBoarded ? 300 : 0}
+              height={!onBoarded ? 150 : 0}
+              navigation={navigation}
+            />
 
-						<Cards
-							title="Order a Product Now!!!"
-							amount="Up to ₦500,000"
-							type="a Product"
-							onRequest={handleRequest}
-							isDisabled={!onBoarded}
-							width={!onBoarded ? 300 : 0}
-							height={!onBoarded ? 150 : 0}
-						/>
-					</View>
-				</View>
-			)}
-		</View>
-	);
+            <Cards
+              title="Order a Product Now!!!"
+              amount="Up to ₦500,000"
+              type="product"
+              onRequest={handleRequest}
+              isDisabled={!onBoarded}
+              width={!onBoarded ? 300 : 0}
+              height={!onBoarded ? 150 : 0}
+              navigation={navigation}
+            />
+          </View>
+        </View>
+      )}
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -377,6 +468,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     position: "relative",
+    backgroundColor: "#EFF5F9",
   },
   activate: {
     backgroundColor: "white",
@@ -394,8 +486,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").height * 0.2,
     height: Dimensions.get("window").height * 0.2,
     backgroundColor: "#EFF5F9",
-    position: "absolute",
-    top: Dimensions.get("window").height * 0.5,
+    marginTop: Dimensions.get("window").height * 0.2,
     left: Dimensions.get("window").width * 0.25,
   },
   hamburger: {
@@ -416,6 +507,7 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#EFF5F9",
+    marginTop:40
   },
   name: {
     marginHorizontal: 30,
@@ -436,43 +528,43 @@ const styles = StyleSheet.create({
     right: 0,
   },
 
-	modalContainer: {
-		height: Dimensions.get('screen').height / 2.1,
-		alignItems: 'center',
-		marginTop: 'auto',
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		backgroundColor: 'white',
-	},
-	modalContent: {
-		paddingVertical: 20,
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		alignItems: 'center',
-		backgroundColor: 'white',
-	},
-	modalHeading: {
-		fontFamily: 'Montserrat_700Bold',
-		fontSize: 30,
-		textAlign: 'center',
-		color: 'black',
-		marginTop: 20,
-	},
-	modalHeaderCloseText: {
-		backgroundColor: 'white',
-		textAlign: 'center',
-		paddingLeft: 5,
-		paddingRight: 5,
-		width: 30,
-		fontSize: 15,
-		borderRadius: 50,
-	},
+  modalContainer: {
+    height: Dimensions.get("screen").height / 2.1,
+    alignItems: "center",
+    marginTop: "auto",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    backgroundColor: "white",
+  },
+  modalContent: {
+    paddingVertical: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    alignItems: "center",
+    backgroundColor: "white",
+  },
+  modalHeading: {
+    fontFamily: "Montserrat_700Bold",
+    fontSize: 30,
+    textAlign: "center",
+    color: "black",
+    marginTop: 20,
+  },
+  modalHeaderCloseText: {
+    backgroundColor: "white",
+    textAlign: "center",
+    paddingLeft: 5,
+    paddingRight: 5,
+    width: 30,
+    fontSize: 15,
+    borderRadius: 50,
+  },
 
-	errText: {
-		fontSize: 15,
-		marginTop: 20,
-		paddingHorizontal: 15,
-		textAlign: 'center',
-		color: '#000',
-	},
+  errText: {
+    fontSize: 15,
+    marginTop: 20,
+    paddingHorizontal: 15,
+    textAlign: "center",
+    color: "#000",
+  },
 });

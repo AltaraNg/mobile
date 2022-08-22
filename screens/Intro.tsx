@@ -39,10 +39,11 @@ const data = [
 ];
 type Item = typeof data[0];
 type RenderPaginationProps = {
-	data: any[];
-	activeIndex: number;
-	slider: AppIntroSlider | null;
-	onIntroCompleted: () => void;
+  data: any[];
+  activeIndex: number;
+  slider: AppIntroSlider | null;
+  onIntroCompleted: () => void;
+  loginPassword: () => void;
 };
 const styles = StyleSheet.create({
 	slide: {
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
 	text: {
 		color: '#5E5C5C',
 		textAlign: 'center',
-		marginHorizontal: 62,
+		marginHorizontal: 52,
         marginVertical: 5,
 		fontFamily: 'Montserrat_400Regular',
 
@@ -86,8 +87,7 @@ const styles = StyleSheet.create({
 		margin: 16,
 		flexDirection: 'row',
 		justifyContent: 'center',
-		alignItems: 'center',
-        paddingBottom: 100
+        paddingBottom: 40
 	},
 	dot: {
 		width: 20,
@@ -115,9 +115,9 @@ const styles = StyleSheet.create({
 	},
 	buttonText: {
 		color: '#074A74',
-		fontWeight: 'bold',
+		fontWeight: 'normal',
 		textAlign: 'center',
-        fontSize: 18,
+        fontSize: 16,
 	},
 
 });
@@ -137,45 +137,58 @@ const renderItem = ({ item }: { item: Item }) => (
 	</View>
 );
 const RenderPagination = ({
-	activeIndex,
-	slider,
-	data,
-	onIntroCompleted,
+  activeIndex,
+  slider,
+  data,
+  onIntroCompleted,
+  loginPassword,
 }: RenderPaginationProps) => {
-	const handleIntroCompleted = () => {
-		onIntroCompleted();
-	};
-	return (
-		<View style={styles.paginationContainer}>
-			<SafeAreaView>
-				<View style={styles.paginationDots}>
-					{data.length > 1 &&
-						data.map((_, i) => (
-							<Pressable
-								key={i}
-								style={[
-									styles.dot,
-									i === activeIndex
-										? { backgroundColor: '#EFF5F9' }
-										: { backgroundColor: '#074A74' },
-								]}
-								onPress={() => slider?.goToSlide(i, true)}
-							/>
-						))}
-				</View>
-			
-					<View style={styles.buttonContainer}>
-						<Pressable
-							onPress={handleIntroCompleted}
-							style={[styles.button, { backgroundColor: '#EFF5F9' }]}
-						>
-							<Text style={styles.buttonText}>Log in</Text>
-						</Pressable>
-					</View>
-				
-			</SafeAreaView>
-		</View>
-	);
+  const handleIntroCompleted = () => {
+    onIntroCompleted();
+  };
+  const LoginPassword = () => {
+    loginPassword();
+  };
+  return (
+    <View style={styles.paginationContainer}>
+      <SafeAreaView>
+        <View style={styles.paginationDots}>
+          {data.length > 1 &&
+            data.map((_, i) => (
+              <Pressable
+                key={i}
+                style={[
+                  styles.dot,
+                  i === activeIndex
+                    ? { backgroundColor: "#EFF5F9" }
+                    : { backgroundColor: "#074A74" },
+                ]}
+                onPress={() => slider?.goToSlide(i, true)}
+              />
+            ))}
+        </View>
+
+        <View style={[styles.buttonContainer, { marginBottom: 10 }]}>
+          <Pressable
+            onPress={handleIntroCompleted}
+            style={[styles.button, { backgroundColor: "#EFF5F9" }]}
+          >
+            <Text style={styles.buttonText}>Log in with OTP</Text>
+          </Pressable>
+        </View>
+        <View style={[styles.buttonContainer, { backgroundColor: "#074A74" }]}>
+          <Pressable
+            onPress={loginPassword}
+            style={[styles.button, { backgroundColor: "#074A74" }]}
+          >
+            <Text style={[styles.buttonText, { color: "white" }]}>
+              Log in with password
+            </Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    </View>
+  );
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Intro'>;
@@ -186,25 +199,29 @@ export const Intro = ({ navigation }: Props) => {
 	
 		navigation.navigate('Login');
 	};
+	const loginPassword = () => {
+    navigation.navigate("LoginPassword");
+  };
 	return (
-		<View style={{ flex: 1 }}>
-			<StatusBar translucent backgroundColor="transparent"  />
-			<Header backgroundColor='#EFF5F9' ></Header>
+    <View style={{ flex: 1 }}>
+      <StatusBar translucent backgroundColor="transparent" />
+      <Header backgroundColor="#EFF5F9"></Header>
 
-			<AppIntroSlider
-				keyExtractor={keyExtractor}
-				renderItem={renderItem}
-				renderPagination={(activeIndex) => (
-					<RenderPagination
-						data={data}
-						activeIndex={activeIndex}
-						slider={sliderEl.current}
-						onIntroCompleted={onIntroCompleted}
-					/>
-				)}
-				data={data}
-				ref={sliderEl}
-			/>
-		</View>
-	);
+      <AppIntroSlider
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        renderPagination={(activeIndex) => (
+          <RenderPagination
+            data={data}
+            activeIndex={activeIndex}
+            slider={sliderEl.current}
+            onIntroCompleted={onIntroCompleted}
+            loginPassword={loginPassword}
+          />
+        )}
+        data={data}
+        ref={sliderEl}
+      />
+    </View>
+  );
 };

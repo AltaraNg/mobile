@@ -1,0 +1,26 @@
+[
+    {
+        "id" : 1,
+        "name": "three_months",
+        "value": 90,
+        "numeral": 3
+    },
+    {
+        "id" : 2,
+        "name": "six_months",
+        "value": 180,
+        "numeral": 6
+    },
+    {
+        "id" : 3,
+        "name": "twelve_months",
+        "value": 360,
+        "numeral": 12
+    },
+    {
+        "id" : 4,
+        "name": "nine_months",
+        "value": 270,
+        "numeral": 9
+    }
+]

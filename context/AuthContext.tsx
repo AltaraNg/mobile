@@ -1,19 +1,40 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { useFeatures } from 'flagged';
+import axios from 'axios';
+import Constants from 'expo-constants';
+
+
 
 import { AuthData, authService } from '../services/authService';
+let url = Constants?.manifest?.extra?.URL;
+axios.defaults.baseURL = url;
 
 type AuthContextData = {
-	isAdmin: boolean,
-	authData?: AuthData;
-	loading: boolean;
-	signIn(
-		phone_number: string,
-		otp: string,
-		device_name: string | null
-	): Promise<void>;
-	signOut(): void;
+  fetchNotification;
+  setAuthData;
+  setTotalUnread;
+  totalUnread: object;
+  isAdmin: boolean;
+  showLoader;
+  setShowLoader;
+  authData?: AuthData;
+  loading: boolean;
+  signIn(
+    phone_number: string,
+    otp: string,
+    device_name: string | null,
+    login_type: string
+  ): Promise<void>;
+  signInPassword(
+    phone_number: string,
+    password: string,
+    device_name: string | null,
+    login_type: string,
+    customer:string
+  ): Promise<void>;
+  signOut(): void;
+  saveProfile(user: object): void;
 };
 
 //Create the Auth Context with the data type specified
@@ -22,7 +43,10 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
 	const [authData, setAuthData] = useState<AuthData>();
-
+	const [showLoader, setShowLoader] = useState(false);
+	const [totalUnread, setTotalUnread] = useState({
+		unread: 0,
+	});
 	//the AuthContext start with loading equals true
 	//and stay like this, until the data be load from Async Storage
 	const [loading, setLoading] = useState(true);
@@ -32,9 +56,11 @@ const AuthProvider: React.FC = ({ children }) => {
 		//Every time the App is opened, this provider is rendered
 		//and call de loadStorage function.
 		loadStorageData();
+		
 	}, []);
 
 	async function loadStorageData(): Promise<void> {
+		setShowLoader(true);
 		try {
 			//Try get the data from Async Storage
 			const authDataSerialized = await SecureStore.getItemAsync('AuthData');
@@ -43,11 +69,14 @@ const AuthProvider: React.FC = ({ children }) => {
 				const _authData: AuthData = JSON.parse(authDataSerialized);
 
 				setAuthData(_authData);
-				if(_authData.user.attributes.staff_id === 999999){
+				fetchNotification();
+				if (_authData.user.attributes.staff_id === 999999) {
 					setIsAdmin(true);
 				}
 			}
+			setShowLoader(false);
 		} catch (error) {
+			setShowLoader(false);
 		} finally {
 			//loading finished
 			setLoading(false);
@@ -55,27 +84,102 @@ const AuthProvider: React.FC = ({ children }) => {
 	}
 
 	const signIn = async (
-		phone_number: string,
-		otp: string,
-		device_name: string
-	) => {
-		//call the service passing credential (email and password).
-		//In a real App this data will be provided by the user from some InputText components.
-		const _authData = await authService.signIn(phone_number, otp, device_name);
+    phone_number: string,
+    otp: string,
+    device_name: string,
+    login_type: string,
+	
+  ) => {
+    setShowLoader(true);
+    //call the service passing credential (email and password).
+    //In a real App this data will be provided by the user from some InputText components.
+    const _authData = await authService.signIn(phone_number, otp, device_name, login_type);
 
-		//Set the data in the context, so the App can be notified
-		//and send the user to the AuthStack
-		if (_authData !== undefined) {
-			setAuthData(_authData);
-			SecureStore.setItemAsync('AuthData', JSON.stringify(_authData));
-			if(_authData.user.attributes.staff_id === 999999){
-				setIsAdmin(true);
-			}
+    //Set the data in the context, so the App can be notified
+    //and send the user to the AuthStack
+    if (_authData !== undefined) {
+      setAuthData(_authData);
+      SecureStore.setItemAsync("AuthData", JSON.stringify(_authData));
+      if (_authData.user.attributes.staff_id === 999999) {
+        setIsAdmin(true);
+      }
+      setShowLoader(false);
+    }
 
+    //Persist the data in the Async Storage
+    //to be recovered in the next user session.
+  };
+  const signInPassword = async (
+    phone_number: string,
+    password: string,
+    device_name: string,
+    login_type: string,
+	customer:string
+  ) => {
+    setShowLoader(true);
+    //call the service passing credential (email and password).
+    //In a real App this data will be provided by the user from some InputText components.
+    const _authData = await authService.SignPassword(
+      phone_number,
+      password,
+      device_name,
+      login_type,
+      customer
+    );
+
+    //Set the data in the context, so the App can be notified
+    //and send the user to the AuthStack
+    if (_authData !== undefined) {
+      setAuthData(_authData);
+      SecureStore.setItemAsync("AuthData", JSON.stringify(_authData));
+      if (_authData.user.attributes.staff_id === 999999) {
+        setIsAdmin(true);
+      }
+      setShowLoader(false);
+    }
+    //Persist the data in the Async Storage
+    //to be recovered in the next user session.
+  };
+
+	const fetchNotification = async () => {
+		try {
+			let response = await axios({
+				method: 'GET',
+				url: `/customers/${authData.user.id}/notifications`,
+				headers: { 'Authorization': `Bearer ${authData.token}` },
+			});
+
+			const notification = response?.data?.data?.notifications?.data;
+			let unread = notification.filter((item) => {
+				return item.read_at === null;
+			});
+
+			setTotalUnread({
+				unread: unread.length,
+			});
+		} catch (error: any) {}
+
+		finally{
+			
 		}
+	};
 
-		//Persist the data in the Async Storage
-		//to be recovered in the next user session.
+	const saveProfile = async (user: object) => {
+		try {
+			const authDataSerialized = await SecureStore.getItemAsync('AuthData');
+			if (authDataSerialized) {
+				//If there are data, it's converted to an Object and the state is updated.
+				const _authData: AuthData = JSON.parse(authDataSerialized);
+				const token = _authData.token;
+				const newUser = user;
+				const newAuthData: AuthData = { token: token, user: newUser };
+
+				setAuthData(newAuthData);
+				SecureStore.setItemAsync('AuthData', JSON.stringify(newAuthData));
+			}
+		} catch (error) {
+			console.log('unable to complete');
+		}
 	};
 
 	const signOut = async () => {
@@ -91,7 +195,23 @@ const AuthProvider: React.FC = ({ children }) => {
 	return (
 		//This component will be used to encapsulate the whole App,
 		//so all components will have access to the Context
-		<AuthContext.Provider value={{ authData, loading, signIn, signOut, isAdmin }}>
+		<AuthContext.Provider
+			value={{
+				totalUnread,
+				setTotalUnread,
+				authData,
+				setAuthData,
+				loading,
+				signIn,
+				signInPassword,
+				signOut,
+				isAdmin,
+				setShowLoader,
+				showLoader,
+				saveProfile,
+				fetchNotification,
+			}}
+		>
 			{children}
 		</AuthContext.Provider>
 	);

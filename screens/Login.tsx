@@ -11,7 +11,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/Header";
 import React, { useState, createRef } from "react";
 import { post } from "../utilities/api";
-
 import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -115,7 +114,7 @@ const styles = StyleSheet.create({
     marginVertical: -15,
   },
   title: {
-    marginTop: 70,
+    marginTop: 40,
     marginHorizontal: 40,
     fontSize: 25,
     color: "#074A74",
@@ -158,7 +157,8 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     marginHorizontal: 40,
-    marginTop: 50,
+    position: "absolute",
+    bottom: 30,
     borderColor: "#074A74",
     borderWidth: 1,
     borderRadius: 10,
@@ -167,7 +167,8 @@ const styles = StyleSheet.create({
   disabled: {
     flexDirection: "row",
     marginHorizontal: 40,
-    marginTop: 50,
+    position: "absolute",
+    bottom: 30,
     borderColor: "#074A74",
     borderWidth: 1,
     borderRadius: 10,

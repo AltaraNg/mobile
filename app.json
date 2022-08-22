@@ -1,9 +1,7 @@
 {
   "expo": {
     "name": "Altara Credit",
-    "extra": {
-      
-    },
+    "extra": {},
     "slug": "Altara",
     "version": "1.0.0",
     "orientation": "portrait",

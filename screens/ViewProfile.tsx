@@ -42,22 +42,8 @@ export default function ViewProfile({ navigation, route }: Props) {
 		navigation.toggleDrawer();
 	};
 
-	const fetchUser = async () => {
-		try {
-			let response = await axios({
-				method: 'GET',
-				url: `/auth/user`,
-				headers: { 'Authorization': `Bearer ${authData.token}` },
-			});
-			const user = response.data.data[0];
-			setUser(user);
-		} catch (error: any) {
-			ToastAndroid.showWithGravity(
-				'Unable to fetch user',
-				ToastAndroid.SHORT,
-				ToastAndroid.CENTER
-			);
-		}
+	const fetchUser = async () => {	
+			setUser(authData.user);
 	};
 	const displayDate = (user) => {
     if (user !== "N/A") {
@@ -68,12 +54,12 @@ export default function ViewProfile({ navigation, route }: Props) {
 
 	useEffect(() => {
 		fetchUser();
-	}, []);
+	}, [authData]);
 
 	return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Header></Header>
+        <Header navigation={navigation}></Header>
         <TouchableOpacity>
           <Pressable onPress={toggleSideMenu}>
             <Hamburger style={styles.hamburger} />
@@ -146,10 +132,7 @@ export default function ViewProfile({ navigation, route }: Props) {
                 {displayDate(user.attributes.date_of_birth)}
               </Text>
             </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Gender:</Text>
-              <Text style={styles.input}>{user.attributes.gender}</Text>
-            </View>
+           
           </View>
         </View>
       )}
@@ -200,6 +183,8 @@ const styles = StyleSheet.create({
 		flex: 1,
 		height: '100%',
 		position: 'relative',
+		backgroundColor: '#EFF5F9'
+		
 	},
 	hamburger: {
 		marginTop: 80,
@@ -211,7 +196,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	header: {
-		flex: 1,
+		
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		backgroundColor: '#EFF5F9',
@@ -219,6 +204,8 @@ const styles = StyleSheet.create({
 	main: {
 		flex: 3,
 		backgroundColor: '#EFF5F9',
+		marginTop:40
+
 	},
 	name: {
 		marginHorizontal: 30,
