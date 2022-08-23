@@ -9,7 +9,7 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "test": "jest --watchAll",
-    "start:wsl": "REACT_NATIVE_PACKAGER_HOSTNAME=$(netsh.exe interface ip show address 'Wi-Fi' | grep '192.168.96.242' | sed -r 's/^.*IP Address:\\W*//') expo start"
+    "start:wsl": "REACT_NATIVE_PACKAGER_HOSTNAME=$(netsh.exe interface ip show address 'Wi-Fi' | grep '192.168.0.119' | sed -r 's/^.*IP Address:\\W*//') expo start"
   },
   "jest": {
     "preset": "jest-expo"

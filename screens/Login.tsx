@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
     color: "#074A74",
   },
   inputContainer: {
+    flex: 1,
     marginHorizontal: 40,
     marginTop: 45,
     backgroundColor: "#EFF5F9",
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    marginBottom: 8,
+    marginBottom: 16,
     color: "#72788D",
     fontFamily: "Montserrat_700Bold",
   },
