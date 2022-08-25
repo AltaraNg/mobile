@@ -8,42 +8,33 @@ import {
   TouchableOpacity,
   Modal,
   TouchableHighlight,
-  Alert,
   RefreshControl,
   Image,
   Dimensions,
 } from "react-native";
-import { Button, Overlay, Icon } from "react-native-elements";
-import { LinearGradient } from "expo-linear-gradient";
+import {  Overlay } from "react-native-elements";
 import { SuccessSvg, FailSvg, LogOut, User, Warning } from "../assets/svgs/svg";
 import Header from "../components/Header";
-import React, { useState, createRef, useEffect, useContext, } from "react";
+import { useState, useEffect, useContext, } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
 import {
-  DrawerParamList,
-  RootStackParamList,
-  RootTabParamList,
+  DrawerParamList, 
 } from "../types";
 import Cards from "../components/Cards";
 import SideMenu from "./SideMenu";
 import { AuthContext } from "../context/AuthContext";
 import {OrderContext} from "../context/OrderContext";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import axios from "axios";
 import { useFeatures } from "flagged";
-import Upload from "../components/Upload";
 
 type Props = DrawerScreenProps<DrawerParamList, "Home">;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { authData, setAuthData, showLoader, setShowLoader } =
+  const { authData, showLoader, setShowLoader } =
     useContext(AuthContext);
-  const {
-    setOrderRequest,
-    orderRequest,
+  const {   
     fetchOrderRequestContext,
     showLoader2,
   } = useContext(OrderContext);
@@ -53,7 +44,6 @@ export default function Dashboard({ navigation, route }: Props) {
   const [refreshing, setRefreshing] = useState(true);
   const [modalResponse, setModalResponse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
   const [onBoarded, setOnBoarded] = useState(null);
   const [type, setType] = useState("");
   const [latefee, setlateFee] = useState(null);

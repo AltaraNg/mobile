@@ -19,7 +19,7 @@ declare global {
 export type RootStackParamList = {
   Dashboard: { user: object };
   Intro: undefined;
-  RequestModal: undefined;
+  RequestModal: {request: object};
   Modal: undefined;
   NotFound: undefined;
   OrderDetails: { order: object };
