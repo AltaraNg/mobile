@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { Dimensions, Image, Platform, StyleSheet } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+import { SuccessSvg } from '../assets/svgs/svg';
 
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
@@ -39,7 +40,7 @@ export default function RequestModal({ navigation, route }: Props) {
 
 	return (
 		<View
-			style={{ flex: 1, flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: 'white' }}
+			style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', backgroundColor: 'white' }}
 		>
 			<View
 				style={{
@@ -143,8 +144,9 @@ export default function RequestModal({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
 	modalContainer: {
-		height: Dimensions.get("screen").height / 2.1,
+		height: Dimensions.get("screen").height / 1.8,
 		paddingHorizontal: 10,
+		alignItems: 'center',
 		marginTop: "auto",
 		borderTopLeftRadius: 30,
 		borderTopRightRadius: 30,
