@@ -480,56 +480,7 @@ export default function Calculator({ navigation, route }: Props) {
 						marginVertical: 10,
 					}}
 				>
-					<View
-						style={{
-							flexDirection: 'row',
-							backgroundColor: 'white',
-							justifyContent: 'space-between',
-						}}
-					>
-						<Text style={styles.label}>For how long?</Text>
-						<Text style={styles.label}>Months</Text>
-					</View>
-					{/* <Slider
-						value={sliderValue}
-						onValueChange={(value: []) => {
-							setValue(value);
-						}}
-						thumbStyle={{
-							backgroundColor: '#074A74',
-						}}
-						minimumValue={minMonth}
-						maximumValue={maxMonth}
-						step={3}
-					/> */}
-					<Slider
-						style={{ width: "100%", height: 60 }}
-						value={sliderValue}
-						minimumValue={minMonth}
-						maximumValue={maxMonth}
-						step={3}
-						minimumTrackTintColor="#074A74"
-						maximumTrackTintColor="#dddddd"
-						disabled={sliderDisabled}
-						onSlidingComplete={() => {
-							// setSliderValue(value);
-
-						}}
-						onValueChange={(value) => {
-							onSliderChange(value);
-						}}
-					/>
-					<View
-						style={{
-							flexDirection: 'row',
-							backgroundColor: 'white',
-							justifyContent: 'space-between',
-						}}
-					>
-						<Text style={styles.label}>{minMonth}</Text>
-						<Text style={styles.label}>9</Text>
-						<Text style={styles.label}>{maxMonth}</Text>
-					</View>
+					
 				</View>
 
 				<View
