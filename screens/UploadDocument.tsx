@@ -1,41 +1,28 @@
 import {
 	Pressable,
 	StyleSheet,
-	TextInput,
-	ActivityIndicator,
 	ToastAndroid,
 	BackHandler,
 	Platform,
 	TouchableOpacity,
-	Modal,
 	Image,
-	Alert,
 	Dimensions,
 	ScrollView,
-	Button,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
-import { SuccessSvg, FailSvg, LogOut, Calender } from '../assets/svgs/svg';
 import Header from '../components/Header';
-import React, { useState, createRef, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Hamburger from '../assets/svgs/hamburger.svg';
 import { Text, View } from '../components/Themed';
-import { CheckBox } from 'react-native-elements';
 import {
-	DrawerParamList,
-	RootStackParamList,
 	RootTabParamList,
 } from '../types';
 import SideMenu from './SideMenu';
 import { AuthContext, useAuth } from '../context/AuthContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { UserInterfaceIdiom } from 'expo-constants';
 import axios from 'axios';
-import RadioButton from '../components/RadioButton';
 type Props = NativeStackScreenProps<RootTabParamList, 'Dashboard'>;
 import Constants from 'expo-constants';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Upload from '../components/Upload';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
