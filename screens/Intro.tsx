@@ -5,13 +5,12 @@ import { SvgXml } from 'react-native-svg';
 import { illustration } from '../assets/svgs/illustration.js';
 import { hands } from '../assets/svgs/hands.js';
 import { image3 } from '../assets/svgs/image3.js';
+import SafeAreaView from 'react-native-safe-area-view';
 
 
 import {
-	View,
-	SafeAreaView,
+	View,	
 	Text,
-	Image,
 	StyleSheet,
 	StatusBar,
 	Pressable,

@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 import {
-	SafeAreaView,
 	View,
 	StyleSheet,
 	Image,
 	Text,
 	Linking,
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 
 import {
 	DrawerContentScrollView,
