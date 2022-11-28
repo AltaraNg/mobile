@@ -18,7 +18,7 @@ export default function Cards({
   title,
   amount,
   isDisabled,
-  type,onRequest
+  type, onRequest
 }) {
   let url = Constants?.manifest?.extra?.URL;
   axios.defaults.baseURL = url;
@@ -44,47 +44,28 @@ export default function Cards({
   }
 
   async function doSome() {
-    if(type === 'cash'){
+    if (type === 'cash') {
       navigation.navigate('Calculator');
     }
-    else{
-      setLoader(true);
-    try {
-      let res = await axios({
-        method: "POST",
-        data: {
-          order_type: type,
-        },
-        url: "/submit/request",
-        headers: { Authorization: `Bearer ${authData.token}` },
-      });
-      if (res.status === 200) {
-        fetchOrder()
-        onRequest(res.data, "success", type);
-        setLoader(false);
-        setRequestOrder(true);
-      }
-    } catch (error) {
-      setLoader(false);
-      onRequest(error.response.data, "failed", type);
+    else {
+      navigation.navigate('ProductRequest');
     }
-    }
-    
+
   }
-    const checkOrder = () => {
-       const isPending = orderRequest?.some(
-         (item) => item.status === "pending"
-       );
-       const checkTitle= orderRequest?.find((item)=>{ return item.status=='pending'} )
-       isPending ? setShowButton(false) : setShowButton(true);
-    };
- 
+  const checkOrder = () => {
+    const isPending = orderRequest?.some(
+      (item) => item.status === "pending"
+    );
+    const checkTitle = orderRequest?.find((item) => { return item.status == 'pending' })
+    isPending ? setShowButton(false) : setShowButton(true);
+  };
+
   const trackOrder = () => {
     navigation.navigate("OrderRequest");
   };
-    useEffect(() => {
-      checkOrder();
-    }, [orderRequest]);
+  useEffect(() => {
+    checkOrder();
+  }, [orderRequest]);
 
   return (
     <View style={styles.container}>
@@ -155,56 +136,56 @@ export default function Cards({
 }
 
 const styles = StyleSheet.create({
-	container: {
-		height: 150,
-		width: 300,
-		backgroundColor: '#074A74',
-		borderRadius: 5,
-		marginBottom: 17,
-		padding: 10,
-		paddingLeft: 15,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.8,
-		shadowRadius: 2,
-		elevation: 5,
-	},
-	header: {
-		fontSize: 24,
-		fontWeight: 'bold',
-		fontFamily: 'Montserrat_700Bold',
-		color: 'white',
-	},
-	leaf: {
-		position: 'absolute',
-		right: 0,
-	},
-	amount: {
-		fontFamily: 'Montserrat_400Regular',
-		color: '#98D4F9',
-		paddingTop: 5,
-		fontSize: 13,
-	},
-	buttonContainer: {
-		flexDirection: 'row',
-		marginTop: 26,
-		borderColor: '#074A74',
-		borderWidth: 1,
-		borderRadius: 10,
-		width: 130,
-		
-		height:40,
-	},
-	button: {
-		flex: 1,
-		paddingVertical: 4,
-		marginHorizontal: 8,
-		borderRadius: 24,
-	},
-	buttonText: {
-		color: '#ffffff',
-		fontWeight: 'normal',
-		textAlign: 'center',
-		fontSize: 18,
-	},
+  container: {
+    height: 150,
+    width: 300,
+    backgroundColor: '#074A74',
+    borderRadius: 5,
+    marginBottom: 17,
+    padding: 10,
+    paddingLeft: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    fontFamily: 'Montserrat_700Bold',
+    color: 'white',
+  },
+  leaf: {
+    position: 'absolute',
+    right: 0,
+  },
+  amount: {
+    fontFamily: 'Montserrat_400Regular',
+    color: '#98D4F9',
+    paddingTop: 5,
+    fontSize: 13,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 26,
+    borderColor: '#074A74',
+    borderWidth: 1,
+    borderRadius: 10,
+    width: 130,
+
+    height: 40,
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 4,
+    marginHorizontal: 8,
+    borderRadius: 24,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontWeight: 'normal',
+    textAlign: 'center',
+    fontSize: 18,
+  },
 });

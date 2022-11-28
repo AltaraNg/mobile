@@ -31,6 +31,7 @@ export type RootStackParamList = {
   Cards: { order: string };
   OrderRequest: { order: string };
   Calculator: undefined;
+  ProductRequest: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =

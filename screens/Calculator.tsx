@@ -6,16 +6,15 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import CurrencyInput from 'react-native-currency-input';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import DropDownPicker from 'react-native-dropdown-picker';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import businessTypes from '../lib/calculator.json';
 import repaymentDurations from '../lib/repaymentDuration.json';
-// import Slider from '@react-native-community/slider';
-import Slider from 'react-native-slider';
 import { Overlay } from 'react-native-elements';
 import { SuccessSvg } from '../assets/svgs/svg';
 import { OrderContext } from '../context/OrderContext';
-// import {cashLoan, calculate} from '../lib/calculator';
+import { TextInput } from 'react-native-gesture-handler';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 
@@ -26,6 +25,10 @@ export default function Calculator({ navigation, route }: Props) {
 		useContext(AuthContext);
 	const [loader, setLoader] = useState(false);
 	const [sliderDisabled, setSliderDisabled] = useState(true);
+	const [open, setOpen] = useState(false);
+	const [staffName, setStaffName] = useState("");
+	const [branch, setBranch] = useState(null);
+	const [branches, setBranches] = useState([]);
 
 	const [inputValue, setInputValue] = useState(0);
 	const [sliderValue, setSliderValue] = useState(6);
@@ -97,6 +100,8 @@ export default function Calculator({ navigation, route }: Props) {
 				method: "POST",
 				data: {
 					order_type: 'cash',
+					branch: branch,
+					staff_name: staffName
 				},
 				url: "/submit/request",
 				headers: { Authorization: `Bearer ${authData.token}` },
@@ -228,6 +233,25 @@ export default function Calculator({ navigation, route }: Props) {
 			);
 		}
 	};
+	const fetchBranches = async () => {
+		setShowLoader(true);
+		try {
+			let response = await axios({
+				method: 'GET',
+				url: `/branches`,
+				headers: { Authorization: `Bearer ${authData.token}` },
+			});
+			setBranches(response?.data?.data?.branch);
+
+			// console.log(response.data.data.price_calculator);
+		} catch (error: any) {
+			ToastAndroid.showWithGravity(
+				"Unable to fetch branches. Please try again later",
+				ToastAndroid.SHORT,
+				ToastAndroid.CENTER
+			);
+		}
+	}
 
 	const onInputValueChange = async (value: number) => {
 		setInputValue(value);
@@ -269,6 +293,7 @@ export default function Calculator({ navigation, route }: Props) {
 	}
 
 	useEffect(() => {
+		fetchBranches();
 		fetchCalculator();
 		getCalc(sliderValue, inputValue);
 	}, []);
@@ -291,7 +316,8 @@ export default function Calculator({ navigation, route }: Props) {
 				style={{ justifyContent: "flex-end", margin: 0, position: "relative" }}
 			>
 				<TouchableHighlight
-					onPress={() => {setModalVisible(!modalVisible);
+					onPress={() => {
+						setModalVisible(!modalVisible);
 						navigation.navigate('Dashboard')
 					}}
 					style={{
@@ -477,11 +503,89 @@ export default function Calculator({ navigation, route }: Props) {
 				<View
 					style={{
 						backgroundColor: 'white',
-						marginVertical: 10,
+						marginVertical: 3,
 					}}
 				>
-					
+
+
 				</View>
+
+				<View
+					style={{
+						backgroundColor: 'white',
+						marginVertical: 20,
+						zIndex: 1
+					}}>
+					<Text
+						style={{
+							color: '#074A74',
+							fontFamily: 'Montserrat_500Medium',
+							fontSize: 12,
+							marginBottom: 10,
+						}}>Branch (Optional)</Text>
+					<DropDownPicker
+						placeholder='Select Branch'
+						placeholderStyle={{
+							color: "#074A74",
+							fontFamily: 'Montserrat_500Medium',
+						}}
+						selectedItemContainerStyle={{
+							backgroundColor: '#E8EBF7',
+
+						}}
+						containerStyle={{
+							borderColor: "#074A74"
+						}}
+						listMode='MODAL'
+						open={open}
+						value={branch}
+						items={branches}
+						setOpen={setOpen}
+						setValue={setBranch}
+						setItems={setBranches}
+						dropDownContainerStyle={{
+							zIndex: 1,
+							backgroundColor: "#E8EBF7",
+						}}
+						listItemLabelStyle={{
+							color: "#074A74",
+							fontFamily: 'Montserrat_500Medium',
+						}}
+						schema={{
+							label: 'name',
+							value: 'name',
+						}} />
+				</View>
+
+				<View
+					style={{
+						backgroundColor: 'white',
+						marginVertical: 20,
+					}}>
+					<Text
+						style={{
+							color: '#074A74',
+							fontFamily: 'Montserrat_500Medium',
+							fontSize: 12,
+							marginBottom: 10,
+						}}>Staff Name (Optional)</Text>
+					<TextInput style={{
+						backgroundColor: "#E8EBF7",
+						color: "#72788D",
+						paddingVertical: 8,
+						borderWidth: 0.5,
+						borderRadius: 2,
+						borderColor: "#aaa",
+						paddingHorizontal: 10,
+						fontSize: 15,
+						fontFamily: "Montserrat_600SemiBold",
+					}}
+						value={staffName}
+						onChangeText={setStaffName}
+					></TextInput>
+				</View>
+
+
 
 				<View
 					style={{

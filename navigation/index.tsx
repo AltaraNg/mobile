@@ -64,6 +64,7 @@ import { FlagsProvider } from 'flagged';
 import OrderDetails from '../screens/OrderDetails';
 import ViewNotification from '../screens/ViewNotification';
 import Calculator from '../screens/Calculator';
+import ProductRequest from '../screens/ProductRequest';
 let url = Constants?.manifest?.extra?.URL;
 
 axios.defaults.baseURL = url;
@@ -207,6 +208,11 @@ function RootNavigator() {
 				<Stack.Screen
 					name="Calculator"
 					component={Calculator}
+					options={{ headerShown: false }}
+				/>
+				<Stack.Screen
+					name="ProductRequest"
+					component={ProductRequest}
 					options={{ headerShown: false }}
 				/>
 				<Stack.Screen

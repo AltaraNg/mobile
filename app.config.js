@@ -50,6 +50,5 @@ export default {
 	'web': {
 		'favicon': './assets/images/icon.png',
 	},
-	'sdkVersion': '44.0.0',
 	'description': 'Altara Mobile Application',
 };
