@@ -1,7 +1,11 @@
 {
   "expo": {
     "name": "Altara Credit",
-    "extra": {},
+    "extra": {
+      "eas": {
+        "projectId": "2ac8d7a0-2f1e-4dc9-a378-1c82872edc98"
+      }
+    },
     "slug": "Altara",
     "version": "1.0.0",
     "orientation": "portrait",
