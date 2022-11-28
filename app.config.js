@@ -7,6 +7,9 @@ export default {
 			'https://altara-customer-play-api.herokuapp.com/api/v1/',
 		APP_ID: process.env.APP_ID ?? '2566',
 		APP_TOKEN: process.env.APP_TOKEN ?? '3giYD4fJ6e7vESNT5Bwa0F',
+		"eas": {
+			"projectId": "2ac8d7a0-2f1e-4dc9-a378-1c82872edc98"
+		  }
 	},
 	'slug': 'Altara',
 	'version': '1.0.0',
