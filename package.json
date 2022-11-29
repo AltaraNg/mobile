@@ -56,7 +56,6 @@
     "react-native-element-dropdown": "^1.8.7",
     "react-native-elements": "^3.4.2",
     "react-native-gesture-handler": "~2.1.0",
-    "react-native-image-picker": "^4.7.3",
     "react-native-paper": "^4.12.3",
     "react-native-pusher-push-notifications": "^2.5.2",
     "react-native-reanimated": "~2.3.1",
