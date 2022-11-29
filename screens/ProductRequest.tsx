@@ -307,7 +307,7 @@ export default function ProductRequest({ navigation, route }: Props) {
                             fontFamily: 'Montserrat_500Medium',
                             fontSize: 12,
                             marginBottom: 10,
-                        }}>Staff Name (Optional)</Text>
+                        }}>Agent (Optional)</Text>
                     <TextInput style={{
                         backgroundColor: "#E8EBF7",
                         color: "#72788D",
