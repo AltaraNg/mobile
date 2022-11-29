@@ -346,7 +346,7 @@ export default function ProductRequest({ navigation, route }: Props) {
                                 style={{ width: 60, height: 27 }}
                             />
                         </View>
-                    ) : (<Text style={{ fontSize: 16, fontFamily: 'Montserrat_600SemiBold' }}>
+                    ) : (<Text style={{ fontSize: 16, fontFamily: 'Montserrat_600SemiBold', color: 'white' }}>
                         Apply
                     </Text>)}
 
