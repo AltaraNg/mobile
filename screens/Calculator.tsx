@@ -11,7 +11,7 @@ import Constants from 'expo-constants';
 import businessTypes from '../lib/calculator.json';
 import repaymentDurations from '../lib/repaymentDuration.json';
 // import Slider from '@react-native-community/slider';
-import Slider from 'react-native-slider';
+import Slider from '@miblanchard/react-native-slider';
 // import {cashLoan, calculate} from '../lib/calculator';
 let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
