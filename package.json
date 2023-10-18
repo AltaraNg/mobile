@@ -1,45 +1,60 @@
 {
-    "name": "loan-app",
-    "version": "1.0.0",
-    "main": "node_modules/expo/AppEntry.js",
-    "scripts": {
-        "start": "expo start",
-        "android": "expo start --android",
-        "ios": "expo start --ios",
-        "web": "expo start --web",
-        "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-        "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-        "format": "prettier --write .",
-        "prepare": "cd .. && husky install frontend/.husky"
-    },
-    "dependencies": {
-        "@types/react": "~17.0.21",
-        "expo": "~49.0.13",
-        "expo-notifications": "~0.14.0",
-        "expo-status-bar": "~1.2.0",
-        "react": "18.2.0",
-        "react-native": "0.72.5",
-        "react-native-svg-transformer": "^1.1.0",
-        "typescript": "~4.3.5"
-    },
-    "devDependencies": {
-        "@babel/core": "^7.20.0",
-        "@typescript-eslint/eslint-plugin": "^6.8.0",
-        "@typescript-eslint/parser": "^6.8.0",
-        "eslint": "^8.51.0",
-        "eslint-config-prettier": "^9.0.0",
-        "eslint-plugin-prettier": "^5.0.1",
-        "eslint-plugin-react": "^7.33.2",
-        "eslint-plugin-react-native": "^4.1.0",
-        "husky": "^8.0.0",
-        "lint-staged": "^15.0.1",
-        "prettier": "^3.0.3"
-    },
-    "lint-staged": {
-        "*.{js,jsx,ts,tsx}": [
-            "eslint --fix",
-            "prettier --write"
-        ]
-    },
-    "private": true
+  "name": "loan-app",
+  "version": "1.0.0",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write .",
+    "prepare": "cd .. && husky install frontend/.husky"
+  },
+  "dependencies": {
+    "@expo-google-fonts/montserrat": "^0.2.3",
+    "@miblanchard/react-native-slider": "^2.3.1",
+    "@react-navigation/bottom-tabs": "^6.5.9",
+    "@react-navigation/drawer": "^6.6.4",
+    "@react-navigation/native": "^6.1.8",
+    "@react-navigation/native-stack": "^6.9.14",
+    "@types/react": "~17.0.21",
+    "axios": "^1.5.1",
+    "expo": "~49.0.13",
+    "expo-app-loading": "^2.1.1",
+    "expo-device": "~5.4.0",
+    "expo-linear-gradient": "~12.3.0",
+    "expo-notifications": "~0.14.0",
+    "expo-status-bar": "~1.2.0",
+    "flagged": "^2.0.10",
+    "react": "18.2.0",
+    "react-native": "0.72.5",
+    "react-native-currency-input": "^1.1.1",
+    "react-native-elements": "^3.4.3",
+    "react-native-paper": "^5.11.0",
+    "react-native-safe-area-context": "^4.7.2",
+    "react-native-svg-transformer": "^1.1.0",
+    "typescript": "~4.3.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
+    "eslint": "^8.51.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-native": "^4.1.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.1",
+    "prettier": "^3.0.3"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "private": true
 }

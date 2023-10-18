@@ -1,6 +1,6 @@
 module.exports = {
     env: {
-        browser: true,
+        node: true,
         es2021: true,
     },
     extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:react/recommended", "plugin:prettier/recommended"],
@@ -23,5 +23,7 @@ module.exports = {
     plugins: ["@typescript-eslint", "react", "react-native"],
     rules: {
         "prettier/prettier": "error",
+        "react/prop-types": "off",
+        "@typescript-eslint/no-namespace": "off",
     },
 };
