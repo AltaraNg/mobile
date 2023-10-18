@@ -2,19 +2,28 @@ import {
   Pressable,
   StyleSheet,
   TouchableOpacity,
+  Touchable,
+  TextInput,
+  ActivityIndicator,
+  ToastAndroid,
+  BackHandler,
+  Platform,
+  ScrollView,
   Modal,
   TouchableHighlight,
+  Alert,
   Image,
   Dimensions,
 } from "react-native";
-import { Overlay } from "react-native-elements";
-import { SuccessSvg } from "../assets/svgs/svg";
+import { Button, Overlay, Icon } from "react-native-elements";
+import { SuccessSvg, ProgressSVG,  } from "../assets/svgs/svg";
 import Header from "../components/Header";
-import { useState, useEffect, useContext } from "react";
+import React, { useState, createRef, useEffect, useContext } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
-import { RootTabParamList } from "../types";
-import { FolderPlus } from "../assets/svgs/svg";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList, RootTabParamList } from "../types";
+import { FolderPlus, Rental, ProductLoan } from "../assets/svgs/svg";
 import { AuthContext } from "../context/AuthContext";
 import { OrderContext } from "../context/OrderContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -26,7 +35,7 @@ let url = Constants?.manifest?.extra?.URL;
 axios.defaults.baseURL = url;
 type Props = NativeStackScreenProps<RootTabParamList, "OrderRequest">;
 
-export default function OrderRequest({ navigation, route }: Props) {
+export default function History({ navigation, route }: Props) {
   const { authData } = useContext(AuthContext);
   const {
     setOrderRequest,
@@ -49,131 +58,130 @@ export default function OrderRequest({ navigation, route }: Props) {
     }
   };
   const modalResponse = (item: any) => {
-    if (item?.status == "approved" || item?.status == "accepted") {
-      return "was successful";
-    }
-    if (item?.status == "pending" || item?.status == "processing") {
-      return "is in progress";
-    }
-    if (item?.status == "declined" || item?.status == "denied") {
-      return "was unsuccessful";
-    }
-  };
+      if (item?.status == "approved" || item?.status == "accepted") {
+        return "was successful";
+      }
+      if (item?.status == "pending" || item?.status == "processing") {
+        return "is in progress";
+      }
+      if (item?.status == "declined" || item?.status == "denied") {
+        return "was unsuccessful";
+      }
+    };
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
   };
 
   const viewDetail = (item) => {
-    navigation.navigate('RequestModal', item)
-    // setModalVisible(true);
-    // setPressedOrder(item);
+     setModalVisible(true);
+     setPressedOrder(item);
   };
-  const OrderDetails = function ({ item }) {
-    return (
-      <View>
-        <Overlay
-          isVisible={modalVisible}
-          onBackdropPress={() => {
-            setModalVisible(!modalVisible);
-          }}
-        />
-        <Modal
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}
-          style={{
-            justifyContent: "flex-end",
-            margin: 0,
-            position: "relative",
-          }}
-          animationType="slide"
-        >
-          <TouchableHighlight
-            onPress={() => setModalVisible(!modalVisible)}
-            style={{
-              borderRadius:
-                Math.round(
-                  Dimensions.get("window").width +
-                  Dimensions.get("window").height
-                ) / 2,
-              width: Dimensions.get("window").width * 0.13,
-              height: Dimensions.get("window").width * 0.13,
-              backgroundColor: "#fff",
-              position: "absolute",
-              //   top: 1 / 2,
-              marginHorizontal: Dimensions.get("window").width * 0.43,
-              marginVertical: Dimensions.get("window").width * 0.76,
-              justifyContent: "center",
-              alignItems: "center",
+  const OrderDetails = function ({item}) {
+      return (
+        <View>
+          <Overlay
+            isVisible={modalVisible}
+            onBackdropPress={() => {
+              setModalVisible(!modalVisible);
             }}
-            underlayColor="#ccc"
+          />
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+            style={{
+              justifyContent: "flex-end",
+              margin: 0,
+              position: "relative",
+            }}
           >
-            <Text
+            <TouchableHighlight
+              onPress={() => setModalVisible(!modalVisible)}
               style={{
-                fontSize: 20,
-                color: "#000",
-                fontFamily: "Montserrat_900Black",
+                borderRadius:
+                  Math.round(
+                    Dimensions.get("window").width +
+                      Dimensions.get("window").height
+                  ) / 2,
+                width: Dimensions.get("window").width * 0.13,
+                height: Dimensions.get("window").width * 0.13,
+                backgroundColor: "#fff",
+                position: "absolute",
+                //   top: 1 / 2,
+                marginHorizontal: Dimensions.get("window").width * 0.43,
+                marginVertical: Dimensions.get("window").width * 0.76,
+                justifyContent: "center",
+                alignItems: "center",
               }}
+              underlayColor="#ccc"
             >
-              &#x2715;
-            </Text>
-          </TouchableHighlight>
-
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              {styleSVG(item) == "#FF4133" && (
-                <TouchableHighlight
-                  style={{
-                    borderRadius:
-                      Math.round(
-                        Dimensions.get("window").width +
-                        Dimensions.get("window").height
-                      ) / 2,
-                    width: Dimensions.get("window").width * 0.3,
-                    height: Dimensions.get("window").width * 0.3,
-                    backgroundColor: "#FF4133",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                  underlayColor="#ccc"
-                >
-                  <Text
-                    style={{
-                      fontSize: 68,
-                      color: "#fff",
-                      fontFamily: "Montserrat_900Black",
-                    }}
-                  >
-                    &#x2715;
-                  </Text>
-                </TouchableHighlight>
-              )}
-
-              {styleSVG(item) == "#FDC228" && (
-                <Image
-                  source={require("../assets/images/ProgressSVG.png")}
-                />
-              )}
-              {styleSVG(item) == "#074A74" && <SuccessSvg />}
-              <Text style={styles.modalHeading}>
-                Your Order Request{" "}
-                <Text style={{ color: styleSVG(item) }}>
-                  {modalResponse(item)}
-                </Text>
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: "#000",
+                  fontFamily: "Montserrat_900Black",
+                }}
+              >
+                &#x2715;
               </Text>
+            </TouchableHighlight>
 
-              <Text style={styles.errText}>{item?.reason || "An agent will reach out to you shortly"}</Text>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                {styleSVG(item) == "#FF4133" && (
+                  <TouchableHighlight
+                    style={{
+                      borderRadius:
+                        Math.round(
+                          Dimensions.get("window").width +
+                            Dimensions.get("window").height
+                        ) / 2,
+                      width: Dimensions.get("window").width * 0.3,
+                      height: Dimensions.get("window").width * 0.3,
+                      backgroundColor: "#FF4133",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                    underlayColor="#ccc"
+                  >
+                    <Text
+                      style={{
+                        fontSize: 68,
+                        color: "#fff",
+                        fontFamily: "Montserrat_900Black",
+                      }}
+                    >
+                      &#x2715;
+                    </Text>
+                  </TouchableHighlight>
+                )}
+
+                {styleSVG(item) == "#FDC228" && (
+                  <Image
+                    source={require("../assets/images/ProgressSVG.png")}
+                  />
+                )}
+                {styleSVG(item) == "#074A74" && <SuccessSvg />}
+                <Text style={styles.modalHeading}>
+                  Your Order Request{" "}
+                  <Text style={{ color: styleSVG(item) }}>
+                    {modalResponse(item)}
+                  </Text>
+                </Text>
+
+                <Text style={styles.errText}>{item?.reason || "An agent will reach out to you shortly"}</Text>
+              </View>
             </View>
-          </View>
-        </Modal>
-      </View>
-    );
-  };
-  useEffect(() => {
-    fetchOrderRequestContext();
-  }, []);
+          </Modal>
+        </View>
+      );
+    };
+      useEffect(() => {
+        fetchOrderRequestContext();
+      }, []);
 
   return (
     <View style={styles.container}>
@@ -321,7 +329,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   header: {
-
+    
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "#fff",
@@ -329,7 +337,7 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#fff",
-    marginTop: 40
+    marginTop:40
 
   },
 

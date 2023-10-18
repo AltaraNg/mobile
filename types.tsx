@@ -3,10 +3,9 @@
  * https://reactnavigation.org/docs/typescript/
  */
 
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import {
-	CompositeScreenProps,
-	NavigatorScreenParams,
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type {
+  CompositeScreenProps,  
 } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -19,7 +18,7 @@ declare global {
 export type RootStackParamList = {
   Dashboard: { user: object };
   Intro: undefined;
-  RequestModal: {request: object};
+  RequestModal: undefined;
   Modal: undefined;
   NotFound: undefined;
   OrderDetails: { order: object };

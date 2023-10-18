@@ -8,6 +8,7 @@ import Navigation from "./navigation";
 import AppLoading from "expo-app-loading";
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { Provider as PaperProvider } from "react-native-paper";
 import axios from "axios";
 import Constants from "expo-constants";
 
@@ -113,7 +114,7 @@ export default function App() {
     } else {
       alert('Must use physical device for Push Notifications');
     }
-  
+
     if (Platform.OS === 'android') {
       Notifications.setNotificationChannelAsync('default', {
         name: 'default',
@@ -122,7 +123,7 @@ export default function App() {
         lightColor: '#FF231F7C',
       });
     }
-  
+
     return token;
   }
 
@@ -134,8 +135,10 @@ export default function App() {
   } else {
     return (
       <SafeAreaProvider>
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar style="dark" />
+        <PaperProvider>
+          <Navigation colorScheme={colorScheme} />
+          <StatusBar style="dark" />
+        </PaperProvider>
       </SafeAreaProvider>
     );
   }

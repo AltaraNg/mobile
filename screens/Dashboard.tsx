@@ -8,14 +8,16 @@ import {
   TouchableOpacity,
   Modal,
   TouchableHighlight,
+  Alert,
   RefreshControl,
   Image,
   Dimensions,
 } from "react-native";
-import {  Overlay } from "react-native-elements";
+import { Button, Overlay, Icon } from "react-native-elements";
+import { LinearGradient } from "expo-linear-gradient";
 import { SuccessSvg, FailSvg, LogOut, User, Warning } from "../assets/svgs/svg";
 import Header from "../components/Header";
-import { useState, useEffect, useContext, } from "react";
+import React, { useState, createRef, useEffect, useContext, } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
 import {
@@ -25,6 +27,8 @@ import Cards from "../components/Cards";
 import SideMenu from "./SideMenu";
 import { AuthContext } from "../context/AuthContext";
 import {OrderContext} from "../context/OrderContext";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import axios from "axios";
 import { useFeatures } from "flagged";
@@ -32,9 +36,11 @@ import { useFeatures } from "flagged";
 type Props = DrawerScreenProps<DrawerParamList, "Home">;
 
 export default function Dashboard({ navigation, route }: Props) {
-  const { authData, showLoader, setShowLoader } =
+  const { authData, setAuthData, showLoader, setShowLoader } =
     useContext(AuthContext);
-  const {   
+  const {
+    setOrderRequest,
+    orderRequest,
     fetchOrderRequestContext,
     showLoader2,
   } = useContext(OrderContext);
