@@ -171,7 +171,6 @@ const styles = StyleSheet.create({
 		height: '100%',
 		position: 'relative',
 		backgroundColor: '#EFF5F9'
-
 	},
 	hamburger: {
 		marginTop: 80,
@@ -183,7 +182,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	header: {
-
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		backgroundColor: '#EFF5F9',

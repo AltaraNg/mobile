@@ -21,9 +21,7 @@ import React, { useState, createRef, useEffect, useContext, } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
 import {
-  DrawerParamList,
-  RootStackParamList,
-  RootTabParamList,
+  DrawerParamList, 
 } from "../types";
 import Cards from "../components/Cards";
 import SideMenu from "./SideMenu";
@@ -34,7 +32,6 @@ import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import axios from "axios";
 import { useFeatures } from "flagged";
-import Upload from "../components/Upload";
 
 type Props = DrawerScreenProps<DrawerParamList, "Home">;
 
@@ -53,7 +50,6 @@ export default function Dashboard({ navigation, route }: Props) {
   const [refreshing, setRefreshing] = useState(true);
   const [modalResponse, setModalResponse] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
   const [onBoarded, setOnBoarded] = useState(null);
   const [type, setType] = useState("");
   const [latefee, setlateFee] = useState(null);
