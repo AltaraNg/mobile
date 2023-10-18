@@ -1,146 +1,130 @@
 import {
 	Pressable,
 	StyleSheet,
-	TextInput,
-	ActivityIndicator,
-	ToastAndroid,
-	BackHandler,
-	Platform,
 	TouchableOpacity,
-	Modal,
-	Alert,
 	Dimensions,
 	TouchableHighlight,
 } from 'react-native';
 
-import { LinearGradient } from 'expo-linear-gradient';
-import { SuccessSvg, FailSvg, LogOut } from '../assets/svgs/svg';
 
 import Header from '../components/Header';
-import React, { useState, createRef, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Hamburger from '../assets/svgs/hamburger.svg';
 import { Text, View } from '../components/Themed';
 import {
 	DrawerParamList,
-	RootStackParamList,
-	RootTabParamList,
 } from '../types';
-import SideMenu from './SideMenu';
 import { AuthContext } from '../context/AuthContext';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { DrawerScreenProps } from '@react-navigation/drawer';
-import axios from 'axios';
 
 type Props = DrawerScreenProps<DrawerParamList, 'View Profile'>;
 
 export default function ViewProfile({ navigation, route }: Props) {
 	const { authData } = useContext(AuthContext);
-	const [exitApp, setExitApp] = useState(1);
-	const [showMenu, setShowMenu] = useState(false);
 	const [user, setUser] = useState(null);
 	const toggleSideMenu = async () => {
 		navigation.toggleDrawer();
 	};
 
-	const fetchUser = async () => {	
-			setUser(authData.user);
+	const fetchUser = async () => {
+		setUser(authData.user);
 	};
 	const displayDate = (user) => {
-    if (user !== "N/A") {
-      var date = new Date(user).toLocaleDateString();
-      return date;
-    } else return "Enter Date";
-  };
+		if (user !== "N/A") {
+			var date = new Date(user).toLocaleDateString();
+			return date;
+		} else return "Enter Date";
+	};
 
 	useEffect(() => {
 		fetchUser();
 	}, [authData]);
 
 	return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Header navigation={navigation}></Header>
-        <TouchableOpacity>
-          <Pressable onPress={toggleSideMenu}>
-            <Hamburger style={styles.hamburger} />
-          </Pressable>
-        </TouchableOpacity>
-      </View>
-      {user && (
-        <View style={styles.main}>
-          <Text style={styles.name}>My Profile</Text>
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#EFF5F9",
-              marginTop: 20,
-            }}
-          >
-            <TouchableHighlight
-              style={{
-                borderRadius:
-                  Math.round(
-                    Dimensions.get("window").width +
-                      Dimensions.get("window").height
-                  ) / 2,
-                width: Dimensions.get("window").width * 0.2,
-                height: Dimensions.get("window").width * 0.2,
-                backgroundColor: "#074A74",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              underlayColor="#ccc"
-            >
-              <Text
-                style={{
-                  fontSize: 38,
-                  color: "#fff",
-                  fontFamily: "Montserrat_800ExtraBold",
-                }}
-              >
-                {" "}
-                {user.attributes.first_name.charAt(0).toUpperCase()}{" "}
-              </Text>
-            </TouchableHighlight>
-          </View>
+		<View style={styles.container}>
+			<View style={styles.header}>
+				<Header navigation={navigation}></Header>
+				<TouchableOpacity>
+					<Pressable onPress={toggleSideMenu}>
+						<Hamburger style={styles.hamburger} />
+					</Pressable>
+				</TouchableOpacity>
+			</View>
+			{user && (
+				<View style={styles.main}>
+					<Text style={styles.name}>My Profile</Text>
+					<View
+						style={{
+							justifyContent: "center",
+							alignItems: "center",
+							backgroundColor: "#EFF5F9",
+							marginTop: 20,
+						}}
+					>
+						<TouchableHighlight
+							style={{
+								borderRadius:
+									Math.round(
+										Dimensions.get("window").width +
+										Dimensions.get("window").height
+									) / 2,
+								width: Dimensions.get("window").width * 0.2,
+								height: Dimensions.get("window").width * 0.2,
+								backgroundColor: "#074A74",
+								justifyContent: "center",
+								alignItems: "center",
+							}}
+							underlayColor="#ccc"
+						>
+							<Text
+								style={{
+									fontSize: 38,
+									color: "#fff",
+									fontFamily: "Montserrat_800ExtraBold",
+								}}
+							>
+								{" "}
+								{user.attributes.first_name.charAt(0).toUpperCase()}{" "}
+							</Text>
+						</TouchableHighlight>
+					</View>
 
-          <View style={styles.row}>
-            <View style={styles.item}>
-              <Text style={styles.label}>First Name:</Text>
-              <Text style={styles.input}>{user.attributes.first_name}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Last Name:</Text>
-              <Text style={styles.input}>{user.attributes.last_name}</Text>
-            </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.item}>
-              <Text style={styles.label}>Gender:</Text>
-              <Text style={styles.input}>{user.attributes.gender}</Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Phone Number:</Text>
-              <Text style={styles.input}>{user.attributes.phone_number}</Text>
-            </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.item}>
-              <Text style={styles.label}>Date of Birth:</Text>
-              <Text style={styles.input}>
-                {displayDate(user.attributes.date_of_birth)}
-              </Text>
-            </View>
-            <View style={styles.item}>
-              <Text style={styles.label}>Gender:</Text>
-              <Text style={styles.input}>{user.attributes.gender}</Text>
-            </View>
-          </View>
-        </View>
-      )}
-    </View>
-  );
+					<View style={styles.row}>
+						<View style={styles.item}>
+							<Text style={styles.label}>First Name:</Text>
+							<Text style={styles.input}>{user.attributes.first_name}</Text>
+						</View>
+						<View style={styles.item}>
+							<Text style={styles.label}>Last Name:</Text>
+							<Text style={styles.input}>{user.attributes.last_name}</Text>
+						</View>
+					</View>
+					<View style={styles.row}>
+						<View style={styles.item}>
+							<Text style={styles.label}>Gender:</Text>
+							<Text style={styles.input}>{user.attributes.gender}</Text>
+						</View>
+						<View style={styles.item}>
+							<Text style={styles.label}>Phone Number:</Text>
+							<Text style={styles.input}>{user.attributes.phone_number}</Text>
+						</View>
+					</View>
+					<View style={styles.row}>
+						<View style={styles.item}>
+							<Text style={styles.label}>Date of Birth:</Text>
+							<Text style={styles.input}>
+								{displayDate(user.attributes.date_of_birth)}
+							</Text>
+						</View>
+						<View style={styles.item}>
+							<Text style={styles.label}>Gender:</Text>
+							<Text style={styles.input}>{user.attributes.gender}</Text>
+						</View>
+					</View>
+				</View>
+			)}
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({
@@ -187,7 +171,7 @@ const styles = StyleSheet.create({
 		height: '100%',
 		position: 'relative',
 		backgroundColor: '#EFF5F9'
-		
+
 	},
 	hamburger: {
 		marginTop: 80,
@@ -199,7 +183,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	header: {
-		
+
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		backgroundColor: '#EFF5F9',
@@ -207,7 +191,7 @@ const styles = StyleSheet.create({
 	main: {
 		flex: 3,
 		backgroundColor: '#EFF5F9',
-		marginTop:40
+		marginTop: 40
 
 	},
 	name: {

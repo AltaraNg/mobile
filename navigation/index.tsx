@@ -3,12 +3,10 @@
  * https://reactnavigation.org/docs/getting-started
  *
  */
-import {
-	AntDesign,
-	EvilIcons,
-	FontAwesome,
-	MaterialCommunityIcons,
-} from '@expo/vector-icons';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useContext, useEffect, useState, useRef } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';

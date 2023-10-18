@@ -3,10 +3,9 @@
  * https://reactnavigation.org/docs/typescript/
  */
 
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import {
-	CompositeScreenProps,
-	NavigatorScreenParams,
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type {
+  CompositeScreenProps,  
 } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
