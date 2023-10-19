@@ -66,6 +66,33 @@ export const Warning = function(){
     </Svg>
   );
 }
+export const Hamburger = function(){
+	return (
+    <Svg width="30" height="30" viewBox="0 0 30 30" fill="#DB2721">
+      <Path
+        d="M4.6875 15H25.3125"
+        stroke="black"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M4.6875 7.5H25.3125"
+        stroke="black"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <Path
+        d="M4.6875 22.5H25.3125"
+        stroke="black"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </Svg>
+  );
+}
 
 export const EditProfileSvg = function () {
 	return (
@@ -77,6 +104,44 @@ export const EditProfileSvg = function () {
 		</Svg>
 	);
 };
+export const Debited = function (){
+	return (
+    <Svg
+      width="35"
+      height="35"
+      viewBox="0 0 35 35"
+      fill="none"
+    >
+      <Circle
+        cx="17.5"
+        cy="17.5"
+        r="17.5"
+        transform="rotate(-180 17.5 17.5)"
+        fill="#FFD5D3"
+      />
+      <Path
+        d="M22 11.0006H12C11.4 11.0006 11 11.4006 11 12.0006C11 12.6006 11.4 13.0006 12 13.0006H19.6L11.3 21.3006C10.9 21.7006 10.9 22.3006 11.3 22.7006C11.7 23.1006 12.3 23.1006 12.7 22.7006L21 14.4006V22.0006C21 22.6006 21.4 23.0006 22 23.0006C22.6 23.0006 23 22.6006 23 22.0006V12.0006C23 11.4006 22.6 11.0006 22 11.0006Z"
+        fill="#FF2B24"
+      />
+    </Svg>
+  );
+} 
+export const Credited = function (){
+	return (
+    <Svg
+      width="35"
+      height="35"
+      viewBox="0 0 35 35"
+      fill="none"
+    >
+      <Circle cx="17.5" cy="17.5" r="17.5" fill="#EAFFED" />
+      <Path
+        d="M13 23.9994H23C23.6 23.9994 24 23.5994 24 22.9994C24 22.3994 23.6 21.9994 23 21.9994H15.4L23.7 13.6994C24.1 13.2994 24.1 12.6994 23.7 12.2994C23.3 11.8994 22.7 11.8994 22.3 12.2994L14 20.5994V12.9994C14 12.3994 13.6 11.9994 13 11.9994C12.4 11.9994 12 12.3994 12 12.9994V22.9994C12 23.5994 12.4 23.9994 13 23.9994Z"
+        fill="#85FF96"
+      />
+    </Svg>
+  );
+}
 
 export const FailSvg = function () {
 	return (
@@ -121,7 +186,6 @@ export const SuccessSvg = function () {
 			height="122"
 			viewBox="0 0 122 122"
 			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
 		>
 			<Mask
 				id="path-1-outside-1_1902_615"

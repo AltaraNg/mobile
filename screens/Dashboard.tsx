@@ -15,7 +15,13 @@ import {
 } from "react-native";
 import { Button, Overlay, Icon } from "react-native-elements";
 import { LinearGradient } from "expo-linear-gradient";
-import { SuccessSvg, FailSvg, LogOut, User, Warning } from "../assets/svgs/svg";
+import {
+  SuccessSvg,
+  FailSvg,
+  LogOut,Debited,Credited,
+  User,
+  Warning,
+} from "../assets/svgs/svg";
 import Header from "../components/Header";
 import React, { useState, createRef, useEffect, useContext, } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
@@ -29,6 +35,7 @@ import { AuthContext } from "../context/AuthContext";
 import {OrderContext} from "../context/OrderContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { FlatList } from "react-native";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import axios from "axios";
 import { useFeatures } from "flagged";
@@ -55,6 +62,7 @@ export default function Dashboard({ navigation, route }: Props) {
   const [latefee, setlateFee] = useState(null);
   const [orders, setOrders] = useState(null)
   const [uploaded, setUploaded] = useState(null);
+
   const toggleSideMenu = async () => {
     navigation.toggleDrawer();
   };
@@ -132,6 +140,29 @@ export default function Dashboard({ navigation, route }: Props) {
       return second_choice;
     }
   };
+  const viewDetail = (item)=>{
+
+  }
+  const recentActivities = [
+    {
+      id: '1',
+      name: "Monthly Repayment",
+      date: "01/11/2023",
+      amount: "₦9,500",
+    },
+    {
+      id: '2',
+      name: "Monthly Repayment",
+      date: "01/11/2023",
+      amount: "₦9,500",
+    },
+    {
+      id: '3',
+      name: "Loan Approved",
+      date: "01/11/2023",
+      amount: "₦100,000",
+    },
+  ];
   const navigateHistory =()=>{
     const lateOrder = orders.find((order) =>{
       const lateFees = order?.included?.late_fees
@@ -296,7 +327,7 @@ export default function Dashboard({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
-      {!showLoader || showLoader2  ? (
+      {!showLoader || showLoader2 ? (
         <Image
           source={require("../assets/gifs/loader.gif")}
           style={styles.image}
@@ -432,8 +463,8 @@ export default function Dashboard({ navigation, route }: Props) {
 
           <View style={styles.cards}>
             <Cards
-              title="Get a Loan Now!!!"
-              amount="Up to ₦500,000"
+              title="Loan Balance"
+              amount="₦500,000"
               type="cash"
               onRequest={handleRequest}
               isDisabled={!onBoarded}
@@ -441,18 +472,53 @@ export default function Dashboard({ navigation, route }: Props) {
               height={!onBoarded ? 150 : 0}
               navigation={navigation}
             />
-
-            <Cards
-              title="Order a Product Now!!!"
-              amount="Up to ₦500,000"
-              type="product"
-              onRequest={handleRequest}
-              isDisabled={!onBoarded}
-              width={!onBoarded ? 300 : 0}
-              height={!onBoarded ? 150 : 0}
-              navigation={navigation}
-            />
           </View>
+          <Text style={styles.name}>Recent Activities</Text>
+          <FlatList
+            scrollEnabled={true}
+            data={recentActivities}
+            keyExtractor={(item) => item.id}
+            extraData={recentActivities}
+            // refreshControl={
+            //   <RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />
+            // }
+            renderItem={({ item }) => (
+              <View style={{ backgroundColor: "transparent" }}>
+                <Pressable onPress={() => viewDetail(item)}>
+                  <View style={styles.order}>
+                    <View style={styles.details}>
+                     { item.name.includes('Approved') ? <Credited/> : <Debited />}
+                      <View style={styles.title}>
+                        <Text
+                          style={{
+                            color: "#333333",
+                            fontFamily: "Montserrat_600SemiBold",
+                          }}
+                          numberOfLines={1}
+                          ellipsizeMode={"tail"}
+                        >
+                          {item.name}{" "}
+                        </Text>
+                        <Text style={{ color: "#000", fontSize: 11 }}>
+                          {item?.date}
+                        </Text>
+                      </View>
+                    </View>
+                    <Text
+                      style={{
+                        color: "#000",
+                        fontSize: 13,
+                        marginRight: 59,
+                        fontFamily: "Montserrat_600SemiBold",
+                      }}
+                    >
+                      {item?.amount}
+                    </Text>
+                  </View>
+                </Pressable>
+              </View>
+            )}
+          />
         </View>
       )}
     </ScrollView>
@@ -494,6 +560,11 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
   },
+  title: {
+    backgroundColor: "#fff",
+    marginLeft: 10,
+    width: "65%",
+  },
   header: {
     flex: 1,
     flexDirection: "row",
@@ -503,17 +574,17 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#EFF5F9",
-    marginTop:40
+    marginTop: 20,
   },
   name: {
     marginHorizontal: 30,
-    fontSize: 25,
+    fontSize: 20,
     color: "#074A74",
     fontFamily: "Montserrat_700Bold",
   },
   message: {
     fontFamily: "Montserrat_400Regular",
-    marginTop: 10,
+    marginTop: 0,
     marginHorizontal: 30,
     fontSize: 12,
     color: "#72788D",
@@ -555,7 +626,29 @@ const styles = StyleSheet.create({
     fontSize: 15,
     borderRadius: 50,
   },
-
+  details: {
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingLeft: 10,
+  },
+  order: {
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    marginLeft: 26,
+    marginRight: 20,
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 10,
+    paddingTop: 12,
+    paddingBottom: 12,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
   errText: {
     fontSize: 15,
     marginTop: 20,
