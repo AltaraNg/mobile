@@ -1,70 +1,51 @@
-import axios from 'axios';
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { AuthContext } from './AuthContext';
+import axios from "axios";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { AuthContext } from "./AuthContext";
 
 const NotificationContext = createContext(undefined);
 const NotificationDispatchContext = createContext(undefined);
-import Constants from 'expo-constants';
 
-let url = Constants?.manifest?.extra?.URL;
+const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 
-function NotificationProvider({children}){
+function NotificationProvider({ children }) {
     const [totalUnread, setTotalUnread] = useState({
-        unread: 0
+        unread: 0,
     });
-    const { authData, setAuthData, showLoader, setShowLoader } =
-    useContext(AuthContext);
-
-    console.log(authData.user);
+    const { authData } = useContext(AuthContext);
 
     useEffect(() => {
-		//Every time the App is opened, this provider is rendered
-		//and call de loadStorage function.
-		fetchNotification();
-	}, []);
-
-    const getUnread = async () => {
-
-    }
+        //Every time the App is opened, this provider is rendered
+        //and call de loadStorage function.
+        fetchNotification();
+    }, []);
 
     const fetchNotification = async () => {
-        
-            try {
-                let response = await axios({
-                    method: 'GET',
-                    url: `/customers/${authData.user.id}/notifications`,
-                    headers: { 'Authorization': `Bearer ${authData.token}` },
-                });
-         
-    
-                const notification = response?.data?.data?.notifications?.data;
-                let unread = notification.filter(item => {
-                    return item.read_at === null;
-                })
-               
-                setTotalUnread({
-                    unread: unread.length
-                })
-                
-            } catch (error: any) {
-            }
-        };
+        try {
+            const response = await axios({
+                method: "GET",
+                url: `/customers/${authData.user.id}/notifications`,
+                headers: { Authorization: `Bearer ${authData.token}` },
+            });
 
+            const notification = response?.data?.data?.notifications?.data;
+            const unread = notification.filter((item) => {
+                return item.read_at === null;
+            });
 
+            setTotalUnread({
+                unread: unread.length,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     return (
         <NotificationContext.Provider value={totalUnread}>
-            <NotificationDispatchContext.Provider value={setTotalUnread}>
-                {children}
-            </NotificationDispatchContext.Provider>
+            <NotificationDispatchContext.Provider value={setTotalUnread}>{children}</NotificationDispatchContext.Provider>
         </NotificationContext.Provider>
     );
 }
 
-export {NotificationProvider, NotificationContext, NotificationDispatchContext};
-
-
-
-
-
+export { NotificationProvider, NotificationContext, NotificationDispatchContext };

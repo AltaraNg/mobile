@@ -11,7 +11,6 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Provider as PaperProvider } from "react-native-paper";
 import axios from "axios";
-import Constants from "expo-constants";
 
 import {
     useFonts,
@@ -46,8 +45,8 @@ Notifications.setNotificationHandler({
     }),
 });
 
-const app_id = Constants?.manifest?.extra?.APP_ID;
-const app_token = Constants?.manifest?.extra?.APP_TOKEN;
+const app_id = process.env.EXPO_PUBLIC_APP_ID;
+const app_token = process.env.EXPO_PUBLIC_APP_TOKEN;
 export default function App() {
     const [, setExpoPushToken] = useState("");
     const [, setNotification] = useState<Notifications.Notification>({});

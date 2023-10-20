@@ -10,7 +10,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useContext, useEffect, useState, useRef } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import * as React from "react";
+import React from "react";
 import { ColorSchemeName } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import ModalScreen from "../modals/ModalScreen";
@@ -28,7 +28,6 @@ import OrderRequest from "../screens/OrderRequest";
 import ViewProfile from "../screens/ViewProfile";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { OrderProvider } from "../context/OrderContext";
-import Constants from "expo-constants";
 import axios from "axios";
 import Notification from "../screens/Notification";
 import History from "../screens/History";
@@ -42,7 +41,7 @@ import { FlagsProvider } from "flagged";
 import OrderDetails from "../screens/OrderDetails";
 import ViewNotification from "../screens/ViewNotification";
 import Calculator from "../screens/Calculator";
-const url = Constants?.manifest?.extra?.URL;
+const url = process.env.EXPO_PUBLIC_API_URL;
 
 axios.defaults.baseURL = url;
 
@@ -65,8 +64,8 @@ function getHeaderTitle(route) {
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
     const navigationRef = useNavigationContainerRef();
     const routeNameRef = useRef<string | null>(null);
-    const app_id = Constants?.manifest?.extra?.APP_ID;
-    const app_token = Constants?.manifest?.extra?.APP_TOKEN;
+    const app_id = process.env.EXPO_PUBLIC_APP_ID;
+    const app_token = process.env.EXPO_PUBLIC_APP_TOKEN;
     return (
         <AuthProvider>
             <OrderProvider>
