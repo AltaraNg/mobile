@@ -1,0 +1,13 @@
+services:
+  frontend:
+    build:
+      context: .
+    env_file:
+      - ${ENV_FILE:-local.env}
+    ports:
+      - 19000:19000
+      - 19001:19001
+      - 19002:19002
+    volumes:
+      - ./:/app:ro
+
