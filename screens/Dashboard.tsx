@@ -61,6 +61,8 @@ export default function Dashboard({ navigation, route }: Props) {
   const [type, setType] = useState("");
   const [latefee, setlateFee] = useState(null);
   const [orders, setOrders] = useState(null)
+  const amortization = orders?.included?.amortizations;
+  const lateFees = orders?.included?.late_fees;
   const [uploaded, setUploaded] = useState(null);
 
   const toggleSideMenu = async () => {
@@ -95,7 +97,7 @@ export default function Dashboard({ navigation, route }: Props) {
         url: `/customers/${authData.user.id}/orders`,
         headers: { Authorization: `Bearer ${authData.token}` },
       });
-      const order = response.data.data[0].included.orders;
+      const order = response.data.data[0].included.orders[0];
       setOrders(order)
       
       const checkLateFee = order.some(function (item) {
@@ -143,12 +145,36 @@ export default function Dashboard({ navigation, route }: Props) {
   const viewDetail = (item)=>{
 
   }
+  const trackOrder = () => {
+    navigation.navigate("OrderDetails", orders);
+  };
+  let totalDebt: number;
+  	let paid_repayment = amortization?.map((item: { actual_amount: number }) => {
+      return item.actual_amount;
+    });
+   let expected_repayment = amortization?.map(
+     (item: { expected_amount: number }) => {
+       return item.expected_amount;
+     }
+   );
+   let total_expected_repayment = expected_repayment?.reduce((total, item) => {
+     return total + item;
+   });
+   let totalPaid = paid_repayment?.reduce((total, item) => {
+     return total + item;
+   }); 
+  totalDebt = total_expected_repayment - totalPaid;
+  const progressBar =
+    (totalPaid + orders?.attributes?.down_payment / total_expected_repayment) *
+    100;
+    const nextRepayment = amortization.find((payment) =>  payment.actual_amount== 0);
+    console.log(nextRepayment);
   const recentActivities = [
     {
       id: '1',
       name: "Monthly Repayment",
       date: "01/11/2023",
-      amount: "₦9,500",
+      amount: "₦9,600",
     },
     {
       id: '2',
@@ -177,6 +203,7 @@ export default function Dashboard({ navigation, route }: Props) {
     navigation.navigate("OrderDetails", lateOrder );
     
   }
+  
 
   useEffect(() => {
     settUser();
@@ -464,9 +491,18 @@ export default function Dashboard({ navigation, route }: Props) {
           <View style={styles.cards}>
             <Cards
               title="Loan Balance"
-              amount="₦500,000"
+              amount={
+                totalDebt <= 0
+                  ? 0
+                  : `₦${totalDebt
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
+              }
+              progressBar={progressBar}
+              next_repayment={nextRepayment}
               type="cash"
               onRequest={handleRequest}
+              trackOrder={trackOrder}
               isDisabled={!onBoarded}
               width={!onBoarded ? 300 : 0}
               height={!onBoarded ? 150 : 0}
@@ -487,7 +523,11 @@ export default function Dashboard({ navigation, route }: Props) {
                 <Pressable onPress={() => viewDetail(item)}>
                   <View style={styles.order}>
                     <View style={styles.details}>
-                     { item.name.includes('Approved') ? <Credited/> : <Debited />}
+                      {item.name.includes("Approved") ? (
+                        <Credited />
+                      ) : (
+                        <Debited />
+                      )}
                       <View style={styles.title}>
                         <Text
                           style={{

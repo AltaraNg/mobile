@@ -16,7 +16,10 @@ export default function Cards({
   navigation,
   height,
   width,
+  trackOrder,
+  next_repayment,
   title,
+  progressBar,
   amount,
   isDisabled,
   type,onRequest
@@ -29,7 +32,7 @@ export default function Cards({
   const [loader, setLoader] = useState(false);
   const [showButton, setShowButton] = useState(null);
   const [requestOrder, setRequestOrder] = useState(null);
-  const progressBar = 30
+
  // const progressBar = ((totalPaid - order?.attributes?.down_payment) / order?.attributes?.repayment) * 100;
 
   async function fetchOrder(): Promise<void> {
@@ -82,9 +85,7 @@ export default function Cards({
        isPending ? setShowButton(false) : setShowButton(true);
     };
  
-  const trackOrder = () => {
-    navigation.navigate("OrderRequest");
-  };
+  
     useEffect(() => {
       checkOrder();
     }, [orderRequest]);
@@ -166,7 +167,13 @@ export default function Cards({
           ]}
         />
       </View>
-      <Text>To pay ₦9,500 on 17/11/2023 </Text>
+      <Text>
+        To pay{" "}
+        {`₦${next_repayment.expected_amount
+          .toString()
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}{" "}
+        on {next_repayment.expected_payment_date}{" "}
+      </Text>
     </View>
   );
 }
