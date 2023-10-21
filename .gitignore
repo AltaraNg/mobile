@@ -33,7 +33,8 @@ newrelic_agent.log
 .devcontainer/
 
 # local env files
-.env*.local
+.env
+.env.local
 
 # typescript
 *.tsbuildinfo

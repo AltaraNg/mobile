@@ -9,11 +9,10 @@ import { RootTabParamList } from "../types";
 import { FolderPlus } from "../assets/svgs/svg";
 import { OrderContext } from "../context/OrderContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import Constants from "expo-constants";
 import axios from "axios";
 import { FlatList } from "react-native-gesture-handler";
 
-const url = Constants?.manifest?.extra?.URL;
+const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 type Props = NativeStackScreenProps<RootTabParamList, "OrderRequest">;
 

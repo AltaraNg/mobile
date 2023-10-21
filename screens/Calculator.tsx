@@ -8,13 +8,12 @@ import CurrencyInput from "react-native-currency-input";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import Constants from "expo-constants";
 import businessTypes from "../lib/calculator.json";
 import repaymentDurations from "../lib/repaymentDuration.json";
 // import Slider from '@react-native-community/slider';
 import { Slider } from "@miblanchard/react-native-slider";
 // import {cashLoan, calculate} from '../lib/calculator';
-const url = Constants?.manifest?.extra?.URL;
+const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;

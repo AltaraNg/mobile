@@ -1,11 +1,6 @@
 export default {
     // ...
-    extra: {
-        // Fall back to development URL when not set
-        URL: process.env.API_URL ?? "https://altara-customer-play-api.herokuapp.com/api/v1/",
-        APP_ID: process.env.APP_ID ?? "2566",
-        APP_TOKEN: process.env.APP_TOKEN ?? "3giYD4fJ6e7vESNT5Bwa0F",
-    },
+    extra: {},
     slug: "Altara",
     version: "1.0.0",
     orientation: "portrait",
