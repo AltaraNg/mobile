@@ -1,28 +1,39 @@
 {
-  "build": {
-    "preview": {
-      "android": {
-        "buildType": "apk"
-      }
+    "cli": {
+        "version": ">= 5.4.0"
     },
-    "preview2": {
-      "android": {
-        "gradleCommand": ":app:assembleRelease"
-      }
+    "build": {
+        "development": {
+            "developmentClient": true,
+            "distribution": "internal",
+            "env": {
+                "EXPO_PUBLIC_API_URL": "https://altara-customer-play-api.herokuapp.com/api/v1/",
+                "EXPO_PUBLIC_APP_ID": "2566",
+                "EXPO_PUBLIC_APP_TOKEN": "3giYD4fJ6e7vESNT5Bwa0F"
+            },
+            "android": {
+                "buildType": "apk",
+            }
+        },
+        "preview1": {
+            "distribution": "internal"
+        },
+        "preview": {
+            "android": {
+                "buildType": "apk"
+            }
+        },
+        "preview2": {
+            "android": {
+                "gradleCommand": ":app:assembleRelease"
+            }
+        },
+        "preview3": {
+            "developmentClient": true
+        },
+        "production": {}
     },
-    "preview3": {
-      "developmentClient": true
-    },
-    "production": {
-      "android": {
-        "buildType": "apk"
-      },
-      "releaseChannel": "production",
-      "env": {
-      }
+    "submit": {
+        "production": {}
     }
-  },
-  "cli": {
-    "version": ">= 0.47.0"
-  }
 }

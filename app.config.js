@@ -1,7 +1,12 @@
 export default {
     // ...
-    extra: {},
-    slug: "Altara",
+    owner: "ipixels",
+    extra: {
+        eas: {
+            projectId: "ec89dc74-c330-41a0-a4f7-30e7feaf1d42",
+        },
+    },
+    slug: "loan-app",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
@@ -18,6 +23,19 @@ export default {
             {
                 icon: "./assets/images/icon.png",
                 color: "#ffffff",
+            },
+        ],
+        [
+            "expo-build-properties",
+            {
+                android: {
+                    compileSdkVersion: 33,
+                    targetSdkVersion: 31,
+                    buildToolsVersion: "31.0.0",
+                },
+                ios: {
+                    deploymentTarget: "13.0",
+                },
             },
         ],
     ],

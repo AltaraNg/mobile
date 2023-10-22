@@ -25,5 +25,6 @@ module.exports = {
         "prettier/prettier": "error",
         "react/prop-types": "off",
         "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/no-var-requires": "off",
     },
 };
