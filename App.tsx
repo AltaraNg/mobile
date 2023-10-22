@@ -6,11 +6,11 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
 import Navigation from "./navigation";
-import AppLoading from "expo-app-loading";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Provider as PaperProvider } from "react-native-paper";
-import axios from "axios";
+import * as SplashScreen from "expo-splash-screen";
+import { Alert } from "react-native";
 
 import {
     useFonts,
@@ -45,11 +45,21 @@ Notifications.setNotificationHandler({
     }),
 });
 
+// Keep the splash screen visible while we fetch resources|
+SplashScreen.preventAutoHideAsync();
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+    }),
+});
+
 const app_id = process.env.EXPO_PUBLIC_APP_ID;
-const app_token = process.env.EXPO_PUBLIC_APP_TOKEN;
 export default function App() {
     const [, setExpoPushToken] = useState("");
-    const [, setNotification] = useState<Notifications.Notification>({});
+    const [, setNotification] = useState<Notifications.Notification>();
     const notificationListener = useRef({});
     const responseListener = useRef({});
 
@@ -75,18 +85,15 @@ export default function App() {
     });
 
     useEffect(() => {
-        axios.post(`https://app.nativenotify.com/api/analytics`, {
-            app_id: app_id,
-            app_token: app_token,
-            screenName: "Home",
-        }).then;
         registerForPushNotificationsAsync().then((token) => setExpoPushToken(token));
 
         notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
             setNotification(notification);
         });
 
-        responseListener.current = Notifications.addNotificationResponseReceivedListener(() => {});
+        responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+            console.log(response);
+        });
 
         return () => {
             Notifications.removeNotificationSubscription(notificationListener.current as Subscription);
@@ -94,49 +101,68 @@ export default function App() {
         };
     }, []);
 
-    async function registerForPushNotificationsAsync() {
-        let token;
-        if (Device.isDevice) {
-            const { status: existingStatus } = await Notifications.getPermissionsAsync();
-            let finalStatus = existingStatus;
-            if (existingStatus !== "granted") {
-                const { status } = await Notifications.requestPermissionsAsync();
-                finalStatus = status;
-            }
-            if (finalStatus !== "granted") {
-                alert("Failed to get push token for push notification!");
-                return;
-            }
-            token = (await Notifications.getExpoPushTokenAsync()).data;
-        } else {
-            alert("Must use physical device for Push Notifications");
-        }
-
-        if (Platform.OS === "android") {
-            Notifications.setNotificationChannelAsync("default", {
-                name: "default",
-                importance: Notifications.AndroidImportance.MAX,
-                vibrationPattern: [0, 250, 250, 250],
-                lightColor: "#FF231F7C",
-            });
-        }
-
-        return token;
-    }
-
     const isLoadingComplete = useCachedResources();
     const colorScheme = useColorScheme();
 
     if (!isLoadingComplete || !fontsLoaded) {
-        return <AppLoading />;
-    } else {
-        return (
-            <SafeAreaProvider>
-                <PaperProvider>
-                    <Navigation colorScheme={colorScheme} />
-                    <StatusBar style="dark" />
-                </PaperProvider>
-            </SafeAreaProvider>
-        );
+        return null;
     }
+
+    SplashScreen.hideAsync();
+
+    return (
+        <SafeAreaProvider>
+            <PaperProvider>
+                <Navigation colorScheme={colorScheme} />
+                <StatusBar style="dark" />
+            </PaperProvider>
+        </SafeAreaProvider>
+    );
 }
+
+async function registerForPushNotificationsAsync() {
+    let token;
+
+    if (Platform.OS === "android") {
+        await Notifications.setNotificationChannelAsync("default", {
+            name: "default",
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: "#FF231F7C",
+        });
+    }
+
+    if (Device.isDevice) {
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== "granted") {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+        }
+        if (finalStatus !== "granted") {
+            AlertModal("Failed to get push token for push notification!");
+            return;
+        }
+        // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+        token = (await Notifications.getExpoPushTokenAsync({ projectId: app_id })).data;
+        console.log(token);
+    } else {
+        AlertModal("Must use physical device for Push Notifications");
+    }
+
+    return token;
+}
+
+const AlertModal = (message: string) =>
+    Alert.alert("Info", message, [
+        {
+            text: "Ask me later",
+            onPress: () => console.log("Ask me later pressed"),
+        },
+        {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+        },
+        { text: "OK", onPress: () => console.log("OK Pressed") },
+    ]);
