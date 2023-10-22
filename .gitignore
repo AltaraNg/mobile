@@ -38,3 +38,5 @@ newrelic_agent.log
 
 # typescript
 *.tsbuildinfo
+
+wsl/

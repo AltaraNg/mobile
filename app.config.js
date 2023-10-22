@@ -29,7 +29,7 @@ export default {
             "expo-build-properties",
             {
                 android: {
-                    compileSdkVersion: 31,
+                    compileSdkVersion: 33,
                     targetSdkVersion: 31,
                     buildToolsVersion: "31.0.0",
                 },
