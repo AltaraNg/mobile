@@ -1,8 +1,18 @@
 {
+<<<<<<< HEAD
   "extends": "@tsconfig/react-native/tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "node",
   "jsx": "react-jsx",
     "strict": false
   }
+=======
+    "extends": "@tsconfig/react-native/tsconfig.json",
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "jsx": "react-jsx",
+        "strict": false,
+        "types": ["react", "react-native", "@types/node"]
+    }
+>>>>>>> fa571561f48eb7d12fc4db7f5f113255a7646528
 }
