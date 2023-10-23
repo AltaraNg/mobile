@@ -2,9 +2,6 @@ export default {
     // ...
     owner: "ipixels",
     extra: {
-        eas: {
-            projectId: "ec89dc74-c330-41a0-a4f7-30e7feaf1d42",
-        },
     },
     slug: "loan-app",
     version: "1.0.0",
