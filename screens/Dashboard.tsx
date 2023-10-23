@@ -60,7 +60,10 @@ export default function Dashboard({ navigation, route }: Props) {
   const [onBoarded, setOnBoarded] = useState(null);
   const [type, setType] = useState("");
   const [latefee, setlateFee] = useState(null);
-  const [orders, setOrders] = useState(null)
+  const [orders, setOrders] = useState(null);
+  const [nextExpectedRepayment, setNextRepayment] = useState({
+    expected_amount:0
+  });
   const amortization = orders?.included?.amortizations;
   const lateFees = orders?.included?.late_fees;
   const [uploaded, setUploaded] = useState(null);
@@ -98,18 +101,23 @@ export default function Dashboard({ navigation, route }: Props) {
         headers: { Authorization: `Bearer ${authData.token}` },
       });
       const order = response.data.data[0].included.orders[0];
-      setOrders(order)
-      
+      setOrders(order);
+      //console.log(order.included?.amortizations, "orderrr");
+       let nextRepayment = order?.included?.amortizations?.find(
+         (payment: { actual_amount: number }) => payment.actual_amount == 0
+       );
+       setNextRepayment(nextRepayment)
+
       const checkLateFee = order.some(function (item) {
-           const lateFees = item?.included?.late_fees;
-           const lateFeeDebt =
-             lateFees?.reduce((accumulator, object) => {
-               return accumulator + Number(object.amount_due);
-             }, 0) -
-             lateFees.reduce((accumulator, object) => {
-               return accumulator + Number(object.amount_paid);
-             }, 0);
-           return item?.included?.late_fees.length > 0 && lateFeeDebt != 0;
+        const lateFees = item?.included?.late_fees;
+        const lateFeeDebt =
+          lateFees?.reduce((accumulator, object) => {
+            return accumulator + Number(object.amount_due);
+          }, 0) -
+          lateFees.reduce((accumulator, object) => {
+            return accumulator + Number(object.amount_paid);
+          }, 0);
+        return item?.included?.late_fees.length > 0 && lateFeeDebt != 0;
       });
       setlateFee(checkLateFee);
     } catch (error: any) {}
@@ -118,20 +126,20 @@ export default function Dashboard({ navigation, route }: Props) {
     status === "success" ? setIsError(false) : setIsError(true);
     setModalResponse(res);
     setType(type);
-    
+
     setModalVisible(true);
   }
 
   const settUser = async () => {
-    fetchOrder()
+    await fetchOrder();
     fetchOrderRequestContext();
     setUser(authData?.user);
     setOnBoarded(authData?.user?.attributes?.on_boarded);
-    const upload = Object?.values(authData?.user?.included?.verification || {'item': false}).every(
-      (val) => val
-    );
+    const upload = Object?.values(
+      authData?.user?.included?.verification || { item: false }
+    ).every((val) => val);
     setUploaded(upload);
-    setShowLoader(true)
+    setShowLoader(true);
     setRefreshing(false);
   };
   const navigating = (first_choice, second_choice) => {
@@ -142,83 +150,80 @@ export default function Dashboard({ navigation, route }: Props) {
       return second_choice;
     }
   };
-  const viewDetail = (item)=>{
-
-  }
+  const viewDetail = (item) => {};
   const trackOrder = () => {
     navigation.navigate("OrderDetails", orders);
   };
   let totalDebt: number;
-  	let paid_repayment = amortization?.map((item: { actual_amount: number }) => {
-      return item.actual_amount;
-    });
-   let expected_repayment = amortization?.map(
-     (item: { expected_amount: number }) => {
-       return item.expected_amount;
-     }
-   );
-   let total_expected_repayment = expected_repayment?.reduce((total, item) => {
-     return total + item;
-   });
-   let totalPaid = paid_repayment?.reduce((total, item) => {
-     return total + item;
-   }); 
+
+ 
+  let paid_repayment = amortization?.map((item: { actual_amount: number }) => {
+    return item.actual_amount;
+  });
+  let expected_repayment = amortization?.map(
+    (item: { expected_amount: number }) => {
+      return item.expected_amount;
+    }
+  );
+  let total_expected_repayment = expected_repayment?.reduce((total, item) => {
+    return total + item;
+  });
+  let totalPaid = paid_repayment?.reduce((total, item) => {
+    return total + item;
+  });
   totalDebt = total_expected_repayment - totalPaid;
   const progressBar =
     (totalPaid + orders?.attributes?.down_payment / total_expected_repayment) *
     100;
-    const nextRepayment = amortization.find((payment) =>  payment.actual_amount== 0);
-    console.log(nextRepayment);
+
+  // const nextRepayment = {
+  //   expected_amount: 23600,
+  //   expected_payment_date: "2023-03-03",
+  // };
   const recentActivities = [
     {
-      id: '1',
+      id: "1",
       name: "Monthly Repayment",
       date: "01/11/2023",
       amount: "₦9,600",
     },
     {
-      id: '2',
+      id: "2",
       name: "Monthly Repayment",
       date: "01/11/2023",
       amount: "₦9,500",
     },
     {
-      id: '3',
+      id: "3",
       name: "Loan Approved",
       date: "01/11/2023",
       amount: "₦100,000",
     },
   ];
-  const navigateHistory =()=>{
-    const lateOrder = orders.find((order) =>{
-      const lateFees = order?.included?.late_fees
-      const lateFeeDebt = lateFees?.reduce((accumulator, object) => {
+  const navigateHistory = () => {
+    const lateOrder = orders.find((order) => {
+      const lateFees = order?.included?.late_fees;
+      const lateFeeDebt =
+        lateFees?.reduce((accumulator, object) => {
           return accumulator + Number(object.amount_due);
         }, 0) -
         lateFees.reduce((accumulator, object) => {
           return accumulator + Number(object.amount_paid);
         }, 0);
       return order?.included?.late_fees.length > 0 && lateFeeDebt != 0;
-      });
-    navigation.navigate("OrderDetails", lateOrder );
-    
-  }
-  
+    });
+    navigation.navigate("OrderDetails", lateOrder);
+  };
 
   useEffect(() => {
     settUser();
-  }, [authData,]);
-    useEffect(() => {
-      fetchOrder();
-    }, []);
+  }, [authData]);
+  useEffect(() => {
+    fetchOrder();
+  }, []);
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={settUser} />
-      }
-    >
+    <View style={styles.container}>
       <Overlay
         isVisible={modalVisible}
         onBackdropPress={() => {
@@ -361,7 +366,7 @@ export default function Dashboard({ navigation, route }: Props) {
         />
       ) : (
         <View style={styles.main}>
-          <Text style={styles.name}>
+          <Text style={[styles.name,]}>
             {navigating("Hello ☺️", user?.attributes?.first_name)},
           </Text>
           <Text style={styles.message}>Welcome to your altara dashboard </Text>
@@ -499,7 +504,7 @@ export default function Dashboard({ navigation, route }: Props) {
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
               }
               progressBar={progressBar}
-              next_repayment={nextRepayment}
+              next_repayment={nextExpectedRepayment}
               type="cash"
               onRequest={handleRequest}
               trackOrder={trackOrder}
@@ -515,6 +520,9 @@ export default function Dashboard({ navigation, route }: Props) {
             data={recentActivities}
             keyExtractor={(item) => item.id}
             extraData={recentActivities}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={settUser} />
+            }
             // refreshControl={
             //   <RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />
             // }
@@ -561,7 +569,7 @@ export default function Dashboard({ navigation, route }: Props) {
           />
         </View>
       )}
-    </ScrollView>
+    </View>
   );
 }
 
@@ -585,10 +593,11 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   image: {
-    width: Dimensions.get("window").height * 0.2,
+    position:'absolute',
+    width: Dimensions.get("window").width * 0.5,
     height: Dimensions.get("window").height * 0.2,
     backgroundColor: "#EFF5F9",
-    marginTop: Dimensions.get("window").height * 0.2,
+    marginTop: Dimensions.get("window").height * 0.4,
     left: Dimensions.get("window").width * 0.25,
   },
   hamburger: {
@@ -614,7 +623,7 @@ const styles = StyleSheet.create({
   main: {
     flex: 3,
     backgroundColor: "#EFF5F9",
-    marginTop: 20,
+    marginTop: 0,
   },
   name: {
     marginHorizontal: 30,
