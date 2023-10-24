@@ -144,7 +144,7 @@ const RenderPagination = ({ activeIndex, slider, data, onIntroCompleted, loginPa
 
                 <View style={[styles.buttonContainer, { marginBottom: 10 }]}>
                     <Pressable onPress={handleIntroCompleted} style={[styles.button, { backgroundColor: "#EFF5F9" }]}>
-                        <Text style={styles.buttonText}>Log in with OTP</Text>
+                        <Text style={styles.buttonText}>Login</Text>
                     </Pressable>
                 </View>
                 

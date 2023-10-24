@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, TextInput, ToastAndroid, Platform, TouchableOpacity, Image, Dimensions, ScrollView } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calender } from "../assets/svgs/svg";
 import Header from "../components/Header";
@@ -22,16 +22,16 @@ export default function Dashboard({ navigation }: Props) {
     const auth = useAuth();
 
     const { authData, setAuthData } = useContext(AuthContext);
-    const [, setUser] = useState(null);
+    const [setUser] = useState(null);
     const [loading, setLoading] = useState(false);
     const [loading2, setLoading2] = useState(null);
     const [onBoarded, setOnBoarded] = useState(null);
     const [showMenu] = useState(false);
     const [isFocus, setIsFocus] = useState(false);
     const [date, setDate] = useState(new Date());
-    const [, setMode] = useState("date");
+    const [mode, setMode] = useState("date");
     const [show, setShow] = useState(false);
-    const [, setText] = useState("Enter Date");
+    const [text, setText] = useState("Enter Date");
     const [uploaded, setUploaded] = useState(null);
     const [validateForm, setValidateForm] = useState(false);
     const [userData, setUserData] = useState({} as UserData);
@@ -55,13 +55,16 @@ export default function Dashboard({ navigation }: Props) {
         staff_id?: number;
         date_of_birth;
     }
-    const onChange = (_, selectedDate) => {
+    const onChange = (event: DateTimePickerEvent, selectedDate: Date) => {
         const currentDate = selectedDate || date;
         setShow(Platform.OS == "ios");
-        setDate(currentDate);
+        console.log(currentDate)
+
+        setDate(selectedDate);
         const tempDate = new Date(currentDate);
         const fDate = tempDate.getDate() + "/" + (tempDate.getMonth() + 1) + "/" + tempDate.getFullYear();
         setText(fDate);
+
         setUserData({ ...userData, date_of_birth: selectedDate.toLocaleDateString() });
     };
     const showMode = (currentMode) => {
@@ -286,9 +289,9 @@ export default function Dashboard({ navigation }: Props) {
                                                 testID="dateTimePicker"
                                                 value={date}
                                                 mode="date"
-                                                is24Hour={true}
                                                 display="default"
                                                 onChange={onChange}
+                                                dateFormat="dayofweek day month"
                                             />
                                         )}
                                     </View>
