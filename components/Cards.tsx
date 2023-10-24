@@ -3,14 +3,13 @@ import { StyleSheet, Pressable, Image } from "react-native";
 import { Text, View } from "../components/Themed";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
-import Constants from "expo-constants";
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { OrderContext } from "../context/OrderContext";
 import Animated from "react-native-reanimated";
 
 export default function Cards({ navigation, trackOrder, next_repayment, title, progressBar, amount, isDisabled, type, onRequest }) {
-    const url = Constants?.manifest?.extra?.URL;
+    const url = process.env.EXPO_PUBLIC_API_URL;
     axios.defaults.baseURL = url;
     const { authData } = useContext(AuthContext);
     const { setOrderRequest, orderRequest } = useContext(OrderContext);
@@ -18,17 +17,6 @@ export default function Cards({ navigation, trackOrder, next_repayment, title, p
     const [showButton, setShowButton] = useState(null);
 
     // const progressBar = ((totalPaid - order?.attributes?.down_payment) / order?.attributes?.repayment) * 100;
-
-    async function fetchOrder(): Promise<void> {
-        const response = await axios({
-            method: "GET",
-            url: `/customers/${authData.user.id}/requests`,
-            headers: { Authorization: `Bearer ${authData.token}` },
-        });
-        const orderRequestContext = response.data.data.order_requests;
-        const reversed = orderRequestContext.reverse();
-        setOrderRequest(reversed);
-    }
 
     async function doSome() {
         if (type === "cash") {
@@ -45,7 +33,7 @@ export default function Cards({ navigation, trackOrder, next_repayment, title, p
                     headers: { Authorization: `Bearer ${authData.token}` },
                 });
                 if (res.status === 200) {
-                    fetchOrder();
+                    setOrderRequest();
                     onRequest(res.data, "success", type);
                     setLoader(false);
                 }

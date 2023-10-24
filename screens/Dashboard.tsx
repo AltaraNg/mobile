@@ -4,7 +4,6 @@ import { Overlay } from "react-native-elements";
 import { SuccessSvg, Hamburger, Debited, Credited, User, Warning } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import React, { useState, useEffect, useContext } from "react";
-//import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
 import { DrawerParamList } from "../types";
 import Cards from "../components/Cards";
@@ -21,7 +20,7 @@ export default function Dashboard({ navigation }: Props) {
     const { fetchOrderRequestContext, showLoader2 } = useContext(OrderContext);
     const [isError, setIsError] = useState(false);
     const [user, setUser] = useState(null);
-    const [refreshing, setRefreshing] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [modalResponse, setModalResponse] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [onBoarded, setOnBoarded] = useState(null);
@@ -79,7 +78,7 @@ export default function Dashboard({ navigation }: Props) {
         setOnBoarded(authData?.user?.attributes?.on_boarded);
         const upload = Object?.values(authData?.user?.included?.verification || { item: false }).every((val) => val);
         setUploaded(upload);
-        setShowLoader(true);
+        setShowLoader(false);
         setRefreshing(false);
     };
     const navigating = (first_choice, second_choice) => {
@@ -89,9 +88,6 @@ export default function Dashboard({ navigation }: Props) {
         if ((onBoarded && !uploaded) || onBoarded) {
             return second_choice;
         }
-    };
-    const viewDetail = (item) => {
-        return item;
     };
     const trackOrder = () => {
         navigation.navigate("OrderDetails", orders);
@@ -111,11 +107,6 @@ export default function Dashboard({ navigation }: Props) {
     });
     const totalDebt = total_expected_repayment - totalPaid;
     const progressBar = (totalPaid + orders?.attributes?.down_payment / total_expected_repayment) * 100;
-
-    // const nextRepayment = {
-    //   expected_amount: 23600,
-    //   expected_payment_date: "2023-03-03",
-    // };
     const recentActivities = [
         {
             id: "1",
@@ -423,12 +414,9 @@ export default function Dashboard({ navigation }: Props) {
                         keyExtractor={(item) => item.id}
                         extraData={recentActivities}
                         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={settUser} />}
-                        // refreshControl={
-                        //   <RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />
-                        // }
                         renderItem={({ item }) => (
                             <View style={{ backgroundColor: "transparent" }}>
-                                <Pressable onPress={() => viewDetail(item)}>
+                                <Pressable>
                                     <View style={styles.order}>
                                         <View style={styles.details}>
                                             {item.name.includes("Approved") ? <Credited /> : <Debited />}
