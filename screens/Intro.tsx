@@ -147,11 +147,7 @@ const RenderPagination = ({ activeIndex, slider, data, onIntroCompleted, loginPa
                         <Text style={styles.buttonText}>Log in with OTP</Text>
                     </Pressable>
                 </View>
-                <View style={[styles.buttonContainer, { backgroundColor: "#074A74" }]}>
-                    <Pressable onPress={loginPassword} style={[styles.button, { backgroundColor: "#074A74" }]}>
-                        <Text style={[styles.buttonText, { color: "white" }]}>Log in with password</Text>
-                    </Pressable>
-                </View>
+                
             </SafeAreaView>
         </View>
     );
