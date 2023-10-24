@@ -1,84 +1,67 @@
-import { Pressable, StyleSheet, ScrollView, TouchableOpacity, Modal, TouchableHighlight, RefreshControl, Image, Dimensions } from "react-native";
+import { Pressable, StyleSheet, TouchableOpacity, Modal, TouchableHighlight, RefreshControl, Image, Dimensions } from "react-native";
 import { Overlay } from "react-native-elements";
-import { SuccessSvg, User, Warning } from "../assets/svgs/svg";
+
+import { SuccessSvg, Hamburger, Debited, Credited, User, Warning } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import React, { useState, useEffect, useContext } from "react";
-import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
 import { DrawerParamList } from "../types";
 import Cards from "../components/Cards";
 import { AuthContext } from "../context/AuthContext";
 import { OrderContext } from "../context/OrderContext";
+import { FlatList } from "react-native";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import axios from "axios";
-// import { useFeatures } from "flagged";
 
 type Props = DrawerScreenProps<DrawerParamList, "Home">;
 
 export default function Dashboard({ navigation }: Props) {
     const { authData, showLoader, setShowLoader } = useContext(AuthContext);
     const { fetchOrderRequestContext, showLoader2 } = useContext(OrderContext);
-    // const [exitApp, setExitApp] = useState(1);
     const [isError, setIsError] = useState(false);
     const [user, setUser] = useState(null);
-    const [refreshing, setRefreshing] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [modalResponse, setModalResponse] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [onBoarded, setOnBoarded] = useState(null);
     const [type, setType] = useState("");
     const [latefee, setlateFee] = useState(null);
     const [orders, setOrders] = useState(null);
+    const [nextExpectedRepayment, setNextRepayment] = useState({
+        expected_amount: 0,
+    });
+    const amortization = orders?.included?.amortizations;
     const [uploaded, setUploaded] = useState(null);
+
     const toggleSideMenu = async () => {
         navigation.toggleDrawer();
     };
 
-    // const features = useFeatures();
-
-    // const backAction = () => {
-    //   if (Platform.OS === "ios") return;
-    //   setTimeout(() => {}, 3000);
-
-    //   if (exitApp === 0) {
-    //     setExitApp(exitApp + 1);
-
-    //     ToastAndroid.showWithGravity(
-    //       "press back button again to exit app",
-    //       ToastAndroid.SHORT,
-    //       ToastAndroid.CENTER
-    //     );
-    //   } else {
-    //     BackHandler.exitApp();
-    //   }
-
-    //   return true;
-    // };
     const fetchOrder = async () => {
         setShowLoader(true);
-        try {
-            const response = await axios({
-                method: "GET",
-                url: `/customers/${authData?.user?.id}/orders`,
-                headers: { Authorization: `Bearer ${authData?.token}` },
-            });
-            const order = response.data.data[0].included.orders;
-            setOrders(order);
 
-            const checkLateFee = order.some(function (item) {
-                const lateFees = item?.included?.late_fees;
-                const lateFeeDebt =
-                    lateFees?.reduce((accumulator, object) => {
-                        return accumulator + Number(object.amount_due);
-                    }, 0) -
-                    lateFees.reduce((accumulator, object) => {
-                        return accumulator + Number(object.amount_paid);
-                    }, 0);
-                return item?.included?.late_fees.length > 0 && lateFeeDebt != 0;
-            });
-            setlateFee(checkLateFee);
-        } catch (error) {
-            console.log(error);
-        }
+        const response = await axios({
+            method: "GET",
+            url: `/customers/${authData.user.id}/orders`,
+            headers: { Authorization: `Bearer ${authData.token}` },
+        });
+        const order = response.data.data[0].included.orders[0];
+        setOrders(order);
+        const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
+        setNextRepayment(nextRepayment);
+
+        const checkLateFee = order.some(function (item) {
+            const lateFees = item?.included?.late_fees;
+            const lateFeeDebt =
+                lateFees?.reduce((accumulator, object) => {
+                    return accumulator + Number(object.amount_due);
+                }, 0) -
+                lateFees.reduce((accumulator, object) => {
+                    return accumulator + Number(object.amount_paid);
+                }, 0);
+            return item?.included?.late_fees.length > 0 && lateFeeDebt != 0;
+        });
+        setlateFee(checkLateFee);
     };
     function handleRequest(res, status: string, type: string) {
         status === "success" ? setIsError(false) : setIsError(true);
@@ -89,13 +72,13 @@ export default function Dashboard({ navigation }: Props) {
     }
 
     const settUser = async () => {
-        fetchOrder();
+        await fetchOrder();
         fetchOrderRequestContext();
         setUser(authData?.user);
         setOnBoarded(authData?.user?.attributes?.on_boarded);
         const upload = Object?.values(authData?.user?.included?.verification || { item: false }).every((val) => val);
         setUploaded(upload);
-        setShowLoader(true);
+        setShowLoader(false);
         setRefreshing(false);
     };
     const navigating = (first_choice, second_choice) => {
@@ -106,6 +89,44 @@ export default function Dashboard({ navigation }: Props) {
             return second_choice;
         }
     };
+    const trackOrder = () => {
+        navigation.navigate("OrderDetails", orders);
+    };
+
+    const paid_repayment = amortization?.map((item: { actual_amount: number }) => {
+        return item.actual_amount;
+    });
+    const expected_repayment = amortization?.map((item: { expected_amount: number }) => {
+        return item.expected_amount;
+    });
+    const total_expected_repayment = expected_repayment?.reduce((total, item) => {
+        return total + item;
+    });
+    const totalPaid = paid_repayment?.reduce((total, item) => {
+        return total + item;
+    });
+    const totalDebt = total_expected_repayment - totalPaid;
+    const progressBar = (totalPaid + orders?.attributes?.down_payment / total_expected_repayment) * 100;
+    const recentActivities = [
+        {
+            id: "1",
+            name: "Monthly Repayment",
+            date: "01/11/2023",
+            amount: "₦9,600",
+        },
+        {
+            id: "2",
+            name: "Monthly Repayment",
+            date: "01/11/2023",
+            amount: "₦9,500",
+        },
+        {
+            id: "3",
+            name: "Loan Approved",
+            date: "01/11/2023",
+            amount: "₦100,000",
+        },
+    ];
     const navigateHistory = () => {
         const lateOrder = orders.find((order) => {
             const lateFees = order?.included?.late_fees;
@@ -129,7 +150,7 @@ export default function Dashboard({ navigation }: Props) {
     }, []);
 
     return (
-        <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={settUser} />}>
+        <View style={styles.container}>
             <Overlay
                 isVisible={modalVisible}
                 onBackdropPress={() => {
@@ -242,7 +263,9 @@ export default function Dashboard({ navigation }: Props) {
                 <Header navigation={navigation}></Header>
                 <TouchableOpacity>
                     <Pressable onPress={toggleSideMenu}>
-                        <Hamburger style={styles.hamburger} />
+                        <View style={styles.hamburger}>
+                            <Hamburger />
+                        </View>
                     </Pressable>
                 </TouchableOpacity>
             </View>
@@ -251,7 +274,7 @@ export default function Dashboard({ navigation }: Props) {
                 <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
             ) : (
                 <View style={styles.main}>
-                    <Text style={styles.name}>{navigating("Hello ☺️", user?.attributes?.first_name)},</Text>
+                    <Text style={[styles.name]}>{navigating("Hello ☺️", user?.attributes?.first_name)},</Text>
                     <Text style={styles.message}>Welcome to your altara dashboard </Text>
                     {!uploaded && (
                         <View
@@ -373,30 +396,62 @@ export default function Dashboard({ navigation }: Props) {
 
                     <View style={styles.cards}>
                         <Cards
-                            title="Get a Loan Now!!!"
-                            amount="Up to ₦500,000"
+                            title="Loan Balance"
+                            amount={totalDebt <= 0 ? 0 : `₦${totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}
+                            progressBar={progressBar}
+                            next_repayment={nextExpectedRepayment}
                             type="cash"
                             onRequest={handleRequest}
+                            trackOrder={trackOrder}
                             isDisabled={!onBoarded}
-                            width={!onBoarded ? 300 : 0}
-                            height={!onBoarded ? 150 : 0}
-                            navigation={navigation}
-                        />
-
-                        <Cards
-                            title="Order a Product Now!!!"
-                            amount="Up to ₦500,000"
-                            type="product"
-                            onRequest={handleRequest}
-                            isDisabled={!onBoarded}
-                            width={!onBoarded ? 300 : 0}
-                            height={!onBoarded ? 150 : 0}
                             navigation={navigation}
                         />
                     </View>
+                    <Text style={styles.name}>Recent Activities</Text>
+                    <FlatList
+                        scrollEnabled={true}
+                        data={recentActivities}
+                        keyExtractor={(item) => item.id}
+                        extraData={recentActivities}
+                        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={settUser} />}
+                        renderItem={({ item }) => (
+                            <View style={{ backgroundColor: "transparent" }}>
+                                <Pressable>
+                                    <View style={styles.order}>
+                                        <View style={styles.details}>
+                                            {item.name.includes("Approved") ? <Credited /> : <Debited />}
+                                            <View style={styles.title}>
+                                                <Text
+                                                    style={{
+                                                        color: "#333333",
+                                                        fontFamily: "Montserrat_600SemiBold",
+                                                    }}
+                                                    numberOfLines={1}
+                                                    ellipsizeMode={"tail"}
+                                                >
+                                                    {item.name}{" "}
+                                                </Text>
+                                                <Text style={{ color: "#000", fontSize: 11 }}>{item?.date}</Text>
+                                            </View>
+                                        </View>
+                                        <Text
+                                            style={{
+                                                color: "#000",
+                                                fontSize: 13,
+                                                marginRight: 59,
+                                                fontFamily: "Montserrat_600SemiBold",
+                                            }}
+                                        >
+                                            {item?.amount}
+                                        </Text>
+                                    </View>
+                                </Pressable>
+                            </View>
+                        )}
+                    />
                 </View>
             )}
-        </ScrollView>
+        </View>
     );
 }
 
@@ -420,20 +475,27 @@ const styles = StyleSheet.create({
         padding: 15,
     },
     image: {
-        width: Dimensions.get("window").height * 0.2,
+        position: "absolute",
+        width: Dimensions.get("window").width * 0.5,
         height: Dimensions.get("window").height * 0.2,
         backgroundColor: "#EFF5F9",
-        marginTop: Dimensions.get("window").height * 0.2,
+        marginTop: Dimensions.get("window").height * 0.4,
         left: Dimensions.get("window").width * 0.25,
     },
     hamburger: {
         marginTop: 80,
         marginRight: 24,
+        backgroundColor: "transparent",
     },
     cards: {
         backgroundColor: "#EFF5F9",
         flexDirection: "column",
         alignItems: "center",
+    },
+    title: {
+        backgroundColor: "#fff",
+        marginLeft: 10,
+        width: "65%",
     },
     header: {
         flex: 1,
@@ -444,17 +506,17 @@ const styles = StyleSheet.create({
     main: {
         flex: 3,
         backgroundColor: "#EFF5F9",
-        marginTop: 40,
+        marginTop: 0,
     },
     name: {
         marginHorizontal: 30,
-        fontSize: 25,
+        fontSize: 20,
         color: "#074A74",
         fontFamily: "Montserrat_700Bold",
     },
     message: {
         fontFamily: "Montserrat_400Regular",
-        marginTop: 10,
+        marginTop: 0,
         marginHorizontal: 30,
         fontSize: 12,
         color: "#72788D",
@@ -496,7 +558,29 @@ const styles = StyleSheet.create({
         fontSize: 15,
         borderRadius: 50,
     },
-
+    details: {
+        backgroundColor: "#fff",
+        flexDirection: "row",
+        alignItems: "center",
+        paddingLeft: 10,
+    },
+    order: {
+        backgroundColor: "#fff",
+        flexDirection: "row",
+        marginLeft: 26,
+        marginRight: 20,
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginVertical: 10,
+        paddingTop: 12,
+        paddingBottom: 12,
+        borderRadius: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+    },
     errText: {
         fontSize: 15,
         marginTop: 20,
