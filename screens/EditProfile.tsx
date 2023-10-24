@@ -200,14 +200,8 @@ export default function Dashboard({ navigation }: Props) {
                 <View style={styles.main}>
                     <Text style={styles.title}>{!onBoarded ? "Create" : "Edit"} Profile</Text>
                     {!onBoarded && <Text style={styles.simple}>We want to know you better</Text>}
-                    <ScrollView
-                        style={{
-                            backgroundColor: "white",
-                            overflow: "scroll",
-                            paddingTop: 10,
-                        }}
-                    >
-                        <View style={{ backgroundColor: "white", paddingHorizontal: 15 }}>
+                    <ScrollView>
+                        <View style={styles.custom}>
                             <View style={styles.data}>
                                 <Text style={[styles.label, { width: Dimensions.get("window").width * 0.92 }]}> First Name </Text>
                                 <TextInput
@@ -524,6 +518,10 @@ const styles = StyleSheet.create({
         flex: 4,
         backgroundColor: "#fff",
         marginTop: 40,
+    },
+    custom: {
+        backgroundColor: "white",
+        paddingHorizontal: 15,
     },
     title: {
         marginHorizontal: 15,
