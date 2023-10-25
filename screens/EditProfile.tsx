@@ -142,8 +142,6 @@ export default function Dashboard({ navigation }: Props) {
             setOnBoarded(user?.on_boarded);
             setLoading2(false);
         } catch (error) {
-            console.log(error.response);
-
             ToastAndroid.showWithGravity("Unable to fetch user", ToastAndroid.SHORT, ToastAndroid.CENTER);
             setLoading2(false);
         }
