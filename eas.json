@@ -12,7 +12,7 @@
                 "EXPO_PUBLIC_APP_TOKEN": "3giYD4fJ6e7vESNT5Bwa0F"
             },
             "android": {
-                "buildType": "apk",
+                "buildType": "apk"
             }
         },
         "preview1": {

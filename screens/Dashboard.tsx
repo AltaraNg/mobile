@@ -235,7 +235,7 @@ export default function Dashboard({ navigation }: Props) {
                                         height: Dimensions.get("window").width * 0.3,
                                         backgroundColor: "#DB2721",
                                         justifyContent: "center",
-                                        alignItems: "center"
+                                        alignItems: "center",
                                     }}
                                     underlayColor="#ccc"
                                 >
@@ -243,7 +243,7 @@ export default function Dashboard({ navigation }: Props) {
                                         style={{
                                             fontSize: 68,
                                             color: "#fff",
-                                            fontFamily: "Montserrat_900Black"
+                                            fontFamily: "Montserrat_900Black",
                                         }}
                                     >
                                         &#x2715;
@@ -281,7 +281,7 @@ export default function Dashboard({ navigation }: Props) {
                             style={{
                                 alignItems: "center",
                                 backgroundColor: "#EFF5F9",
-                                marginBottom: 20
+                                marginBottom: 20,
                             }}
                         >
                             <View style={styles.activate}>
@@ -311,7 +311,7 @@ export default function Dashboard({ navigation }: Props) {
                                     <Pressable
                                         onPress={() =>
                                             navigation.navigate("CreateProfile", {
-                                                user: authData.user
+                                                user: authData.user,
                                             })
                                         }
                                     >

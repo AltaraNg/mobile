@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, TextInput, ToastAndroid, Platform, TouchableOpacity, Image, Dimensions, ScrollView } from "react-native";
-import DateTimePicker, {DateTimePickerEvent} from "@react-native-community/datetimepicker";
+import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calender } from "../assets/svgs/svg";
 import Header from "../components/Header";
@@ -94,7 +94,6 @@ export default function Dashboard({ navigation }: Props) {
         userData.date_of_birth = "1999-10-09";
         userData.civil_status = "single";
         try {
-
             const result = await axios({
                 method: "PATCH",
                 url: `/customers/${authData.user.id}`,
@@ -120,8 +119,8 @@ export default function Dashboard({ navigation }: Props) {
     };
 
     const checkUser = () => {
-        delete(userData.civil_status);
-        delete(userData.date_of_birth);
+        delete userData.civil_status;
+        delete userData.date_of_birth;
         const validateForm = Object.values(userData as Obj).every((userData: string) => userData !== "N/A" && userData);
         validateForm ? setValidateForm(true) : setValidateForm(false);
     };

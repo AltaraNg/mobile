@@ -27,7 +27,7 @@ const data = [
         img: image3,
     },
 ];
-type Item = typeof data[0];
+type Item = (typeof data)[0];
 type RenderPaginationProps = {
     data: any[];
     activeIndex: number;
@@ -147,7 +147,6 @@ const RenderPagination = ({ activeIndex, slider, data, onIntroCompleted, loginPa
                         <Text style={styles.buttonText}>Login</Text>
                     </Pressable>
                 </View>
-                
             </SafeAreaView>
         </View>
     );
