@@ -103,8 +103,8 @@ export default function Cards({ navigation, trackOrder, next_repayment, title, p
                 />
             </View>
             <Text>
-                To pay {`₦${next_repayment.expected_amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on{" "}
-                {next_repayment.expected_payment_date}{" "}
+                To pay {`₦${next_repayment?.expected_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on{" "}
+                {next_repayment?.expected_payment_date}{" "}
             </Text>
         </View>
     );

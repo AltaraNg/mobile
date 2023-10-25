@@ -112,7 +112,7 @@ export default function Dashboard({ navigation }: Props) {
             setOnBoarded(authData.user?.attributes?.on_boarded);
             const upload = Object.values(authData.user?.included?.verification || {}).every((val) => val);
             setUploaded(upload);
-            navigation.navigate("ViewProfile", { user: authData?.user });
+            navigation.navigate("Home", { user: authData?.user });
         } catch (error) {
             ToastAndroid.showWithGravity("Error! Request was not completed, Please complete all fields", ToastAndroid.SHORT, ToastAndroid.CENTER);
             setLoading(false);
