@@ -89,6 +89,4 @@ export const illustration = `<svg width="296" height="225" viewBox="0 0 296 225"
 <rect width="27.5865" height="192.065" fill="white" transform="translate(189.557 0.302979)"/>
 </clipPath>
 </defs>
-</svg>`
-
-
+</svg>`;

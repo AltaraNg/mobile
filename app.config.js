@@ -1,8 +1,7 @@
 export default {
     // ...
     owner: "ipixels",
-    extra: {
-    },
+    extra: {},
     slug: "loan-app",
     version: "1.0.0",
     orientation: "portrait",

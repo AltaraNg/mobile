@@ -126,7 +126,6 @@ function RootNavigator() {
                         <Stack.Screen options={{ headerShown: false }} name="Intro" component={Intro} />
                         <Stack.Screen options={{ headerShown: false }} name="Login" component={Login} />
                         <Stack.Screen options={{ headerShown: false }} name="LoginPassword" component={LoginPassword} />
-
                         <Stack.Screen options={{ headerShown: false }} name="OTP" component={Otp} />
                     </Stack.Group>
                 ) : (
@@ -171,12 +170,12 @@ function DrawerNavigator() {
     }, [authData]);
     return (
         <DrawerNav.Navigator
-            initialRouteName="Home"
+            initialRouteName={user?.attributes?.on_boarded ? "Home" : "CreateProfile"}
             backBehavior="initialRoute"
             screenOptions={{
                 drawerStyle: {
                     backgroundColor: "#fff",
-                    width: 240,
+                    width: 280,
                 },
             }}
             drawerContent={(props) => <CustomSidebarMenu {...props} />}
@@ -200,6 +199,7 @@ function DrawerNavigator() {
                 options={{
                     drawerLabelStyle: { color: "#9C9696" },
                     headerShown: false,
+                    drawerLabel: "View Profile",
                     drawerIcon: () => <EvilIcons name="user" size={24} color="#9C9696" />,
                 }}
             />
@@ -209,6 +209,7 @@ function DrawerNavigator() {
                     component={EditProfile}
                     options={{
                         drawerLabelStyle: { color: "#9C9696" },
+                        drawerLabel: "Edit Profile",
                         headerShown: false,
                         drawerIcon: () => <AntDesign name="edit" size={24} color="#9C9696" />,
                     }}
@@ -219,6 +220,7 @@ function DrawerNavigator() {
                     component={EditProfile}
                     options={{
                         drawerLabelStyle: { color: "#9C9696" },
+                        drawerLabel: "Create Profile",
                         headerShown: false,
                         drawerIcon: () => <AntDesign name="edit" size={24} color="#9C9696" />,
                     }}
@@ -230,6 +232,7 @@ function DrawerNavigator() {
                     component={UploadDocument}
                     options={{
                         drawerLabelStyle: { color: "#9C9696" },
+                        drawerLabel: "Upload Document",
                         headerShown: false,
                         drawerIcon: () => <AntDesign name="addfile" size={24} color="#9C9696" />,
                     }}

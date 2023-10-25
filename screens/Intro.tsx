@@ -27,7 +27,7 @@ const data = [
         img: image3,
     },
 ];
-type Item = typeof data[0];
+type Item = (typeof data)[0];
 type RenderPaginationProps = {
     data: any[];
     activeIndex: number;
@@ -144,12 +144,7 @@ const RenderPagination = ({ activeIndex, slider, data, onIntroCompleted, loginPa
 
                 <View style={[styles.buttonContainer, { marginBottom: 10 }]}>
                     <Pressable onPress={handleIntroCompleted} style={[styles.button, { backgroundColor: "#EFF5F9" }]}>
-                        <Text style={styles.buttonText}>Log in with OTP</Text>
-                    </Pressable>
-                </View>
-                <View style={[styles.buttonContainer, { backgroundColor: "#074A74" }]}>
-                    <Pressable onPress={loginPassword} style={[styles.button, { backgroundColor: "#074A74" }]}>
-                        <Text style={[styles.buttonText, { color: "white" }]}>Log in with password</Text>
+                        <Text style={styles.buttonText}>Login</Text>
                     </Pressable>
                 </View>
             </SafeAreaView>

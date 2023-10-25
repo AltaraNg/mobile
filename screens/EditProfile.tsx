@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, TextInput, ToastAndroid, Platform, TouchableOpacity, Image, Dimensions, ScrollView } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calender } from "../assets/svgs/svg";
 import Header from "../components/Header";
@@ -22,16 +22,16 @@ export default function Dashboard({ navigation }: Props) {
     const auth = useAuth();
 
     const { authData, setAuthData } = useContext(AuthContext);
-    const [, setUser] = useState(null);
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
     const [loading2, setLoading2] = useState(null);
     const [onBoarded, setOnBoarded] = useState(null);
     const [showMenu] = useState(false);
     const [isFocus, setIsFocus] = useState(false);
     const [date, setDate] = useState(new Date());
-    const [, setMode] = useState("date");
+    const [mode, setMode] = useState("date");
     const [show, setShow] = useState(false);
-    const [, setText] = useState("Enter Date");
+    const [text, setText] = useState("Enter Date");
     const [uploaded, setUploaded] = useState(null);
     const [validateForm, setValidateForm] = useState(false);
     const [userData, setUserData] = useState({} as UserData);
@@ -46,28 +46,29 @@ export default function Dashboard({ navigation }: Props) {
         last_name?: string;
         add_street?: string;
         city?: string;
-        civil_status?;
         date_of_registration?: string;
         employment_status;
         gender?: string;
         on_boarded?: boolean;
         phone_number?: string;
         staff_id?: number;
-        date_of_birth;
     }
-    const onChange = (_, selectedDate) => {
-        const currentDate = selectedDate || date;
-        setShow(Platform.OS == "ios");
-        setDate(currentDate);
-        const tempDate = new Date(currentDate);
-        const fDate = tempDate.getDate() + "/" + (tempDate.getMonth() + 1) + "/" + tempDate.getFullYear();
-        setText(fDate);
-        setUserData({ ...userData, date_of_birth: selectedDate.toLocaleDateString() });
-    };
-    const showMode = (currentMode) => {
-        setShow(true);
-        setMode(currentMode);
-    };
+    // const onChange = (event: DateTimePickerEvent, selectedDate: Date) => {
+    //     const currentDate = selectedDate || date;
+    //     setShow(Platform.OS == "ios");
+    //     console.log(currentDate)
+
+    //     setDate(selectedDate);
+    //     const tempDate = new Date(currentDate);
+    //     const fDate = tempDate.getDate() + "/" + (tempDate.getMonth() + 1) + "/" + tempDate.getFullYear();
+    //     setText(fDate);
+
+    //     setUserData({ ...userData, date_of_birth: selectedDate.toLocaleDateString() });
+    // };
+    // const showMode = (currentMode) => {
+    //     setShow(true);
+    //     setMode(currentMode);
+    // };
     const toggleSideMenu = async () => {
         navigation.toggleDrawer();
     };
@@ -90,6 +91,8 @@ export default function Dashboard({ navigation }: Props) {
     // }
     const handleUpdate = async () => {
         setLoading(true);
+        userData.date_of_birth = "1999-10-09";
+        userData.civil_status = "single";
         try {
             const result = await axios({
                 method: "PATCH",
@@ -108,7 +111,7 @@ export default function Dashboard({ navigation }: Props) {
             setOnBoarded(authData.user?.attributes?.on_boarded);
             const upload = Object.values(authData.user?.included?.verification || {}).every((val) => val);
             setUploaded(upload);
-            uploaded ? navigation.navigate("ViewProfile", { user: authData?.user }) : navigation.navigate("UploadDocument", { user: authData?.user });
+            navigation.navigate("Home", { user: authData?.user });
         } catch (error) {
             ToastAndroid.showWithGravity("Error! Request was not completed, Please complete all fields", ToastAndroid.SHORT, ToastAndroid.CENTER);
             setLoading(false);
@@ -116,6 +119,8 @@ export default function Dashboard({ navigation }: Props) {
     };
 
     const checkUser = () => {
+        delete userData.civil_status;
+        delete userData.date_of_birth;
         const validateForm = Object.values(userData as Obj).every((userData: string) => userData !== "N/A" && userData);
         validateForm ? setValidateForm(true) : setValidateForm(false);
     };
@@ -128,10 +133,10 @@ export default function Dashboard({ navigation }: Props) {
                 url: `/auth/user`,
                 headers: { Authorization: `Bearer ${authData.token}` },
             });
-            const user = response.data.data[0].attributes;
-            setUser(user);
+            const userFetched = response.data.data[0].attributes;
+            setUser(userFetched);
+
             const { reg_id, middle_name, email_address, on_boarded, staff_id, ...rest } = user || ({} as Obj);
-            console.log(reg_id, middle_name, email_address, on_boarded, staff_id);
             setUserData({ ...rest, ...{ state: "none" } });
             setOnBoarded(user?.on_boarded);
             setLoading2(false);
@@ -180,7 +185,7 @@ export default function Dashboard({ navigation }: Props) {
 
     useEffect(() => {
         fetchUser();
-    }, [authData]);
+    }, []);
     useEffect(() => {
         checkUser();
     }, [userData]);
@@ -200,14 +205,8 @@ export default function Dashboard({ navigation }: Props) {
                 <View style={styles.main}>
                     <Text style={styles.title}>{!onBoarded ? "Create" : "Edit"} Profile</Text>
                     {!onBoarded && <Text style={styles.simple}>We want to know you better</Text>}
-                    <ScrollView
-                        style={{
-                            backgroundColor: "white",
-                            overflow: "scroll",
-                            paddingTop: 10,
-                        }}
-                    >
-                        <View style={{ backgroundColor: "white", paddingHorizontal: 15 }}>
+                    <ScrollView>
+                        <View style={styles.custom}>
                             <View style={styles.data}>
                                 <Text style={[styles.label, { width: Dimensions.get("window").width * 0.92 }]}> First Name </Text>
                                 <TextInput
@@ -263,7 +262,7 @@ export default function Dashboard({ navigation }: Props) {
                                             />
                                         </View>
                                     </View>
-                                    <View style={styles.data}>
+                                    {/* <View style={styles.data}>
                                         <Text style={[styles.label, { width: Dimensions.get("window").width * 0.42 }]}> Date of Birth </Text>
                                         <View
                                             style={[
@@ -292,12 +291,12 @@ export default function Dashboard({ navigation }: Props) {
                                                 testID="dateTimePicker"
                                                 value={date}
                                                 mode="date"
-                                                is24Hour={true}
                                                 display="default"
                                                 onChange={onChange}
+                                                dateFormat="dayofweek day month"
                                             />
                                         )}
-                                    </View>
+                                    </View> */}
                                 </View>
 
                                 <View style={styles.data}>
@@ -341,13 +340,13 @@ export default function Dashboard({ navigation }: Props) {
                                 </View>
 
                                 <View style={styles.row}>
-                                    <View style={[styles.data, { width: Dimensions.get("window").width * 0.46 }]}>
+                                    <View style={[styles.data, { width: Dimensions.get("window").width * 0.92 }]}>
                                         <View style={styles.container2}>
                                             <Text style={styles.label}>Employment Status</Text>
                                             <Dropdown
                                                 style={[
                                                     styles.input2,
-                                                    { width: Dimensions.get("window").width * 0.46 },
+                                                    { width: Dimensions.get("window").width * 0.92 },
                                                     isFocus && { borderColor: "blue" },
                                                 ]}
                                                 placeholderStyle={styles.placeholderStyle}
@@ -373,7 +372,7 @@ export default function Dashboard({ navigation }: Props) {
                                             />
                                         </View>
                                     </View>
-                                    <View style={[styles.data, { width: Dimensions.get("window").width * 0.46 }]}>
+                                    {/* <View style={[styles.data, { width: Dimensions.get("window").width * 0.46 }]}>
                                         <View style={styles.container2}>
                                             <Text style={styles.label}>Civil Status</Text>
                                             <Dropdown
@@ -401,7 +400,7 @@ export default function Dashboard({ navigation }: Props) {
                                                 }}
                                             />
                                         </View>
-                                    </View>
+                                    </View> */}
                                 </View>
                             </View>
                         )}
@@ -524,6 +523,10 @@ const styles = StyleSheet.create({
         flex: 4,
         backgroundColor: "#fff",
         marginTop: 40,
+    },
+    custom: {
+        backgroundColor: "white",
+        paddingHorizontal: 15,
     },
     title: {
         marginHorizontal: 15,

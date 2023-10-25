@@ -1,11 +1,4 @@
-import {
-  Pressable,
-  StyleSheet,
-  TextInput,
-  ActivityIndicator,
-  Dimensions,
-  Image,
-} from "react-native";
+import { Pressable, StyleSheet, TextInput, ActivityIndicator, Dimensions, Image } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/Header";
@@ -17,176 +10,165 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
 export default function Login({ navigation }: Props) {
-  const [userPhone, setUserPhone] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(true);
-  let [errorText, setErrorText] = useState("");
-  let url = "otp/send";
+    const [userPhone, setUserPhone] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [isDisabled, setIsDisabled] = useState(true);
+    let [errorText, setErrorText] = useState("");
+    let url = "otp/send";
 
-  const handleLogin = async () => {
-    setErrorText("");
-    if (!userPhone) {
-      alert("Please fill phone");
-      return;
-    }
-    setLoading(true);
-    let data = {
-      phone_number: userPhone,
-    };
-    post(url, data)
-      .then((res) => {
-        navigation.navigate("OTP", { phone_number: userPhone });
-      })
-      .catch((err) => {
-        let message = err?.response?.data?.data.errors?.phone_number[0];
-        setErrorText(message);
-        if (message !== "The selected phone number is invalid.") {
-          navigation.navigate("OTP", { phone_number: userPhone });
+    const handleLogin = async () => {
+        setErrorText("");
+        if (!userPhone) {
+            alert("Please fill phone");
+            return;
         }
-      })
-      .finally(() => {
-        setLoading(false);
-        setIsDisabled(true);
-      });
-  };
-  return (
-    <View style={styles.container}>
-      {/* {isLoading ? <ActivityIndicator size={'large'} /> : (<View> */}
-      <Header></Header>
+        setLoading(true);
+        let data = {
+            phone_number: userPhone,
+        };
+        post(url, data)
+            .then((res) => {
+                navigation.navigate("OTP", { phone_number: userPhone });
+            })
+            .catch((err) => {
+                let message = err?.response?.data?.data.errors?.phone_number[0];
+                setErrorText(message);
+                if (message !== "The selected phone number is invalid.") {
+                    navigation.navigate("OTP", { phone_number: userPhone });
+                }
+            })
+            .finally(() => {
+                setLoading(false);
+                setIsDisabled(true);
+            });
+    };
+    return (
+        <View style={styles.container}>
+            {/* {isLoading ? <ActivityIndicator size={'large'} /> : (<View> */}
+            <Header></Header>
 
-      <Text style={styles.title}>Enter phone number</Text>
-      <Text style={styles.simple}>
-        We'll send a verification code to this number
-      </Text>
+            <Text style={styles.title}>Enter phone number</Text>
+            <Text style={styles.simple}>We'll send a verification code to this number</Text>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Phone Number</Text>
-        <TextInput
-          keyboardType="phone-pad"
-          onChangeText={(userPhone) => {
-            setUserPhone(userPhone);
-            if (userPhone.length === 11) {
-              setIsDisabled(false);
-            } else {
-              setIsDisabled(true);
-            }
-          }}
-          style={styles.input}
-        />
-        {errorText != "" ? (
-          <Text style={styles.errorText}>{errorText}</Text>
-        ) : null}
-      </View>
-      <LinearGradient
-        colors={["#074A74", "#089CA4"]}
-        style={isDisabled ? styles.disabled : styles.buttonContainer}
-        start={{ x: 1, y: 0.5 }}
-        end={{ x: 0, y: 0.5 }}
-      >
-        <Pressable
-          style={[styles.button]}
-          onPress={handleLogin}
-          disabled={isDisabled}
-        >
-          {loading ? (
-            <Image
-              source={require("../assets/gifs/loader.gif")}
-              style={styles.image}
-            />
-          ) : (
-            <Text style={styles.buttonText}>Next</Text>
-          )}
-        </Pressable>
-      </LinearGradient>
-      {/* </View>)} */}
-    </View>
-  );
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Phone Number</Text>
+                <TextInput
+                    keyboardType="phone-pad"
+                    onChangeText={(userPhone) => {
+                        setUserPhone(userPhone);
+                        if (userPhone.length === 11) {
+                            setIsDisabled(false);
+                        } else {
+                            setIsDisabled(true);
+                        }
+                    }}
+                    style={styles.input}
+                />
+                {errorText != "" ? <Text style={styles.errorText}>{errorText}</Text> : null}
+            </View>
+            <LinearGradient
+                colors={["#074A74", "#089CA4"]}
+                style={isDisabled ? styles.disabled : styles.buttonContainer}
+                start={{ x: 1, y: 0.5 }}
+                end={{ x: 0, y: 0.5 }}
+            >
+                <Pressable style={[styles.button]} onPress={handleLogin} disabled={isDisabled}>
+                    {loading ? (
+                        <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
+                    ) : (
+                        <Text style={styles.buttonText}>Next</Text>
+                    )}
+                </Pressable>
+            </LinearGradient>
+            {/* </View>)} */}
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#EFF5F9",
-  },
-  image: {
-    width: Dimensions.get("window").height * 0.08,
-    height: Dimensions.get("window").height * 0.08,
-    marginVertical: -15,
-  },
-  title: {
-    marginTop: 40,
-    marginHorizontal: 40,
-    fontSize: 25,
-    color: "#074A74",
-    fontFamily: "Montserrat_700Bold",
-  },
-  simple: {
-    fontFamily: "Montserrat_400Regular",
-    marginTop: 10,
-    marginHorizontal: 40,
-    fontSize: 12,
-    color: "#72788D",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#074A74",
-    borderRadius: 5,
-    height: 50,
-    fontSize: 20,
-    paddingHorizontal: 10,
-    color: "#074A74",
-  },
-  inputContainer: {
-    flex: 1,
-    marginHorizontal: 40,
-    marginTop: 45,
-    backgroundColor: "#EFF5F9",
-  },
-  errorText: {
-    color: "red",
-    fontSize: 15,
-  },
-  spinnerTextStyle: {
-    color: "#FFF",
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 16,
-    color: "#72788D",
-    fontFamily: "Montserrat_700Bold",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    marginHorizontal: 40,
-    position: "absolute",
-    bottom: 30,
-    borderColor: "#074A74",
-    borderWidth: 1,
-    borderRadius: 10,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: "#EFF5F9",
+    },
+    image: {
+        width: Dimensions.get("window").height * 0.08,
+        height: Dimensions.get("window").height * 0.08,
+        marginVertical: -15,
+    },
+    title: {
+        marginTop: 40,
+        marginHorizontal: 40,
+        fontSize: 25,
+        color: "#074A74",
+        fontFamily: "Montserrat_700Bold",
+    },
+    simple: {
+        fontFamily: "Montserrat_400Regular",
+        marginTop: 10,
+        marginHorizontal: 40,
+        fontSize: 12,
+        color: "#72788D",
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: "#074A74",
+        borderRadius: 5,
+        height: 50,
+        fontSize: 20,
+        paddingHorizontal: 10,
+        color: "#074A74",
+    },
+    inputContainer: {
+        flex: 1,
+        marginHorizontal: 40,
+        marginTop: 45,
+        backgroundColor: "#EFF5F9",
+    },
+    errorText: {
+        color: "red",
+        fontSize: 15,
+    },
+    spinnerTextStyle: {
+        color: "#FFF",
+    },
+    label: {
+        fontSize: 16,
+        marginBottom: 16,
+        color: "#72788D",
+        fontFamily: "Montserrat_700Bold",
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        marginHorizontal: 40,
+        position: "absolute",
+        bottom: 30,
+        borderColor: "#074A74",
+        borderWidth: 1,
+        borderRadius: 10,
+    },
 
-  disabled: {
-    flexDirection: "row",
-    marginHorizontal: 40,
-    position: "absolute",
-    bottom: 30,
-    borderColor: "#074A74",
-    borderWidth: 1,
-    borderRadius: 10,
-    opacity: 0.5,
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 15,
-    marginHorizontal: 8,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    color: "#ffffff",
-    fontWeight: "bold",
-    textAlign: "center",
-    fontSize: 18,
-  },
+    disabled: {
+        flexDirection: "row",
+        marginHorizontal: 40,
+        position: "absolute",
+        bottom: 30,
+        borderColor: "#074A74",
+        borderWidth: 1,
+        borderRadius: 10,
+        opacity: 0.5,
+    },
+    button: {
+        flex: 1,
+        paddingVertical: 15,
+        marginHorizontal: 8,
+        borderRadius: 24,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    buttonText: {
+        color: "#ffffff",
+        fontWeight: "bold",
+        textAlign: "center",
+        fontSize: 18,
+    },
 });

@@ -1,7 +1,7 @@
 # Using Flagged included in the project
 
 > I only created one flag which is <b>admin</b> and it defaults to false.
-**If user.attributes.staff_id === 1, then it becomes true**
+> **If user.attributes.staff_id === 1, then it becomes true**
 
 ## 1. Hiding entire component
 
@@ -24,7 +24,8 @@
         <h1>Only seen by admin</h1>
       </Feature>
     </header>
-  );
-        }`
+
+);
+}`
 
 [You can view more usage tips here](https://github.com/sergiodxa/flagged)
