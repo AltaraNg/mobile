@@ -127,15 +127,9 @@ export default function Dashboard({ navigation }: Props) {
 
     const fetchUser = async () => {
         setLoading2(true);
+        console.log(authData)
         try {
-            const response = await axios({
-                method: "GET",
-                url: `/auth/user`,
-                headers: { Authorization: `Bearer ${authData.token}` },
-            });
-            const userFetched = response.data.data[0].attributes;
-            setUser(userFetched);
-
+            setUser(authData?.user?.attributes);
             const { reg_id, middle_name, email_address, on_boarded, staff_id, ...rest } = user || ({} as Obj);
             setUserData({ ...rest, ...{ state: "none" } });
             setOnBoarded(user?.on_boarded);
@@ -145,6 +139,7 @@ export default function Dashboard({ navigation }: Props) {
             setLoading2(false);
         }
     };
+
 
     const prefilledData = (data) => {
         return data == "N/A" ? "" : data;
@@ -191,7 +186,7 @@ export default function Dashboard({ navigation }: Props) {
     }, [userData]);
 
     return (
-        <View style={styles.container}>
+        <View style={styles.container}> 
             {showMenu && <SideMenu Logout="Logout" />}
             <View style={styles.header}>
                 <Header navigation={navigation}></Header>

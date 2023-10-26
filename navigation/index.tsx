@@ -80,13 +80,13 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
                         const previousRouteName = routeNameRef.current;
                         const currentRouteName = navigationRef.getCurrentRoute()?.name;
 
-                        if (previousRouteName !== currentRouteName) {
-                            axios.post(`https://app.nativenotify.com/api/analytics`, {
-                                app_id: app_id,
-                                app_token: app_token,
-                                screenName: currentRouteName,
-                            });
-                        }
+                        // if (previousRouteName !== currentRouteName) {
+                        //     axios.post(`https://app.nativenotify.com/api/analytics`, {
+                        //         app_id: app_id,
+                        //         app_token: app_token,
+                        //         screenName: currentRouteName,
+                        //     });
+                        // }
 
                         // Save the current route name for later comparison
                         routeNameRef.current = currentRouteName || "";
@@ -159,18 +159,11 @@ const DrawerNav = createDrawerNavigator<DrawerParamList>();
 function DrawerNavigator() {
     const { authData } = useContext(AuthContext);
     const [user, setUser] = useState(null);
-    const [uploaded, setUploaded] = useState<boolean>(false);
-    const fetchUser = async () => {
-        setUser(authData?.user);
-        const upload = Object.values(authData?.user?.included?.verification || {}).every((val) => val);
-        setUploaded(upload);
-    };
-    useEffect(() => {
-        fetchUser();
-    }, [authData]);
+    const [uploaded, setUploaded] = useState<boolean>(false);  
+    
     return (
         <DrawerNav.Navigator
-            initialRouteName={user?.attributes?.on_boarded ? "Home" : "CreateProfile"}
+            initialRouteName={authData?.user?.attributes?.on_boarded ? "Home" : "CreateProfile"}
             backBehavior="initialRoute"
             screenOptions={{
                 drawerStyle: {
@@ -203,7 +196,7 @@ function DrawerNavigator() {
                     drawerIcon: () => <EvilIcons name="user" size={24} color="#9C9696" />,
                 }}
             />
-            {user?.attributes?.on_boarded ? (
+            {authData?.user?.attributes?.on_boarded ? (
                 <DrawerNav.Screen
                     name="EditProfile"
                     component={EditProfile}
@@ -259,7 +252,7 @@ const BottomTab = createBottomTabNavigator<RootTabParamList>();
 function BottomTabNavigator() {
     const { totalUnread, fetchNotification } = useAuth();
 
-    fetchNotification();
+    // fetchNotification();
     return (
         <BottomTab.Navigator
             initialRouteName="Dashboard"

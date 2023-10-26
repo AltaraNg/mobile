@@ -124,7 +124,7 @@ const AuthProvider: React.FC = ({ children }) => {
                 unread: unread.length,
             });
         } catch (error) {
-            console.log(error);
+            console.log(error.response);
         }
     };
 
