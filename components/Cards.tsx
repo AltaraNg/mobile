@@ -3,57 +3,47 @@ import { StyleSheet, Pressable, Image } from "react-native";
 import { Text, View } from "../components/Themed";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
-import { useContext, useState, useEffect } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { OrderContext } from "../context/OrderContext";
+//import { useContext, useState, useEffect } from "react";
+//import { AuthContext } from "../context/AuthContext";
+//import { OrderContext } from "../context/OrderContext";
 import Animated from "react-native-reanimated";
 
-export default function Cards({ navigation, trackOrder, next_repayment, title, progressBar, amount, isDisabled, type, onRequest }) {
+export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount }) {
     const url = process.env.EXPO_PUBLIC_API_URL;
     axios.defaults.baseURL = url;
-    const { authData } = useContext(AuthContext);
-    const { setOrderRequest, orderRequest } = useContext(OrderContext);
-    const [loader, setLoader] = useState(false);
-    const [showButton, setShowButton] = useState(null);
 
-    // const progressBar = ((totalPaid - order?.attributes?.down_payment) / order?.attributes?.repayment) * 100;
-
-    async function doSome() {
-        if (type === "cash") {
-            navigation.navigate("Calculator");
-        } else {
-            setLoader(true);
-            try {
-                const res = await axios({
-                    method: "POST",
-                    data: {
-                        order_type: type,
-                    },
-                    url: "/submit/request",
-                    headers: { Authorization: `Bearer ${authData.token}` },
-                });
-                if (res.status === 200) {
-                    setOrderRequest();
-                    onRequest(res.data, "success", type);
-                    setLoader(false);
-                }
-            } catch (error) {
-                setLoader(false);
-                onRequest(error.response.data, "failed", type);
-            }
-        }
-    }
-    const checkOrder = () => {
-        const isPending = orderRequest?.some((item) => item.status === "pending");
-        isPending ? setShowButton(false) : setShowButton(true);
-    };
-
-    useEffect(() => {
-        checkOrder();
-    }, [orderRequest]);
+    // async function doSome() {
+    //     if (type === "cash") {
+    //         navigation.navigate("Calculator");
+    //     } else {
+    //         setLoader(true);
+    //         try {
+    //             const res = await axios({
+    //                 method: "POST",
+    //                 data: {
+    //                     order_type: type,
+    //                 },
+    //                 url: "/submit/request",
+    //                 headers: { Authorization: `Bearer ${authData.token}` },
+    //             });
+    //             if (res.status === 200) {
+    //                 setOrderRequest();
+    //                 onRequest(res.data, "success", type);
+    //                 setLoader(false);
+    //             }
+    //         } catch (error) {
+    //             setLoader(false);
+    //             onRequest(error.response.data, "failed", type);
+    //         }
+    //     }
+    // }
+    // const checkOrder = () => {
+    //     const isPending = orderRequest?.some((item) => item.status === "pending");
+    //     isPending ? setShowButton(false) : setShowButton(true);
+    // };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, haveActiveOrder ? { height: 150 } : { height: 100, paddingTop: 10 }]}>
             <Image style={[styles.leaf, { bottom: 0 }]} source={require("../assets/images/big_leaf.png")} />
             <Image style={[styles.leaf, { left: 0 }]} source={require("../assets/images/leaf.png")} />
 
@@ -64,48 +54,32 @@ export default function Cards({ navigation, trackOrder, next_repayment, title, p
                 </View>
 
                 <View style={{ flexDirection: "row", backgroundColor: "transparent" }}>
-                    {showButton ? (
-                        <LinearGradient colors={["#fff", "#fff"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
-                            <Pressable style={[styles.button]} onPress={doSome} disabled={isDisabled}>
-                                {loader ? (
-                                    <View
-                                        style={{
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            backgroundColor: "transparent",
-                                        }}
-                                    >
-                                        <Image source={require("../assets/gifs/loader.gif")} style={{ width: 60, height: 27 }} />
-                                    </View>
-                                ) : (
-                                    <Text style={styles.buttonText}>Order Now</Text>
-                                )}
-                            </Pressable>
-                        </LinearGradient>
-                    ) : (
-                        <LinearGradient colors={["#fff", "#DADADA"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
-                            <Pressable style={[styles.button]} onPress={trackOrder} disabled={isDisabled}>
-                                <Text style={[styles.buttonText, { color: "#074A74" }]}>Track Order</Text>
-                            </Pressable>
-                        </LinearGradient>
-                    )}
+                    <LinearGradient colors={["#fff", "#DADADA"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
+                        <Pressable style={[styles.button]} onPress={performAction}>
+                            <Text style={[styles.buttonText, { color: "#074A74" }]}>{haveActiveOrder ? "Track Order" : "Request Loan"}</Text>
+                        </Pressable>
+                    </LinearGradient>
                 </View>
             </View>
-            <View style={styles.statusBar}>
-                <Animated.View
-                    style={[
-                        StyleSheet.absoluteFill,
-                        {
-                            backgroundColor: "#007AFF",
-                            width: `${progressBar < 0 ? 0 : progressBar > 100 ? 100 : progressBar}%`,
-                        },
-                    ]}
-                />
-            </View>
-            <Text>
-                To pay {`₦${next_repayment?.expected_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on{" "}
-                {next_repayment?.expected_payment_date}{" "}
-            </Text>
+            {haveActiveOrder && (
+                <View style={styles.statusBar}>
+                    <Animated.View
+                        style={[
+                            StyleSheet.absoluteFill,
+                            {
+                                backgroundColor: "#007AFF",
+                                width: `${progressBar < 0 ? 0 : progressBar > 100 ? 100 : progressBar}%`,
+                            },
+                        ]}
+                    />
+                </View>
+            )}
+            {haveActiveOrder && (
+                <Text>
+                    To pay {`₦${next_repayment?.expected_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on{" "}
+                    {next_repayment?.expected_payment_date}{" "}
+                </Text>
+            )}
         </View>
     );
 }
@@ -127,7 +101,6 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
     container: {
-        height: 150,
         width: 300,
         backgroundColor: "#074A74",
         borderRadius: 5,
