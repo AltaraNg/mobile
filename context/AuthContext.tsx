@@ -52,11 +52,13 @@ const AuthProvider: React.FC = ({ children }) => {
                 //If there are data, it's converted to an Object and the state is updated.
                 const _authData: AuthData = JSON.parse(authDataSerialized);
 
-                setAuthData(_authData);
-                fetchNotification();
+                setAuthData(() =>_authData);
+
                 if (_authData.user.attributes.staff_id === 999999) {
                     setIsAdmin(true);
                 }
+                fetchNotification(_authData);
+
             }
             setShowLoader(false);
         } catch (error) {
@@ -107,24 +109,24 @@ const AuthProvider: React.FC = ({ children }) => {
         //to be recovered in the next user session.
     };
 
-    const fetchNotification = async () => {
+    const fetchNotification = async (_authData) => {
         try {
             const response = await axios({
                 method: "GET",
-                url: `/customers/${authData.user.id}/notifications`,
-                headers: { Authorization: `Bearer ${authData.token}` },
+                url: `/customers/${_authData?.user?.id}/notifications`,
+                headers: { Authorization: `Bearer ${_authData?.token}` },
             });
 
             const notification = response?.data?.data?.notifications?.data;
             const unread = notification.filter((item) => {
-                return item.read_at === null;
+                return item.read_at === null
             });
 
             setTotalUnread({
                 unread: unread.length,
             });
         } catch (error) {
-            console.log(error.response);
+            console.log(error);
         }
     };
 

@@ -22,7 +22,7 @@ export default function Dashboard({ navigation }: Props) {
     const auth = useAuth();
 
     const { authData, setAuthData } = useContext(AuthContext);
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState({});
     const [loading, setLoading] = useState(false);
     const [loading2, setLoading2] = useState(null);
     const [onBoarded, setOnBoarded] = useState(null);
@@ -127,12 +127,12 @@ export default function Dashboard({ navigation }: Props) {
 
     const fetchUser = async () => {
         setLoading2(true);
-        console.log(authData)
         try {
-            setUser(authData?.user?.attributes);
-            const { reg_id, middle_name, email_address, on_boarded, staff_id, ...rest } = user || ({} as Obj);
+            const fetchedUser = authData?.user?.attributes
+            setUser(fetchedUser);
+            const { reg_id, middle_name, email_address, on_boarded, staff_id, ...rest } = fetchedUser || ({} as Obj);
             setUserData({ ...rest, ...{ state: "none" } });
-            setOnBoarded(user?.on_boarded);
+            setOnBoarded(fetchedUser?.on_boarded);
             setLoading2(false);
         } catch (error) {
             ToastAndroid.showWithGravity("Unable to fetch user", ToastAndroid.SHORT, ToastAndroid.CENTER);

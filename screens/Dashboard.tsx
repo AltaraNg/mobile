@@ -45,10 +45,10 @@ export default function Dashboard({ navigation }: Props) {
         });
         setUser(authData?.user);
         const order = response.data.data[0].included.orders[0];
-        console.log(authData, "hellpppp");
         setOrders(order);
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
         setNextRepayment(nextRepayment);
+        
 
         const checkLateFee = order.some(function (item) {
             const lateFees = item?.included?.late_fees;
