@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, TouchableOpacity, Modal, TouchableHighlight, RefreshControl, Image, Dimensions } from "react-native";
 import { Overlay } from "react-native-elements";
 
-import { SuccessSvg, Hamburger, Debited, Credited, User, Warning } from "../assets/svgs/svg";
+import { SuccessSvg, Hamburger, Debited, Credited, Warning } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import React, { useState, useEffect, useContext } from "react";
 import { Text, View } from "../components/Themed";
@@ -23,7 +23,6 @@ export default function Dashboard({ navigation }: Props) {
     const [refreshing, setRefreshing] = useState(false);
     const [modalResponse, setModalResponse] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-    const [onBoarded, setOnBoarded] = useState(null);
     const [type, setType] = useState("");
     const [latefee, setlateFee] = useState(null);
     const [orders, setOrders] = useState(null);
@@ -31,7 +30,6 @@ export default function Dashboard({ navigation }: Props) {
         expected_amount: 0,
     });
     const amortization = orders?.included?.amortizations;
-    const [uploaded, setUploaded] = useState(null);
 
     const toggleSideMenu = async () => {
         navigation.toggleDrawer();
@@ -45,7 +43,9 @@ export default function Dashboard({ navigation }: Props) {
             url: `/customers/${authData.user.id}/orders`,
             headers: { Authorization: `Bearer ${authData.token}` },
         });
+        setUser(authData?.user);
         const order = response.data.data[0].included.orders[0];
+        console.log(authData, "hellpppp");
         setOrders(order);
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
         setNextRepayment(nextRepayment);
@@ -63,6 +63,7 @@ export default function Dashboard({ navigation }: Props) {
         });
         setlateFee(checkLateFee);
     };
+
     function handleRequest(res, status: string, type: string) {
         status === "success" ? setIsError(false) : setIsError(true);
         setModalResponse(res);
@@ -75,22 +76,12 @@ export default function Dashboard({ navigation }: Props) {
         await fetchOrder();
         fetchOrderRequestContext();
         setUser(authData?.user);
-        setOnBoarded(authData?.user?.attributes?.on_boarded);
-        const upload = Object?.values(authData?.user?.included?.verification || { item: false }).every((val) => val);
-        setUploaded(upload);
+        //const upload = Object?.values(authData?.user?.included?.verification || { item: false }).every((val) => val);
         setShowLoader(false);
         setRefreshing(false);
     };
-    const navigating = (first_choice, second_choice) => {
-        if (!onBoarded) {
-            return first_choice;
-        }
-        if ((onBoarded && !uploaded) || onBoarded) {
-            return second_choice;
-        }
-    };
-    const trackOrder = () => {
-        navigation.navigate("OrderDetails", orders);
+    const performAction = () => {
+        orders?.included ? navigation.navigate("OrderDetails", orders) : "Calculator";
     };
 
     const paid_repayment = amortization?.map((item: { actual_amount: number }) => {
@@ -125,6 +116,22 @@ export default function Dashboard({ navigation }: Props) {
             name: "Loan Approved",
             date: "01/11/2023",
             amount: "₦100,000",
+        },
+    ];
+    const recommendedLoans = [
+        {
+            id: "1",
+            name: "Loan",
+            downpayment: "₦40,000",
+            amount: "₦100,000",
+            color: "#FFFDD2",
+        },
+        {
+            id: "2",
+            name: "Loan",
+            downpayment: "₦40,000",
+            amount: "₦100,000",
+            color: "#EAFFED",
         },
     ];
     const navigateHistory = () => {
@@ -274,80 +281,9 @@ export default function Dashboard({ navigation }: Props) {
                 <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
             ) : (
                 <View style={styles.main}>
-                    <Text style={[styles.name]}>{navigating("Hello ☺️", user?.attributes?.first_name)},</Text>
+                    <Text style={[styles.name]}>{user?.attributes?.first_name},</Text>
                     <Text style={styles.message}>Welcome to your altara dashboard </Text>
-                    {!uploaded && (
-                        <View
-                            style={{
-                                alignItems: "center",
-                                backgroundColor: "#EFF5F9",
-                                marginBottom: 20,
-                            }}
-                        >
-                            <View style={styles.activate}>
-                                <View
-                                    style={{
-                                        backgroundColor: "white",
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    <User />
-                                    <Text style={{ color: "#474A57", fontSize: 14 }}>
-                                        To fully activate your account please {navigating(" complete your profile", "upload your document")}
-                                    </Text>
-                                </View>
-                                <View
-                                    style={{
-                                        height: 1,
-                                        width: 250,
-                                        backgroundColor: "#DADADA",
-                                        marginVertical: 8,
-                                        alignSelf: "center",
-                                    }}
-                                ></View>
-                                {!onBoarded && (
-                                    <Pressable
-                                        onPress={() =>
-                                            navigation.navigate("CreateProfile", {
-                                                user: authData.user,
-                                            })
-                                        }
-                                    >
-                                        <Text
-                                            style={{
-                                                color: "#074A74",
-                                                fontFamily: "Montserrat_700Bold",
-                                                fontSize: 12,
-                                            }}
-                                        >
-                                            Complete your profile
-                                        </Text>
-                                    </Pressable>
-                                )}
-                                {onBoarded && !uploaded && (
-                                    <Pressable
-                                        onPress={() => {
-                                            navigation.navigate("UploadDocument", {
-                                                user: authData.user,
-                                            });
-                                        }}
-                                    >
-                                        <Text
-                                            style={{
-                                                color: "#074A74",
-                                                fontFamily: "Montserrat_700Bold",
-                                                fontSize: 12,
-                                            }}
-                                        >
-                                            Upload your document
-                                        </Text>
-                                    </Pressable>
-                                )}
-                            </View>
-                        </View>
-                    )}
+
                     {latefee && (
                         <Pressable onPress={navigateHistory}>
                             <View
@@ -396,59 +332,123 @@ export default function Dashboard({ navigation }: Props) {
 
                     <View style={styles.cards}>
                         <Cards
+                            haveActiveOrder={orders?.included}
                             title="Loan Balance"
-                            amount={totalDebt <= 0 ? 0 : `₦${totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}
+                            amount={!totalDebt ? "₦0.00" : `₦${totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}
                             progressBar={progressBar}
                             next_repayment={nextExpectedRepayment}
                             type="cash"
                             onRequest={handleRequest}
-                            trackOrder={trackOrder}
-                            isDisabled={!onBoarded}
-                            navigation={navigation}
+                            performAction={performAction}
                         />
                     </View>
-                    <Text style={styles.name}>Recent Activities</Text>
-                    <FlatList
-                        scrollEnabled={true}
-                        data={recentActivities}
-                        keyExtractor={(item) => item.id}
-                        extraData={recentActivities}
-                        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={settUser} />}
-                        renderItem={({ item }) => (
-                            <View style={{ backgroundColor: "transparent" }}>
-                                <Pressable>
-                                    <View style={styles.order}>
-                                        <View style={styles.details}>
-                                            {item.name.includes("Approved") ? <Credited /> : <Debited />}
-                                            <View style={styles.title}>
-                                                <Text
+                    <Text style={styles.name}>{orders?.included ? "Recent Activities" : "Recommended Loans"}</Text>
+                    {orders?.included ? (
+                        <FlatList
+                            scrollEnabled={true}
+                            data={recentActivities}
+                            keyExtractor={(item) => item.id}
+                            extraData={recentActivities}
+                            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={settUser} />}
+                            renderItem={({ item }) => (
+                                <View style={{ backgroundColor: "transparent" }}>
+                                    <Pressable>
+                                        <View style={styles.order}>
+                                            <View style={styles.details}>
+                                                {item.name.includes("Approved") ? <Credited /> : <Debited />}
+                                                <View style={styles.title}>
+                                                    <Text
+                                                        style={{
+                                                            color: "#333333",
+                                                            fontFamily: "Montserrat_600SemiBold",
+                                                        }}
+                                                        numberOfLines={1}
+                                                        ellipsizeMode={"tail"}
+                                                    >
+                                                        {item.name}{" "}
+                                                    </Text>
+                                                    <Text style={{ color: "#000", fontSize: 11 }}>{item?.date}</Text>
+                                                </View>
+                                            </View>
+                                            <Text
+                                                style={{
+                                                    color: "#000",
+                                                    fontSize: 13,
+                                                    marginRight: 59,
+                                                    fontFamily: "Montserrat_600SemiBold",
+                                                }}
+                                            >
+                                                {item?.amount}
+                                            </Text>
+                                        </View>
+                                    </Pressable>
+                                </View>
+                            )}
+                        />
+                    ) : (
+                        <FlatList
+                            scrollEnabled={true}
+                            data={recommendedLoans}
+                            keyExtractor={(item) => item.id}
+                            extraData={recommendedLoans}
+                            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={settUser} />}
+                            renderItem={({ item }) => (
+                                <View style={{ backgroundColor: "transparent" }}>
+                                    <Pressable>
+                                        <View
+                                            style={[
+                                                styles.order,
+                                                {
+                                                    backgroundColor: item.color,
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    height: 130,
+                                                    paddingHorizontal: 10,
+                                                },
+                                            ]}
+                                        >
+                                            <Image
+                                                source={require("../assets/images/cashloan.png")}
+                                                style={{ width: Dimensions.get("window").width * 0.3 }}
+                                            />
+                                            <View
+                                                style={{
+                                                    backgroundColor: "transparent",
+                                                    paddingLeft: 5,
+                                                    width: Dimensions.get("window").width * 0.6,
+                                                }}
+                                            >
+                                                <Text style={[styles.name, { marginHorizontal: 0 }]}>Loan</Text>
+                                                <View
                                                     style={{
-                                                        color: "#333333",
-                                                        fontFamily: "Montserrat_600SemiBold",
+                                                        backgroundColor: "transparent",
+                                                        paddingVertical: 3,
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        flexDirection: "row",
+                                                        justifyContent: "flex-start",
                                                     }}
-                                                    numberOfLines={1}
-                                                    ellipsizeMode={"tail"}
                                                 >
-                                                    {item.name}{" "}
-                                                </Text>
-                                                <Text style={{ color: "#000", fontSize: 11 }}>{item?.date}</Text>
+                                                    <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
+                                                        <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Amount</Text>
+                                                        <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
+                                                            {item.amount}
+                                                        </Text>
+                                                    </View>
+                                                    <View style={{ backgroundColor: "transparent" }}>
+                                                        <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Downpayment</Text>
+                                                        <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
+                                                            {item.downpayment}
+                                                        </Text>
+                                                    </View>
+                                                </View>
                                             </View>
                                         </View>
-                                        <Text
-                                            style={{
-                                                color: "#000",
-                                                fontSize: 13,
-                                                marginRight: 59,
-                                                fontFamily: "Montserrat_600SemiBold",
-                                            }}
-                                        >
-                                            {item?.amount}
-                                        </Text>
-                                    </View>
-                                </Pressable>
-                            </View>
-                        )}
-                    />
+                                    </Pressable>
+                                </View>
+                            )}
+                        />
+                    )}
                 </View>
             )}
         </View>
