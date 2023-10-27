@@ -66,22 +66,23 @@ export default function Calculator({ navigation }: Props) {
     };
 
     async function doSome() {
+        navigation.navigate("UploadDocument");
         setLoader(true);
-        try {
-            const res = await axios({
-                method: "POST",
-                data: {
-                    order_type: "cash",
-                },
-                url: "/submit/request",
-                headers: { Authorization: `Bearer ${authData?.token}` },
-            });
-            if (res.status === 200) {
-                navigation.navigate("Dashboard");
-            }
-        } catch (error) {
-            ToastAndroid.showWithGravity("Unable to submit request. Please try again later", ToastAndroid.SHORT, ToastAndroid.CENTER);
-        }
+        // try {
+        //     const res = await axios({
+        //         method: "POST",
+        //         data: {
+        //             order_type: "cash",
+        //         },
+        //         url: "/submit/request",
+        //         headers: { Authorization: `Bearer ${authData?.token}` },
+        //     });
+        //     if (res.status === 200) {
+        //         navigation.navigate("Dashboard");
+        //     }
+        // } catch (error) {
+        //     ToastAndroid.showWithGravity("Unable to submit request. Please try again later", ToastAndroid.SHORT, ToastAndroid.CENTER);
+        // }
     }
 
     const getCalc = (val = sliderValue, input = inputValue) => {

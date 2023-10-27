@@ -82,7 +82,7 @@ export default function Upload(props) {
                         marginTop: 10,
                     }}
                 >
-                    <Text style={{ fontFamily: "Montserrat_700Bold", fontSize: 12 }}>{props.document}</Text>
+                    <Text style={{ fontFamily: "Montserrat_700Bold", fontSize: 11 }}>{props.document}</Text>
                     <Text style={{ color: "#888", textAlign: "center", fontSize: 10 }}>Click here to upload file</Text>
                 </View>
             </View>
