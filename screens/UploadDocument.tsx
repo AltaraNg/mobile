@@ -126,7 +126,7 @@ export default function UploadDocument({ navigation }: Props) {
                                     {loading ? (
                                         <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
                                     ) : (
-                                        <Text style={styles.buttonText}> Save </Text>
+                                        <Text style={styles.buttonText}> Continue </Text>
                                     )}
                                 </Pressable>
                             </LinearGradient>
