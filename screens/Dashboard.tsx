@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, TouchableOpacity, Modal, TouchableHighlight, RefreshControl, Image, Dimensions } from "react-native";
+import { Pressable, StyleSheet, TouchableOpacity, RefreshControl, Image, Dimensions } from "react-native";
 import { Overlay } from "react-native-elements";
 
-import { SuccessSvg, Hamburger, Debited, Credited, Warning } from "../assets/svgs/svg";
+import { Hamburger, Debited, Credited, Warning } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import React, { useState, useEffect, useContext } from "react";
 import { Text, View } from "../components/Themed";
@@ -18,12 +18,9 @@ type Props = DrawerScreenProps<DrawerParamList, "Home">;
 export default function Dashboard({ navigation }: Props) {
     const { authData, showLoader, setShowLoader } = useContext(AuthContext);
     const { fetchOrderRequestContext, showLoader2 } = useContext(OrderContext);
-    const [isError, setIsError] = useState(false);
     const [user, setUser] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
-    const [modalResponse, setModalResponse] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-    const [type, setType] = useState("");
     const [latefee, setlateFee] = useState(null);
     const [orders, setOrders] = useState(null);
     const [nextExpectedRepayment, setNextRepayment] = useState({
@@ -48,8 +45,6 @@ export default function Dashboard({ navigation }: Props) {
         setOrders(order);
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
         setNextRepayment(nextRepayment);
-
-
         const checkLateFee = order.some(function (item) {
             const lateFees = item?.included?.late_fees;
             const lateFeeDebt =
@@ -64,14 +59,6 @@ export default function Dashboard({ navigation }: Props) {
         setlateFee(checkLateFee);
     };
 
-    function handleRequest(res, status: string, type: string) {
-        status === "success" ? setIsError(false) : setIsError(true);
-        setModalResponse(res);
-        setType(type);
-
-        setModalVisible(true);
-    }
-
     const settUser = async () => {
         await fetchOrder();
         fetchOrderRequestContext();
@@ -81,7 +68,7 @@ export default function Dashboard({ navigation }: Props) {
         setRefreshing(false);
     };
     const performAction = () => {
-        orders?.included ? navigation.navigate("OrderDetails", orders) : "Calculator";
+        orders?.included ? navigation.navigate("OrderDetails", orders) : navigation.navigate("Calculator");
     };
 
     const paid_repayment = amortization?.map((item: { actual_amount: number }) => {
@@ -123,13 +110,13 @@ export default function Dashboard({ navigation }: Props) {
             id: "1",
             name: "Loan",
             downpayment: "₦40,000",
-            amount: "₦100,000",
+            amount: "₦200,000",
             color: "#FFFDD2",
         },
         {
             id: "2",
             name: "Loan",
-            downpayment: "₦40,000",
+            downpayment: "₦20,000",
             amount: "₦100,000",
             color: "#EAFFED",
         },
@@ -150,8 +137,7 @@ export default function Dashboard({ navigation }: Props) {
     };
     const testNav = () => {
         navigation.navigate("OrderConfirmation", {});
-
-    }
+    };
 
     useEffect(() => {
         settUser();
@@ -168,108 +154,7 @@ export default function Dashboard({ navigation }: Props) {
                     setModalVisible(!modalVisible);
                 }}
             />
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                    setModalVisible(!modalVisible);
-                }}
-                style={{ justifyContent: "flex-end", margin: 0, position: "relative" }}
-            >
-                <TouchableHighlight
-                    onPress={() => setModalVisible(!modalVisible)}
-                    style={{
-                        borderRadius: Math.round(Dimensions.get("window").width + Dimensions.get("window").height) / 2,
-                        width: Dimensions.get("window").width * 0.13,
-                        height: Dimensions.get("window").width * 0.13,
-                        backgroundColor: "#fff",
-                        position: "absolute",
-                        //   top: 1 / 2,
-                        marginHorizontal: Dimensions.get("window").width * 0.43,
-                        marginVertical: Dimensions.get("window").width * 0.76,
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}
-                    underlayColor="#ccc"
-                >
-                    <Text
-                        style={{
-                            fontSize: 20,
-                            color: "#000",
-                            fontFamily: "Montserrat_900Black",
-                        }}
-                    >
-                        &#x2715;
-                    </Text>
-                </TouchableHighlight>
-                {!isError ? (
-                    <View style={styles.modalContainer}>
-                        <TouchableOpacity style={{ alignItems: "center" }} onPress={() => setModalVisible(!modalVisible)}>
-                            <Text style={styles.modalHeaderCloseText}>X</Text>
-                        </TouchableOpacity>
-                        <View style={styles.modalContainer}>
-                            <View style={styles.modalContent}>
-                                <SuccessSvg />
-                                <Text style={styles.modalHeading}>
-                                    You have <Text style={{ color: "#074A74" }}>successfully</Text> applied for {type}
-                                </Text>
 
-                                {modalResponse && (
-                                    <Text
-                                        style={{
-                                            color: "#474A57",
-                                            fontFamily: "Montserrat_500Medium",
-                                            marginTop: 30,
-                                            marginHorizontal: 30,
-                                            fontSize: 12,
-                                            textAlign: "center",
-                                        }}
-                                    >
-                                        {modalResponse.message}
-                                    </Text>
-                                )}
-                            </View>
-                        </View>
-                    </View>
-                ) : (
-                    <View style={styles.modalContainer}>
-                        <TouchableOpacity style={{ alignItems: "center" }} onPress={() => setModalVisible(!modalVisible)}>
-                            <Text style={styles.modalHeaderCloseText}>X</Text>
-                        </TouchableOpacity>
-                        <View style={styles.modalContainer}>
-                            <View style={styles.modalContent}>
-                                <TouchableHighlight
-                                    style={{
-                                        borderRadius: Math.round(Dimensions.get("window").width + Dimensions.get("window").height) / 2,
-                                        width: Dimensions.get("window").width * 0.3,
-                                        height: Dimensions.get("window").width * 0.3,
-                                        backgroundColor: "#DB2721",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                    }}
-                                    underlayColor="#ccc"
-                                >
-                                    <Text
-                                        style={{
-                                            fontSize: 68,
-                                            color: "#fff",
-                                            fontFamily: "Montserrat_900Black",
-                                        }}
-                                    >
-                                        &#x2715;
-                                    </Text>
-                                </TouchableHighlight>
-                                <Text style={styles.modalHeading}>
-                                    Sorry! Your Order is <Text style={{ color: "red" }}>unsuccessful</Text>
-                                </Text>
-
-                                <Text style={styles.errText}>{modalResponse?.error_message}</Text>
-                            </View>
-                        </View>
-                    </View>
-                )}
-            </Modal>
             <View style={styles.header}>
                 <Header navigation={navigation}></Header>
                 <TouchableOpacity>
@@ -285,7 +170,7 @@ export default function Dashboard({ navigation }: Props) {
                 <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
             ) : (
                 <View style={styles.main}>
-                    <Text style={[styles.name]}>{user?.attributes?.first_name},</Text>
+                    <Text style={[styles.name]}>Hi {user?.attributes?.first_name},</Text>
                     <Text style={styles.message}>Welcome to your altara dashboard </Text>
 
                     {latefee && (
@@ -341,8 +226,6 @@ export default function Dashboard({ navigation }: Props) {
                             amount={!totalDebt ? "₦0.00" : `₦${totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}
                             progressBar={progressBar}
                             next_repayment={nextExpectedRepayment}
-                            type="cash"
-                            onRequest={handleRequest}
                             performAction={performAction}
                         />
                     </View>
@@ -422,7 +305,7 @@ export default function Dashboard({ navigation }: Props) {
                                                     width: Dimensions.get("window").width * 0.6,
                                                 }}
                                             >
-                                                <Text style={[styles.name, { marginHorizontal: 0 }]}>Loan</Text>
+                                                <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Loan</Text>
                                                 <View
                                                     style={{
                                                         backgroundColor: "transparent",
@@ -457,11 +340,15 @@ export default function Dashboard({ navigation }: Props) {
             )}
             <Pressable onPress={testNav}>
                 <View style={{ backgroundColor: "transparent" }}>
-                <Text style={{
-                    color: "#333333",
-                    fontFamily: "Montserrat_600SemiBold",
-                    textAlign: "center"
-                }}>Test Nav</Text>
+                    <Text
+                        style={{
+                            color: "#333333",
+                            fontFamily: "Montserrat_600SemiBold",
+                            textAlign: "center",
+                        }}
+                    >
+                        Test Nav
+                    </Text>
                 </View>
             </Pressable>
         </View>

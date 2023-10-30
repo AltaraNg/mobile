@@ -28,7 +28,7 @@ export type RootStackParamList = {
     LoginPassword: undefined;
     Cards: { order: string };
     OrderRequest: { order: string };
-    Calculator: undefined;
+    Calculator: { order: object };
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, Screen>;
@@ -45,7 +45,6 @@ export type RootTabParamList = {
     OrderRequest: { order: string };
     OrderDetails: { order: object };
     OrderConfirmation: { order: object };
-
 };
 
 export type DrawerParamList = {

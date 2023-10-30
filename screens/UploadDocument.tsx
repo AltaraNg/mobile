@@ -101,7 +101,7 @@ export default function UploadDocument({ navigation }: Props) {
                             }}
                         >
                             <Upload onRequest={handleRequest} document="Guarantor's ID" type="guarantor_id" />
-                            <Upload onRequest={handleRequest} document="Proof of Income" type="proof_of_income" />
+                            <Upload onRequest={handleRequest} document="Bank Statement" type="proof_of_income" />
                         </View>
                         <View
                             style={{
@@ -126,7 +126,7 @@ export default function UploadDocument({ navigation }: Props) {
                                     {loading ? (
                                         <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
                                     ) : (
-                                        <Text style={styles.buttonText}> Save </Text>
+                                        <Text style={styles.buttonText}> Continue </Text>
                                     )}
                                 </Pressable>
                             </LinearGradient>
