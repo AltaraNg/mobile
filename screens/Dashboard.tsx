@@ -48,7 +48,7 @@ export default function Dashboard({ navigation }: Props) {
         setOrders(order);
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
         setNextRepayment(nextRepayment);
-        
+
 
         const checkLateFee = order.some(function (item) {
             const lateFees = item?.included?.late_fees;
@@ -148,6 +148,10 @@ export default function Dashboard({ navigation }: Props) {
         });
         navigation.navigate("OrderDetails", lateOrder);
     };
+    const testNav = () => {
+        navigation.navigate("OrderConfirmation", {});
+
+    }
 
     useEffect(() => {
         settUser();
@@ -451,6 +455,15 @@ export default function Dashboard({ navigation }: Props) {
                     )}
                 </View>
             )}
+            <Pressable onPress={testNav}>
+                <View style={{ backgroundColor: "transparent" }}>
+                <Text style={{
+                    color: "#333333",
+                    fontFamily: "Montserrat_600SemiBold",
+                    textAlign: "center"
+                }}>Test Nav</Text>
+                </View>
+            </Pressable>
         </View>
     );
 }

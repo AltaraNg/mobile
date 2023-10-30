@@ -8,7 +8,7 @@ import axios from "axios";
 //import { OrderContext } from "../context/OrderContext";
 import Animated from "react-native-reanimated";
 
-export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount }) {
+export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount, type, onRequest }) {
     const url = process.env.EXPO_PUBLIC_API_URL;
     axios.defaults.baseURL = url;
 

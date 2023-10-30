@@ -20,6 +20,7 @@ export type RootStackParamList = {
     Modal: undefined;
     NotFound: undefined;
     OrderDetails: { order: object };
+    OrderConfirmation: { order: object };
     ViewNotification: { notification: object };
     Main: undefined;
     OTP: { phone_number: string };
@@ -43,6 +44,8 @@ export type RootTabParamList = {
     UploadDocument: { user: object };
     OrderRequest: { order: string };
     OrderDetails: { order: object };
+    OrderConfirmation: { order: object };
+
 };
 
 export type DrawerParamList = {

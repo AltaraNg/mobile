@@ -1,62 +1,64 @@
 {
-    "expo": {
-        "name": "Altara Credit",
-        "extra": {},
-        "slug": "Altara",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "icon": "./assets/images/icon.png",
-        "scheme": "myapp",
-        "userInterfaceStyle": "automatic",
-        "splash": {
-            "image": "./assets/images/splash.png",
-            "resizeMode": "contain",
-            "backgroundColor": "#ffffff"
-        },
-        "updates": {
-            "fallbackToCacheTimeout": 0
-        },
-        "assetBundlePatterns": ["**/*"],
-        "ios": {
-            "supportsTablet": true,
-            "bundleIdentifier": "com.altara.mobile",
-            "buildNumber": "1.0.0"
-        },
-        "android": {
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/images/adaptive-icon.png",
-                "backgroundColor": "#ffffff"
-            },
-            "package": "com.altara.mobile",
-            "versionCode": 1
-        },
-        "web": {
-            "favicon": "./assets/images/icon.png"
-        },
-        "sdkVersion": "44.0.0",
-        "description": "",
-        "packagerOpts": {
-            "hostType": "localhost",
-            "lanType": "ip",
-            "dev": true,
-            "minify": false,
-            "port": 19000
-        },
-        "plugins": [
-            [
-                "expo-build-properties",
-                {
-                    "android": {
-                        "compileSdkVersion": 33,
-                        "targetSdkVersion": 31,
-                        "buildToolsVersion": "31.0.0"
-                    },
-                    "ios": {
-                        "deploymentTarget": "13.0"
-                    }
-                }
-            ]
-        ]
+  "expo": {
+    "name": "Altara Credit",
+    "extra": {},
+    "slug": "Altara",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
     },
-    "name": "Altara Credit"
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.altara.mobile",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.altara.mobile",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/images/icon.png"
+    },
+    "sdkVersion": "44.0.0",
+    "description": "",
+    "packagerOpts": {
+      "hostType": "localhost",
+      "lanType": "ip",
+      "dev": true,
+      "minify": false,
+      "port": 19000
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 33,
+            "targetSdkVersion": 31,
+            "buildToolsVersion": "31.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "13.0"
+          }
+        }
+      ]
+    ]
+  },
+  "name": "Altara Credit"
 }
