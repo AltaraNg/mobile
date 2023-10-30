@@ -1,19 +1,32 @@
 import { StyleSheet } from "react-native";
 import { Paystack } from "react-native-paystack-webview";
-import { useState } from "react";
 import { View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { post } from "../utilities/api";
 
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 
 export default function OrderConfirmation({ navigation, route }: Props) {
-    const [viewLateFee, setViewLateFee] = useState(null);
     const order: object = route.params;
     const paystackKey = process.env.EXPO_PUBLIC_PAYSTACK_KEY
 
     const createOrder = async () => {
-        
+        let data = {
+            "down_payment": 16000,
+            "product_price": 80000,
+            "repayment": 64000,
+            "credit_checker_verification_id": 14
+        }
+        try {
+        let res = await post("/mobile-app/create/loan", data);
+        console.log(res);
+        navigation.navigate("Dashboard");
+
+            
+        } catch (error) {
+            console.log(error.response)
+        }
     }
 
 
@@ -28,12 +41,10 @@ export default function OrderConfirmation({ navigation, route }: Props) {
                 activityIndicatorColor="green"
                 onCancel={(e) => {
                     console.log(e);
-                    navigation.navigate("Dashboard");
 
                 }}
-                onSuccess={(res) => {
-                    console.log(res)
-                    navigation.navigate("Dashboard");
+                onSuccess={() => {
+                    createOrder();
 
                 }}
                 autoStart={true}
