@@ -80,7 +80,7 @@ export default function Calculator({ navigation }: Props) {
                 }
             } else {
                 setDownPayment("₦0.00");
-                setRepayment("Applicable");
+                setRepayment("₦0.00");
             }
 
             setSliderValue(val);
@@ -272,7 +272,7 @@ export default function Calculator({ navigation }: Props) {
                             textAlign: "center",
                         }}
                     >
-                        {repayment === "Applicable" ? "" : `Your Monthly Repayment for the next ${sliderValue} months`}
+                        {repayment === "₦0.00" ? "" : `Your Monthly Repayment for the next ${sliderValue} months`}
                     </Text>
                     <Text
                         style={{
