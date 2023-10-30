@@ -168,7 +168,7 @@ export default function Dashboard({ navigation }: Props) {
                 <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
             ) : (
                 <View style={styles.main}>
-                    <Text style={[styles.name]}>{user?.attributes?.first_name},</Text>
+                    <Text style={[styles.name]}>Hi {user?.attributes?.first_name},</Text>
                     <Text style={styles.message}>Welcome to your altara dashboard </Text>
 
                     {latefee && (

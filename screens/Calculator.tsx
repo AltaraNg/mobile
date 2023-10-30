@@ -52,21 +52,6 @@ export default function Calculator({ navigation }: Props) {
     async function doSome() {
         navigation.navigate("UploadDocument");
         setLoader(true);
-        // try {
-        //     const res = await axios({
-        //         method: "POST",
-        //         data: {
-        //             order_type: "cash",
-        //         },
-        //         url: "/submit/request",
-        //         headers: { Authorization: `Bearer ${authData?.token}` },
-        //     });
-        //     if (res.status === 200) {
-        //         navigation.navigate("Dashboard");
-        //     }
-        // } catch (error) {
-        //     ToastAndroid.showWithGravity("Unable to submit request. Please try again later", ToastAndroid.SHORT, ToastAndroid.CENTER);
-        // }
     }
 
     const getCalc = (val = sliderValue, input = inputValue) => {
@@ -94,7 +79,7 @@ export default function Calculator({ navigation }: Props) {
                     setRepayment("₦" + biMonthlyRepayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                 }
             } else {
-                setDownPayment("Not");
+                setDownPayment("₦0.00");
                 setRepayment("Applicable");
             }
 
@@ -241,98 +226,82 @@ export default function Calculator({ navigation }: Props) {
                         <Text style={{ color: "#074A74" }}>Collateral</Text>
                     </View>
                 </View>
-                <View
-                    style={{
-                        backgroundColor: "white",
-                        marginVertical: 10,
-                    }}
-                ></View>
 
                 <View
                     style={{
-                        backgroundColor: "white",
-                        flexDirection: "row",
-                        marginVertical: 20,
+                        backgroundColor: "#D9D9D9",
+                        alignItems: "center",
+                        paddingVertical: 15,
+                        height: 100,
                     }}
                 >
-                    <View
+                    <Text
                         style={{
-                            backgroundColor: "#D9D9D9",
-                            alignItems: "center",
-                            flex: 1,
-                            paddingVertical: 15,
+                            color: "#074A74",
+                            fontFamily: "Montserrat_500Medium",
+                            fontSize: 10,
+                            marginBottom: 10,
                         }}
                     >
-                        <Text
-                            style={{
-                                color: "#074A74",
-                                fontFamily: "Montserrat_500Medium",
-                                fontSize: 10,
-                                marginBottom: 10,
-                            }}
-                        >
-                            {downPayment === "Not" ? "" : "Your Downpayment"}
-                        </Text>
-                        <Text
-                            style={{
-                                color: "#074A74",
-                                fontFamily: "Montserrat_800ExtraBold",
-                                fontSize: 25,
-                            }}
-                        >
-                            {downPayment}
-                        </Text>
-                    </View>
-                    <View
+                        {downPayment === "₦0.00" ? "" : "Your Downpayment"}
+                    </Text>
+                    <Text
                         style={{
-                            backgroundColor: "rgba(7, 74, 116, 0.63)",
-                            flex: 1,
-                            alignItems: "center",
-                            paddingVertical: 15,
+                            color: "#074A74",
+                            fontFamily: "Montserrat_800ExtraBold",
+                            fontSize: 25,
                         }}
                     >
-                        <Text
-                            style={{
-                                color: "white",
-                                fontFamily: "Montserrat_500Medium",
-                                fontSize: 10,
-                                marginBottom: 10,
-                                textAlign: "center",
-                            }}
-                        >
-                            {repayment === "Applicable" ? "" : `Your Monthly Repayment for the next ${sliderValue} months`}
-                        </Text>
-                        <Text
-                            style={{
-                                color: "white",
-                                fontFamily: "Montserrat_800ExtraBold",
-                                fontSize: 25,
-                            }}
-                        >
-                            {repayment}
-                        </Text>
-                    </View>
+                        {downPayment}
+                    </Text>
+                </View>
+                <View
+                    style={{
+                        backgroundColor: "rgba(7, 74, 116, 0.63)",
+                        height: 100,
+                        alignItems: "center",
+                        paddingVertical: 15,
+                    }}
+                >
+                    <Text
+                        style={{
+                            color: "white",
+                            fontFamily: "Montserrat_600SemiBold",
+                            fontSize: 12,
+                            marginBottom: 10,
+                            textAlign: "center",
+                        }}
+                    >
+                        {repayment === "Applicable" ? "" : `Your Monthly Repayment for the next ${sliderValue} months`}
+                    </Text>
+                    <Text
+                        style={{
+                            color: "white",
+                            fontFamily: "Montserrat_800ExtraBold",
+                            fontSize: 25,
+                        }}
+                    >
+                        {repayment}
+                    </Text>
                 </View>
                 <Pressable
                     style={
-                        downPayment === "Not"
-                            ? {
-                                  backgroundColor: "rgba(7, 74, 116, 0.63)",
-                                  alignItems: "center",
-                                  paddingVertical: 15,
-                                  borderRadius: 5,
-                                  marginVertical: 10,
-                              }
-                            : {
-                                  backgroundColor: "#074A74",
-                                  alignItems: "center",
-                                  paddingVertical: 15,
-                                  borderRadius: 5,
-                                  marginVertical: 10,
-                              }
+                        downPayment === "₦0.00"
+                            ? [
+                                  {
+                                      backgroundColor: "rgba(7, 74, 116, 0.63)",
+                                  },
+                                  styles.button,
+                              ]
+                            : [
+                                  {
+                                      backgroundColor: "#074A74",
+                                  },
+                                  styles.button,
+                              ]
                     }
                     onPress={doSome}
-                    disabled={downPayment === "Not"}
+                    disabled={downPayment === "₦0.00"}
                 >
                     {loader ? (
                         <View
@@ -385,6 +354,17 @@ const styles = StyleSheet.create({
         fontFamily: "Montserrat_600SemiBold",
         alignSelf: "center",
         marginVertical: 10,
+    },
+    button: {
+        alignItems: "center",
+        paddingVertical: 15,
+        borderRadius: 5,
+        marginVertical: 10,
+        position: "absolute",
+        bottom: 0,
+        right: Dimensions.get("window").width * 0.1,
+        width: Dimensions.get("window").width * 0.8,
+        justifyContent: "center",
     },
     label: {
         color: "#074A74",
