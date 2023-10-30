@@ -10,8 +10,7 @@ import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import businessTypes from "../lib/calculator.json";
 import repaymentDurations from "../lib/repaymentDuration.json";
-// import Slider from '@react-native-community/slider';
-import { Slider } from "@miblanchard/react-native-slider";
+
 // import {cashLoan, calculate} from '../lib/calculator';
 const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
@@ -21,8 +20,6 @@ type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 export default function Calculator({ navigation }: Props) {
     const { authData, setShowLoader } = useContext(AuthContext);
     const [loader, setLoader] = useState(false);
-    const [sliderDisabled, setSliderDisabled] = useState(false);
-
     const [inputValue, setInputValue] = useState(0);
     const [sliderValue, setSliderValue] = useState(6);
     const [calculator, setCalculator] = useState([]);
@@ -31,9 +28,6 @@ export default function Calculator({ navigation }: Props) {
 
     const [isBiMonthly, setIsBiMonthly] = useState(false);
     const [isCollateral, setIsCollateral] = useState(false);
-
-    const minMonth = 6;
-    const maxMonth = 12;
     const cashBusinessTypes = businessTypes.filter((item) => {
         return !(item.status == 0 || item.slug.includes("ac") || item.slug.includes("ap_products"));
     });
@@ -44,44 +38,20 @@ export default function Calculator({ navigation }: Props) {
                 return item.slug == "ap_super_loan-new";
             } else if (amount > 120000 && amount < 500000 && !isCollateral) {
                 return item.slug == "ap_cash_loan-no_collateral";
-            } else if (amount >= 70000 && amount <= 120000 && !isCollateral) {
+            } else if (amount && amount <= 120000 && !isCollateral) {
                 return item.slug == "ap_starter_cash_loan-no_collateral";
             } else if (amount > 120000 && amount < 500000 && isCollateral) {
                 return item.slug == "ap_cash_loan-product";
-            } else if (amount >= 70000 && amount <= 120000 && isCollateral) {
+            } else if (amount && amount <= 120000 && isCollateral) {
                 return item.slug == "ap_starter_cash_loan";
             }
         });
         return res;
     };
 
-    const onSliderChange = (value) => {
-        if (inputValue >= 70000) {
-            getCalc(value, inputValue);
-        } else {
-            setRepayment("₦0.00");
-            setDownPayment("₦0.00");
-        }
-        setSliderValue(value);
-    };
-
     async function doSome() {
+        navigation.navigate("UploadDocument");
         setLoader(true);
-        try {
-            const res = await axios({
-                method: "POST",
-                data: {
-                    order_type: "cash",
-                },
-                url: "/submit/request",
-                headers: { Authorization: `Bearer ${authData?.token}` },
-            });
-            if (res.status === 200) {
-                navigation.navigate("Dashboard");
-            }
-        } catch (error) {
-            ToastAndroid.showWithGravity("Unable to submit request. Please try again later", ToastAndroid.SHORT, ToastAndroid.CENTER);
-        }
     }
 
     const getCalc = (val = sliderValue, input = inputValue) => {
@@ -109,17 +79,12 @@ export default function Calculator({ navigation }: Props) {
                     setRepayment("₦" + biMonthlyRepayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                 }
             } else {
-                setDownPayment("Not");
-                setRepayment("Applicable");
+                setDownPayment("₦0.00");
+                setRepayment("₦0.00");
             }
 
             setSliderValue(val);
         } catch (error) {
-            // ToastAndroid.showWithGravity(
-            // 	"Unable to fetch calculator. Please try again later",
-            // 	ToastAndroid.SHORT,
-            // 	ToastAndroid.CENTER
-            // );
             setRepayment("₦0.00");
             setDownPayment("₦0.00");
         }
@@ -185,11 +150,8 @@ export default function Calculator({ navigation }: Props) {
         setInputValue(value);
         if (value >= 500000) {
             setSliderValue(12);
-            setSliderDisabled(true);
             getCalc(12, value);
             return;
-        } else {
-            setSliderDisabled(false);
         }
         getCalc(sliderValue, value);
     };
@@ -264,135 +226,82 @@ export default function Calculator({ navigation }: Props) {
                         <Text style={{ color: "#074A74" }}>Collateral</Text>
                     </View>
                 </View>
-                <View
-                    style={{
-                        backgroundColor: "white",
-                        marginVertical: 10,
-                    }}
-                >
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            backgroundColor: "white",
-                            justifyContent: "space-between",
-                        }}
-                    >
-                        <Text style={styles.label}>For how long?</Text>
-                        <Text style={styles.label}>Months</Text>
-                    </View>
-                    <Slider
-                        style={{ width: "100%", height: 60 }}
-                        value={sliderValue}
-                        minimumValue={minMonth}
-                        maximumValue={maxMonth}
-                        step={3}
-                        minimumTrackTintColor="#074A74"
-                        maximumTrackTintColor="#dddddd"
-                        disabled={sliderDisabled}
-                        onSlidingComplete={() => {
-                            // setSliderValue(value);
-                        }}
-                        onValueChange={(value) => {
-                            onSliderChange(value);
-                        }}
-                    />
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            backgroundColor: "white",
-                            justifyContent: "space-between",
-                        }}
-                    >
-                        <Text style={styles.label}>{minMonth}</Text>
-                        <Text style={styles.label}>9</Text>
-                        <Text style={styles.label}>{maxMonth}</Text>
-                    </View>
-                </View>
 
                 <View
                     style={{
-                        backgroundColor: "white",
-                        flexDirection: "row",
-                        marginVertical: 20,
+                        backgroundColor: "#D9D9D9",
+                        alignItems: "center",
+                        paddingVertical: 15,
+                        height: 100,
                     }}
                 >
-                    <View
+                    <Text
                         style={{
-                            backgroundColor: "#D9D9D9",
-                            alignItems: "center",
-                            flex: 1,
-                            paddingVertical: 15,
+                            color: "#074A74",
+                            fontFamily: "Montserrat_500Medium",
+                            fontSize: 10,
+                            marginBottom: 10,
                         }}
                     >
-                        <Text
-                            style={{
-                                color: "#074A74",
-                                fontFamily: "Montserrat_500Medium",
-                                fontSize: 10,
-                                marginBottom: 10,
-                            }}
-                        >
-                            {downPayment === "Not" ? "" : "Your Downpayment"}
-                        </Text>
-                        <Text
-                            style={{
-                                color: "#074A74",
-                                fontFamily: "Montserrat_800ExtraBold",
-                                fontSize: 25,
-                            }}
-                        >
-                            {downPayment}
-                        </Text>
-                    </View>
-                    <View
+                        {downPayment === "₦0.00" ? "" : "Your Downpayment"}
+                    </Text>
+                    <Text
                         style={{
-                            backgroundColor: "rgba(7, 74, 116, 0.63)",
-                            flex: 1,
-                            alignItems: "center",
-                            paddingVertical: 15,
+                            color: "#074A74",
+                            fontFamily: "Montserrat_800ExtraBold",
+                            fontSize: 25,
                         }}
                     >
-                        <Text
-                            style={{
-                                color: "white",
-                                fontFamily: "Montserrat_500Medium",
-                                fontSize: 10,
-                                marginBottom: 10,
-                            }}
-                        >
-                            {repayment === "Applicable" ? "" : "Your Monthly Repayment"}
-                        </Text>
-                        <Text
-                            style={{
-                                color: "white",
-                                fontFamily: "Montserrat_800ExtraBold",
-                                fontSize: 25,
-                            }}
-                        >
-                            {repayment}
-                        </Text>
-                    </View>
+                        {downPayment}
+                    </Text>
+                </View>
+                <View
+                    style={{
+                        backgroundColor: "rgba(7, 74, 116, 0.63)",
+                        height: 100,
+                        alignItems: "center",
+                        paddingVertical: 15,
+                    }}
+                >
+                    <Text
+                        style={{
+                            color: "white",
+                            fontFamily: "Montserrat_600SemiBold",
+                            fontSize: 12,
+                            marginBottom: 10,
+                            textAlign: "center",
+                        }}
+                    >
+                        {repayment === "₦0.00" ? "" : `Your Monthly Repayment for the next ${sliderValue} months`}
+                    </Text>
+                    <Text
+                        style={{
+                            color: "white",
+                            fontFamily: "Montserrat_800ExtraBold",
+                            fontSize: 25,
+                        }}
+                    >
+                        {repayment}
+                    </Text>
                 </View>
                 <Pressable
                     style={
-                        downPayment === "Not"
-                            ? {
-                                  backgroundColor: "rgba(7, 74, 116, 0.63)",
-                                  alignItems: "center",
-                                  paddingVertical: 15,
-                                  borderRadius: 5,
-                                  marginVertical: 10,
-                              }
-                            : {
-                                  backgroundColor: "#074A74",
-                                  alignItems: "center",
-                                  paddingVertical: 15,
-                                  borderRadius: 5,
-                                  marginVertical: 10,
-                              }
+                        downPayment === "₦0.00"
+                            ? [
+                                  {
+                                      backgroundColor: "rgba(7, 74, 116, 0.63)",
+                                  },
+                                  styles.button,
+                              ]
+                            : [
+                                  {
+                                      backgroundColor: "#074A74",
+                                  },
+                                  styles.button,
+                              ]
                     }
                     onPress={doSome}
-                    disabled={downPayment === "Not"}
+                    disabled={downPayment === "₦0.00"}
                 >
                     {loader ? (
                         <View
@@ -445,6 +354,17 @@ const styles = StyleSheet.create({
         fontFamily: "Montserrat_600SemiBold",
         alignSelf: "center",
         marginVertical: 10,
+    },
+    button: {
+        alignItems: "center",
+        paddingVertical: 15,
+        borderRadius: 5,
+        marginVertical: 10,
+        position: "absolute",
+        bottom: 0,
+        right: Dimensions.get("window").width * 0.1,
+        width: Dimensions.get("window").width * 0.8,
+        justifyContent: "center",
     },
     label: {
         color: "#074A74",
