@@ -3,44 +3,44 @@ import { StyleSheet, Pressable, Image } from "react-native";
 import { Text, View } from "../components/Themed";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
-//import { useContext, useState, useEffect } from "react";
-//import { AuthContext } from "../context/AuthContext";
-//import { OrderContext } from "../context/OrderContext";
 import Animated from "react-native-reanimated";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount }) {
-    const url = process.env.EXPO_PUBLIC_API_URL;
-    axios.defaults.baseURL = url;
+    const { authData } = useContext(AuthContext);
+    const statesColor = {
+        pending: "#FDC228",
+        approved: "#074A74",
+        rejected: "#DB2721",
+    };
+    interface CreditChecker {
+        id: number;
+        customer_id: number;
+        initiated_by: number | null;
+        processed_by: number | null;
+        processed_at: string | null;
+        status: string;
+        reason: string | null;
+        created_at: string;
+        updated_at: string;
+        bnpl_vendor_product_id: number | null;
+        repayment_cycle_id: number;
+        repayment_duration_id: number;
+        down_payment_rate_id: number;
+        credit_check_no: string;
+        business_type_id: number;
+        product_id: number;
+    }
 
-    // async function doSome() {
-    //     if (type === "cash") {
-    //         navigation.navigate("Calculator");
-    //     } else {
-    //         setLoader(true);
-    //         try {
-    //             const res = await axios({
-    //                 method: "POST",
-    //                 data: {
-    //                     order_type: type,
-    //                 },
-    //                 url: "/submit/request",
-    //                 headers: { Authorization: `Bearer ${authData.token}` },
-    //             });
-    //             if (res.status === 200) {
-    //                 setOrderRequest();
-    //                 onRequest(res.data, "success", type);
-    //                 setLoader(false);
-    //             }
-    //         } catch (error) {
-    //             setLoader(false);
-    //             onRequest(error.response.data, "failed", type);
-    //         }
-    //     }
-    // }
-    // const checkOrder = () => {
-    //     const isPending = orderRequest?.some((item) => item.status === "pending");
-    //     isPending ? setShowButton(false) : setShowButton(true);
-    // };
+    const creditChecker: CreditChecker = (authData.creditChecker && authData.creditChecker[0]) || {};
+    console.log(creditChecker);
+    const url = process.env.EXPO_PUBLIC_API_URL;
+
+    axios.defaults.baseURL = url;
+    // useEffect(() => {
+    //     checkVerification();
+    // }, [authData]);
 
     return (
         <View style={[styles.container, haveActiveOrder ? { height: 150 } : { height: 100, paddingTop: 10 }]}>
@@ -56,7 +56,9 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
                 <View style={{ flexDirection: "row", backgroundColor: "transparent" }}>
                     <LinearGradient colors={["#fff", "#DADADA"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
                         <Pressable style={[styles.button]} onPress={performAction}>
-                            <Text style={[styles.buttonText, { color: "#074A74" }]}>{haveActiveOrder ? "Track Order" : "Request Loan"}</Text>
+                            <Text style={[styles.buttonText, { color: "#074A74" }, creditChecker.id && { color: statesColor[creditChecker.status] }]}>
+                                {haveActiveOrder ? "Track Order" : creditChecker.id ? creditChecker.status : "Request Loan"}
+                            </Text>
                         </Pressable>
                     </LinearGradient>
                 </View>

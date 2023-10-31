@@ -25,7 +25,7 @@ export default function Calculator({ navigation }: Props) {
     const [calculator, setCalculator] = useState([]);
     const [downPayment, setDownPayment] = useState("");
     const [repayment, setRepayment] = useState("");
-
+    const [completeRepayment, setCompleteRepayment] = useState(0);
     const [isBiMonthly, setIsBiMonthly] = useState(false);
     const [isCollateral, setIsCollateral] = useState(false);
     const cashBusinessTypes = businessTypes.filter((item) => {
@@ -50,7 +50,12 @@ export default function Calculator({ navigation }: Props) {
     };
 
     async function doSome() {
-        navigation.navigate("UploadDocument");
+        navigation.navigate("UploadDocument", {
+            down_payment: parseInt(downPayment.replace(/[^0-9]/g, ""), 10),
+            loan_amount: inputValue,
+            repayment: completeRepayment,
+            repayment_cycle_id: isBiMonthly ? 1 : 2,
+        });
         setLoader(true);
     }
 
@@ -73,7 +78,8 @@ export default function Calculator({ navigation }: Props) {
             if (params) {
                 const { actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(input, data, params, 0);
                 setDownPayment("₦" + actualDownpayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-                if (!isBiMonthly) {
+                setCompleteRepayment(rePayment);
+                if (isBiMonthly) {
                     setRepayment("₦" + (rePayment / val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                 } else {
                     setRepayment("₦" + biMonthlyRepayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));

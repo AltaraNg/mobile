@@ -20,10 +20,10 @@ export default function Upload(props) {
             aspect: [4, 3],
             quality: 1,
         });
-        if (!result.cancelled) {
+        if (!result.canceled) {
             setShowLoader(true);
             // ImagePicker saves the taken photo to disk and returns a local URI to it
-            const localUri = result.uri;
+            const localUri = result.assets[0].uri;
             const filename = localUri.split("/").pop();
             // Infer the type of the image
             const match = /\.(\w+)$/.exec(filename);
@@ -37,26 +37,31 @@ export default function Upload(props) {
                 name: filename,
             });
             formData.append("type", props.type);
-            const res = await fetch(`${url}document/upload`, {
-                method: "post",
-                body: formData,
-                headers: {
-                    Authorization: `Bearer ${authData.token}`,
-                    "Content-Type": "multipart/form-data; ",
-                },
-            });
+            const res = await fetch(
+                `${url}upload/document/s3
+`,
+                {
+                    method: "post",
+                    body: formData,
+                    headers: {
+                        Authorization: `Bearer ${authData.token}`,
+                        "Content-Type": "multipart/form-data; ",
+                    },
+                }
+            );
             const responseJson = await res.json();
-
             if (responseJson.status == "success") {
                 setShowLoader(false);
                 props.onRequest();
-                setImage(result.uri);
-                const res = responseJson.data.user;
+                setImage(result.assets[0].uri);
+                const res = responseJson.data.document;
                 setAuthData((prevState: object) => {
-                    return {
+                    const updatedState = {
                         ...prevState,
-                        user: { ...res },
                     };
+                    updatedState.documents = updatedState.documents || [];
+                    updatedState.documents.push({ name: props.type, url: res });
+                    return updatedState;
                 });
                 ToastAndroid.showWithGravity(responseJson.message, ToastAndroid.SHORT, ToastAndroid.CENTER);
             } else {

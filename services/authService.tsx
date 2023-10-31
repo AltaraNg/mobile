@@ -6,8 +6,9 @@ export type AuthData = {
     name: string;
     included;
     user;
+    creditChecker;
 };
-let url = "auth/login";
+const url = "auth/login";
 
 const signIn = (phone_number: string, otp: string, device_name: string, login_type: string): Promise<AuthData> => {
     // this is a mock of an API call, in a real app
@@ -22,11 +23,11 @@ const signIn = (phone_number: string, otp: string, device_name: string, login_ty
     };
     return post(url, data)
         .then((res) => {
-            let loginInfo = res.data.data;
+            const loginInfo = res.data.data;
             return loginInfo;
         })
         .catch((err) => {
-            return undefined;
+            return err;
         })
         .finally(() => {});
 };
@@ -44,7 +45,7 @@ const SignPassword = (phone_number: string, password: string, device_name: strin
     };
     return post(url, data)
         .then((res) => {
-            let loginInfo = res.data.data;
+            const loginInfo = res.data.data;
 
             return loginInfo;
         })

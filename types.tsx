@@ -40,7 +40,7 @@ export type RootTabParamList = {
     ViewProfile: { user: object };
     EditProfile: { user: object };
     CreateProfile: { user: object };
-    UploadDocument: { user: object };
+    UploadDocument: { order: object; user: object };
     OrderRequest: { order: string };
     OrderDetails: { order: object };
 };
@@ -50,7 +50,7 @@ export type DrawerParamList = {
     ViewProfile: { user: object };
     EditProfile: { user: object };
     CreateProfile: { user: object };
-    UploadDocument: { user: object };
+    UploadDocument: { order: object; user: object };
     OrderRequest: { order: string };
     History: { order: undefined };
     OrderDetails: { order: object };
