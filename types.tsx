@@ -9,7 +9,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 declare global {
     namespace ReactNavigation {
-        interface RootParamList extends RootStackParamList {}
+        interface RootParamList extends RootStackParamList { }
     }
 }
 
@@ -21,6 +21,7 @@ export type RootStackParamList = {
     NotFound: undefined;
     OrderDetails: { order: object };
     OrderConfirmation: { order: object };
+    OrderSuccess: { order: object }
     ViewNotification: { notification: object };
     Main: undefined;
     OTP: { phone_number: string };
@@ -45,6 +46,7 @@ export type RootTabParamList = {
     OrderRequest: { order: string };
     OrderDetails: { order: object };
     OrderConfirmation: { order: object };
+    OrderSuccess: { order: object }
 };
 
 export type DrawerParamList = {

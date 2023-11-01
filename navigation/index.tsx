@@ -42,6 +42,7 @@ import OrderDetails from "../screens/OrderDetails";
 import ViewNotification from "../screens/ViewNotification";
 import Calculator from "../screens/Calculator";
 import OrderConfirmation from "../screens/OrderConfirmation";
+import OrderSuccess from "../screens/OrderSuccess";
 const url = process.env.EXPO_PUBLIC_API_URL;
 
 axios.defaults.baseURL = url;
@@ -138,6 +139,7 @@ function RootNavigator() {
                 <Stack.Screen name="OrderDetails" component={OrderDetails} options={{ headerShown: false }} />
                 <Stack.Screen name="ViewNotification" component={ViewNotification} options={{ headerShown: false }} />
                 <Stack.Screen name="OrderConfirmation" component={OrderConfirmation} options={{ headerShown: false }} />
+                <Stack.Screen name="OrderSuccess" component={OrderSuccess} options={{ headerShown: false }} />
                 <Stack.Screen name="Calculator" component={Calculator} options={{ headerShown: false }} />
                 <Stack.Screen name="Cards" component={Cards} options={{ headerShown: false }} />
 

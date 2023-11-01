@@ -3,8 +3,13 @@ import { Paystack } from "react-native-paystack-webview";
 import { View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { post } from "../utilities/api";
+import axios from "axios";
 
+
+const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
+const instance = axios.create({
+    baseURL: url
+});
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 
 export default function OrderConfirmation({ navigation, route }: Props) {
@@ -16,16 +21,24 @@ export default function OrderConfirmation({ navigation, route }: Props) {
             "down_payment": 16000,
             "product_price": 80000,
             "repayment": 64000,
-            "credit_checker_verification_id": 14
+            "credit_checker_verification_id": 387
         }
         try {
-        let res = await post("/mobile-app/create/loan", data);
-        console.log(res);
-        navigation.navigate("Dashboard");
+            const result = await instance({
+                method: "POST",
+                url: `/mobile-app/create/loan`,
+                headers: { "LOAN-APP-API-KEY": "LAAKswUiUtYsj98CXRG0EDrKmF0m2VbkGUwCx64zALrKEY" },
+                data: data,
+            });
+            console.log(result.data);
+            navigation.navigate("OrderSuccess", );
 
-            
+
         } catch (error) {
             console.log(error.response)
+            console.log(url);
+            // navigation.navigate("Dashboard");
+
         }
     }
 
@@ -41,6 +54,8 @@ export default function OrderConfirmation({ navigation, route }: Props) {
                 activityIndicatorColor="green"
                 onCancel={(e) => {
                     console.log(e);
+                    navigation.navigate("Dashboard");
+
 
                 }}
                 onSuccess={() => {
