@@ -8,6 +8,8 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
+const loanAppKey = process.env.EXPO_PUBLIC_LOAN_APP_KEY;
+
 const instance = axios.create({
     baseURL: url,
 });
@@ -25,16 +27,13 @@ export default function OrderConfirmation({ navigation, route }: Props) {
             const result = await instance({
                 method: "POST",
                 url: `/mobile-app/create/loan`,
-                headers: { "LOAN-APP-API-KEY": "LAAKswUiUtYsj98CXRG0EDrKmF0m2VbkGUwCx64zALrKEY" },
+                headers: { "LOAN-APP-API-KEY": loanAppKey },
                 data: order,
             });
-            console.log(result.data.data.loan);
             setShowLoader(false);
 
             navigation.navigate("OrderDetails", result.data.data.loan);
         } catch (error) {
-            console.log(error);
-            console.log(url);
             // navigation.navigate("Dashboard");
         }
     };
@@ -43,11 +42,10 @@ export default function OrderConfirmation({ navigation, route }: Props) {
         <View style={styles.container}>
             <Paystack
                 paystackKey={paystackKey}
-                amount={"25000.00"}
-                billingEmail="admin@altaracredit.com"
+                amount={order.down_payment}
+                billingEmail="accounts@altaracredit.com"
                 activityIndicatorColor="green"
                 onCancel={(e) => {
-                    console.log(e);
                     navigation.navigate("Dashboard");
                 }}
                 onSuccess={() => {

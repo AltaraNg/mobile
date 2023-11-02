@@ -72,12 +72,10 @@ export default function UploadDocument({ navigation, route }: Props) {
                 headers: headers,
             })
             .then((res) => {
-                console.log(res);
                 fetchUser();
                 navigation.navigate("Dashboard");
             })
             .catch((err) => {
-                console.log(err);
                 ToastAndroid.showWithGravity("Error creating order request", ToastAndroid.SHORT, ToastAndroid.CENTER);
             })
             .finally(() => {

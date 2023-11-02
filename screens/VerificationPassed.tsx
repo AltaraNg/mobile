@@ -15,6 +15,7 @@ import AmortizationObject from "../components/AmortizationObject";
 
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
+const loanAppKey = process.env.EXPO_PUBLIC_LOAN_APP_KEY;
 const instance = axios.create({
     baseURL: url,
 });
@@ -44,7 +45,7 @@ export default function VerificationPassed({ navigation, route }: Props) {
             let details = result.data.data.creditCheckerVerification;
             const getAmort = await instance({
                 method: "POST",
-                headers: { "LOAN-APP-API-KEY": "LAAKswUiUtYsj98CXRG0EDrKmF0m2VbkGUwCx64zALrKEY" },
+                headers: { "LOAN-APP-API-KEY": loanAppKey },
                 url: "/mobile-app/amortization/preview",
                 data: {
                     credit_checker_verification_id: details.id,
@@ -54,12 +55,10 @@ export default function VerificationPassed({ navigation, route }: Props) {
                         parseInt(details.product.retail_price) - (parseInt(details.product.retail_price) * details.down_payment_rate.percent) / 100,
                 },
             });
-            console.log(getAmort, "orderDetails");
             setOrderDetails(details);
             setAmortization(getAmort.data.data.preview);
             setShowLoader(false);
         } catch (error) {
-            console.log(error);
         }
     };
 

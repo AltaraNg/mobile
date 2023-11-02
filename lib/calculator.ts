@@ -54,7 +54,6 @@ const cashLoan = (productPrice, data, params, percentage_discount) => {
         var rePayment = actualRepayment;
     }
     total = actualRepayment + actualDownpayment;
-    console.log(biMonthlyRepayment);
     return { biMonthlyRepayment, total, actualDownpayment, rePayment };
 };
 
