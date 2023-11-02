@@ -165,8 +165,8 @@ const DrawerNav = createDrawerNavigator<DrawerParamList>();
 function DrawerNavigator() {
     const { authData } = useContext(AuthContext);
     const [user, setUser] = useState(null);
-    const [uploaded, setUploaded] = useState<boolean>(false);  
-    
+    const [uploaded, setUploaded] = useState<boolean>(false);
+
     return (
         <DrawerNav.Navigator
             initialRouteName={authData?.user?.attributes?.on_boarded ? "Home" : "CreateProfile"}

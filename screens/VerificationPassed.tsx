@@ -16,23 +16,19 @@ import AmortizationObject from "../components/AmortizationObject";
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
 const instance = axios.create({
-    baseURL: url
+    baseURL: url,
 });
 
 export default function VerificationPassed({ navigation, route }: Props) {
-
     const { authData, showLoader, setShowLoader } = useContext(AuthContext);
     const [orderDetails, setOrderDetails] = useState({});
     const [amortization, setAmortization] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
 
-
     const creditChecker = route.params;
 
     const width = Dimensions.get("window").width;
     const height = Dimensions.get("window").height;
-
-
 
     const goBack = () => {
         navigation.goBack();
@@ -47,63 +43,61 @@ export default function VerificationPassed({ navigation, route }: Props) {
             });
             let details = result.data.data.creditCheckerVerification;
             const getAmort = await instance({
-                method: 'POST',
+                method: "POST",
                 headers: { "LOAN-APP-API-KEY": "LAAKswUiUtYsj98CXRG0EDrKmF0m2VbkGUwCx64zALrKEY" },
-                url: '/mobile-app/amortization/preview',
+                url: "/mobile-app/amortization/preview",
                 data: {
-                    "credit_checker_verification_id": details.id,
-                    "product_price": parseInt(details.product.retail_price),
-                    "down_payment": parseInt(details.product.retail_price) * details.down_payment_rate.percent / 100,
-                    "repayment": parseInt(details.product.retail_price) - (parseInt(details.product.retail_price) * details.down_payment_rate.percent / 100)
-                }
+                    credit_checker_verification_id: details.id,
+                    product_price: parseInt(details.product.retail_price),
+                    down_payment: (parseInt(details.product.retail_price) * details.down_payment_rate.percent) / 100,
+                    repayment:
+                        parseInt(details.product.retail_price) - (parseInt(details.product.retail_price) * details.down_payment_rate.percent) / 100,
+                },
             });
-            console.log(getAmort, 'orderDetails');
+            console.log(getAmort, "orderDetails");
             setOrderDetails(details);
-            setAmortization(getAmort.data.data.preview)
-            setShowLoader(false)
+            setAmortization(getAmort.data.data.preview);
+            setShowLoader(false);
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
-
-    }
+    };
 
     const payDown = () => {
         let data: object = {
             credit_checker_verification_id: orderDetails?.id,
             product_price: parseInt(orderDetails?.product?.retail_price),
-            down_payment: parseInt(orderDetails?.product.retail_price) * orderDetails?.down_payment_rate.percent / 100,
-            repayment: parseInt(orderDetails?.product.retail_price) - (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent / 100)
-
-        }
+            down_payment: (parseInt(orderDetails?.product.retail_price) * orderDetails?.down_payment_rate.percent) / 100,
+            repayment:
+                parseInt(orderDetails?.product.retail_price) -
+                (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100,
+        };
         navigation.navigate("OrderConfirmation", data);
-    }
+    };
 
     useEffect(() => {
         previewOrder();
     }, []);
 
     return (
-
         <View style={styles.container}>
             {showLoader ? (
                 <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
             ) : (
                 <View style={styles.container}>
-                    <Text style={styles.header}>
-                        Verified successfully
-                    </Text>
+                    <Text style={styles.header}>Verified successfully</Text>
                     <View style={styles.cardContainer}>
-                        <Text style={styles.headerText}>
-                            Order Details
+                        <Text style={styles.headerText}>Order Details</Text>
+                        <Text style={styles.modalText}>Product: {`₦${orderDetails?.product?.retail_price}`} loan</Text>
+                        <Text style={styles.modalText}>
+                            Downpayment: {`₦${(parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100}`}
                         </Text>
                         <Text style={styles.modalText}>
-                            Product: {`₦${orderDetails?.product?.retail_price}`} loan
-                        </Text>
-                        <Text style={styles.modalText}>
-                            Downpayment: {`₦${parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent / 100}`}
-                        </Text>
-                        <Text style={styles.modalText}>
-                            Total Repayment: {`₦${parseInt(orderDetails?.product?.retail_price) - (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent / 100)}`}
+                            Total Repayment:{" "}
+                            {`₦${
+                                parseInt(orderDetails?.product?.retail_price) -
+                                (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100
+                            }`}
                         </Text>
                     </View>
 
@@ -113,24 +107,16 @@ export default function VerificationPassed({ navigation, route }: Props) {
                             data={amortization}
                             keyExtractor={(item: any) => item.id}
                             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={previewOrder} />}
-                            renderItem={({ item }) => (
-                                <AmortizationObject item={item} />
-                            )}
+                            renderItem={({ item }) => <AmortizationObject item={item} />}
                         />
                     </View>
-                    <LinearGradient
-                        colors={["#074A74", "#089CA4"]}
-                        style={styles.buttonContainer}
-                        start={{ x: 1, y: 0.5 }}
-                        end={{ x: 0, y: 0.5 }}
-                    >
+                    <LinearGradient colors={["#074A74", "#089CA4"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
                         <Pressable style={styles.button} onPress={payDown}>
                             <Text style={styles.buttonText}>Pay Downpayment</Text>
                         </Pressable>
                     </LinearGradient>
                 </View>
             )}
-
         </View>
     );
 }
@@ -154,7 +140,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         textAlign: "left",
         lineHeight: 35,
-        display: 'flex'
+        display: "flex",
     },
     total: {
         position: "absolute",
@@ -174,7 +160,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "center",
-        textAlign: 'center'
+        textAlign: "center",
     },
     image: {
         position: "absolute",
@@ -204,7 +190,7 @@ const styles = StyleSheet.create({
         textTransform: "uppercase",
         fontFamily: "Montserrat_700Bold",
         fontSize: 20,
-        textAlign: 'center'
+        textAlign: "center",
     },
     orderSummary: {
         flexDirection: "row",

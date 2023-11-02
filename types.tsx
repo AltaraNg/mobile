@@ -9,7 +9,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 declare global {
     namespace ReactNavigation {
-        interface RootParamList extends RootStackParamList { }
+        interface RootParamList extends RootStackParamList {}
     }
 }
 
@@ -21,8 +21,8 @@ export type RootStackParamList = {
     NotFound: undefined;
     OrderDetails: { order: object };
     OrderConfirmation: { order: object };
-    OrderSuccess: { order: object }
-    VerificationPassed: { order: object }
+    OrderSuccess: { order: object };
+    VerificationPassed: { order: object };
     ViewNotification: { notification: object };
     UploadDocument: { down_payment: Number; loan_amount: Number; repayment: Number; repayment_cycle_id };
     Main: undefined;
@@ -44,14 +44,13 @@ export type RootTabParamList = {
     ViewProfile: { user: object };
     EditProfile: { user: object };
     CreateProfile: { user: object };
-    VerificationPassed: { order: object }
-    UploadDocument: { down_payment: Number; loan_amount: Number; repayment: Number; repayment_cycle_id };    
+    VerificationPassed: { order: object };
+    UploadDocument: { down_payment: Number; loan_amount: Number; repayment: Number; repayment_cycle_id };
     OrderRequest: { order: string };
     OrderDetails: { order: object };
     OrderConfirmation: { order: object };
     OrderSuccess: { order: object };
     Calculator: { order: object };
-
 };
 
 export type DrawerParamList = {
@@ -64,7 +63,6 @@ export type DrawerParamList = {
     History: { order: undefined };
     OrderDetails: { order: object };
     Calculator: { order: object };
-
 };
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
     BottomTabScreenProps<RootTabParamList, Screen>,

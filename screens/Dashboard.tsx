@@ -27,12 +27,11 @@ export default function Dashboard({ navigation }: Props) {
         expected_amount: 0,
     });
     const amortization = orders?.included?.amortizations;
-    
 
     const toggleSideMenu = async () => {
         navigation.toggleDrawer();
     };
- 
+
     const fetchOrder = async () => {
         setShowLoader(true);
 
@@ -41,7 +40,7 @@ export default function Dashboard({ navigation }: Props) {
             url: `/customers/${authData.user.id}/orders`,
             headers: { Authorization: `Bearer ${authData.token}` },
         });
-        setUser(authData?.user);        
+        setUser(authData?.user);
         const order = response.data.data[0].included.orders[0];
         setOrders(order);
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
@@ -58,7 +57,7 @@ export default function Dashboard({ navigation }: Props) {
         setRefreshing(false);
     };
     const performAction = () => {
-        creditChecker?.status === 'passed' ? navigation.navigate("VerificationPassed", creditChecker) : navigation.navigate("Calculator");
+        creditChecker?.status === "passed" ? navigation.navigate("VerificationPassed", creditChecker) : navigation.navigate("Calculator");
     };
 
     const paid_repayment = amortization?.map((item: { actual_amount: number }) => {
@@ -77,7 +76,7 @@ export default function Dashboard({ navigation }: Props) {
     const progressBar = (totalPaid + orders?.attributes?.down_payment / total_expected_repayment) * 100;
     const testNav = () => {
         navigation.navigate("OrderConfirmation");
-    }
+    };
     const recentActivities = [
         {
             id: "1",
@@ -90,7 +89,7 @@ export default function Dashboard({ navigation }: Props) {
             name: "Monthly Repayment",
             date: "01/11/2023",
             amount: "₦9,500",
-        }, 
+        },
         {
             id: "3",
             name: "Loan Approved",

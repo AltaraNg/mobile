@@ -31,7 +31,7 @@ const OrderProvider: React.FC = ({ children }) => {
             const orderRequestContext = response.data.data.order_requests;
             const reversed = orderRequestContext.reverse();
             setOrderRequest(reversed);
-           
+
             setShowLoader(false);
         } catch (error: any) {
             setShowLoader(false);
