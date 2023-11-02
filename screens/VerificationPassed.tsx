@@ -58,8 +58,7 @@ export default function VerificationPassed({ navigation, route }: Props) {
             setOrderDetails(details);
             setAmortization(getAmort.data.data.preview);
             setShowLoader(false);
-        } catch (error) {
-        }
+        } catch (error) {}
     };
 
     const payDown = () => {

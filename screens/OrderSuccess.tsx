@@ -9,9 +9,6 @@ type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 
 export default function OrderSuccess({ navigation, route }: Props) {
     const order: object = route.params;
-    
-
-    
 
     return (
         <View style={styles.container}>
