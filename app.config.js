@@ -12,7 +12,7 @@ export default {
         image: "./assets/images/splash.png",
         resizeMode: "contain",
         backgroundColor: "#ffffff",
-    },
+    },    
     plugins: [
         [
             "expo-notifications",

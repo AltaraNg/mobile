@@ -1,14 +1,15 @@
 import React from "react";
-import { StyleSheet, Pressable, Image } from "react-native";
+import { StyleSheet, Pressable, Image, Dimensions } from "react-native";
 import { Text, View } from "../components/Themed";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import Animated from "react-native-reanimated";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount }) {
     const { authData } = useContext(AuthContext);
+    const [creditChecker, setCreditChecker] = useState(authData?.user?.included?.creditCheckerVerifications[0]);
     const statesColor = {
         pending: "#FDC228",
         approved: "#074A74",
@@ -33,8 +34,7 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
         product_id: number;
     }
 
-    const creditChecker: CreditChecker = (authData.creditChecker && authData.creditChecker[0]) || {};
-    console.log(creditChecker);
+    // setCreditChecker({})
     const url = process.env.EXPO_PUBLIC_API_URL;
 
     axios.defaults.baseURL = url;
@@ -56,8 +56,8 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
                 <View style={{ flexDirection: "row", backgroundColor: "transparent" }}>
                     <LinearGradient colors={["#fff", "#DADADA"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
                         <Pressable style={[styles.button]} onPress={performAction}>
-                            <Text style={[styles.buttonText, { color: "#074A74" }, creditChecker.id && { color: statesColor[creditChecker.status] }]}>
-                                {haveActiveOrder ? "Track Order" : creditChecker.id ? creditChecker.status : "Request Loan"}
+                            <Text style={[styles.buttonText, { color: "#074A74" }, creditChecker?.id && { color: statesColor[creditChecker.status] }]}>
+                                {haveActiveOrder ? "Track Order" : creditChecker?.id ? creditChecker.status : "Request Loan"}
                             </Text>
                         </Pressable>
                     </LinearGradient>
@@ -103,7 +103,8 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
     container: {
-        width: 300,
+        width: "87%",
+        height: "auto",
         backgroundColor: "#074A74",
         borderRadius: 5,
         marginBottom: 17,

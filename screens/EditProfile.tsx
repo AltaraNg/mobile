@@ -48,6 +48,8 @@ export default function Dashboard({ navigation }: Props) {
         city?: string;
         date_of_registration?: string;
         employment_status;
+        date_of_birth?: string
+        civil_status?: string
         gender?: string;
         on_boarded?: boolean;
         phone_number?: string;

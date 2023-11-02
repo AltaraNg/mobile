@@ -33,7 +33,7 @@ export default function OrderSuccess({ navigation, route }: Props) {
 
     return (
         <View style={styles.container}>
-           <Text>Order SUccessful</Text>
+           <Text>Order Successful</Text>
         </View>
     );
 }

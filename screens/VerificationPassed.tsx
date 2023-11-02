@@ -1,0 +1,335 @@
+import { RefreshControl, StyleSheet, Dimensions, FlatList, Pressable, Image } from "react-native";
+
+import { LinearGradient } from "expo-linear-gradient";
+import { useState, useContext, useEffect } from "react";
+import { Overlay } from "react-native-elements";
+import { Text, View } from "../components/Themed";
+import { RootStackParamList } from "../types";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { OrderStatusPass, OrderStatusFail, OrderStatusPending, BackButton } from "../assets/svgs/svg";
+import Animated from "react-native-reanimated";
+import { AuthContext } from "../context/AuthContext";
+import axios from "axios";
+import { get, post } from "../utilities/api";
+import AmortizationObject from "../components/AmortizationObject";
+
+type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
+const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
+const instance = axios.create({
+    baseURL: url
+});
+
+export default function VerificationPassed({ navigation, route }: Props) {
+
+    const { authData, showLoader, setShowLoader } = useContext(AuthContext);
+    const [orderDetails, setOrderDetails] = useState({});
+    const [amortization, setAmortization] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
+
+
+    const creditChecker = route.params;
+
+    const width = Dimensions.get("window").width;
+    const height = Dimensions.get("window").height;
+
+
+
+    const goBack = () => {
+        navigation.goBack();
+    };
+    const previewOrder = async () => {
+        setShowLoader(true);
+        try {
+            const result = await axios({
+                method: "GET",
+                url: `/credit-check-verification/${creditChecker?.id}`,
+                headers: { Authorization: `Bearer ${authData.token}` },
+            });
+            let details = result.data.data.creditCheckerVerification;
+            const getAmort = await instance({
+                method: 'POST',
+                headers: { "LOAN-APP-API-KEY": "LAAKswUiUtYsj98CXRG0EDrKmF0m2VbkGUwCx64zALrKEY" },
+                url: '/mobile-app/amortization/preview',
+                data: {
+                    "credit_checker_verification_id": details.id,
+                    "product_price": parseInt(details.product.retail_price),
+                    "down_payment": parseInt(details.product.retail_price) * details.down_payment_rate.percent / 100,
+                    "repayment": parseInt(details.product.retail_price) - (parseInt(details.product.retail_price) * details.down_payment_rate.percent / 100)
+                }
+            });
+            console.log(getAmort, 'orderDetails');
+            setOrderDetails(details);
+            setAmortization(getAmort.data.data.preview)
+            setShowLoader(false)
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+
+    const payDown = () => {
+        let data: object = {
+            credit_checker_verification_id: orderDetails?.id,
+            product_price: parseInt(orderDetails?.product?.retail_price),
+            down_payment: parseInt(orderDetails?.product.retail_price) * orderDetails?.down_payment_rate.percent / 100,
+            repayment: parseInt(orderDetails?.product.retail_price) - (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent / 100)
+
+        }
+        navigation.navigate("OrderConfirmation", data);
+    }
+
+    useEffect(() => {
+        previewOrder();
+    }, []);
+
+    return (
+
+        <View style={styles.container}>
+            {showLoader ? (
+                <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
+            ) : (
+                <View style={styles.container}>
+                    <Text style={styles.header}>
+                        Verified successfully
+                    </Text>
+                    <View style={styles.cardContainer}>
+                        <Text style={styles.headerText}>
+                            Order Details
+                        </Text>
+                        <Text style={styles.modalText}>
+                            Product: {`₦${orderDetails?.product?.retail_price}`} loan
+                        </Text>
+                        <Text style={styles.modalText}>
+                            Downpayment: {`₦${parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent / 100}`}
+                        </Text>
+                        <Text style={styles.modalText}>
+                            Total Repayment: {`₦${parseInt(orderDetails?.product?.retail_price) - (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent / 100)}`}
+                        </Text>
+                    </View>
+
+                    <View style={styles.container}>
+                        <FlatList
+                            scrollEnabled={true}
+                            data={amortization}
+                            keyExtractor={(item: any) => item.id}
+                            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={previewOrder} />}
+                            renderItem={({ item }) => (
+                                <AmortizationObject item={item} />
+                            )}
+                        />
+                    </View>
+                    <LinearGradient
+                        colors={["#074A74", "#089CA4"]}
+                        style={styles.buttonContainer}
+                        start={{ x: 1, y: 0.5 }}
+                        end={{ x: 0, y: 0.5 }}
+                    >
+                        <Pressable style={styles.button} onPress={payDown}>
+                            <Text style={styles.buttonText}>Pay Downpayment</Text>
+                        </Pressable>
+                    </LinearGradient>
+                </View>
+            )}
+
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#fff",
+        paddingTop: 23,
+    },
+    totalText: {
+        fontWeight: "bold",
+        fontSize: 24,
+        color: "#9C9696",
+    },
+    modalText: {
+        color: "white",
+        fontFamily: "Montserrat_500Medium",
+        marginTop: 5,
+        marginHorizontal: 10,
+        fontSize: 15,
+        textAlign: "left",
+        lineHeight: 35,
+        display: 'flex'
+    },
+    total: {
+        position: "absolute",
+        bottom: 0,
+        marginHorizontal: -15,
+        zIndex: 1000,
+        height: 75,
+        backgroundColor: "#F9FBFC",
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 10,
+        justifyContent: "space-between",
+    },
+    header: {
+        backgroundColor: "#074A74",
+        padding: 20,
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        textAlign: 'center'
+    },
+    image: {
+        position: "absolute",
+        width: Dimensions.get("window").width * 0.5,
+        height: Dimensions.get("window").height * 0.2,
+        backgroundColor: "#EFF5F9",
+        marginTop: Dimensions.get("window").height * 0.4,
+        left: Dimensions.get("window").width * 0.25,
+    },
+    toggle: {
+        flexDirection: "row",
+        width: 326,
+        height: 50,
+        borderRadius: 19,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+        backgroundColor: "#EEEFF0",
+        alignItems: "center",
+        paddingHorizontal: 1,
+        justifyContent: "space-evenly",
+    },
+    headerText: {
+        color: "white",
+        textTransform: "uppercase",
+        fontFamily: "Montserrat_700Bold",
+        fontSize: 20,
+        textAlign: 'center'
+    },
+    orderSummary: {
+        flexDirection: "row",
+        paddingHorizontal: 20,
+        backgroundColor: "#fff",
+        marginTop: 10,
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        marginHorizontal: 40,
+        position: "absolute",
+        bottom: 30,
+        borderColor: "#074A74",
+        borderWidth: 1,
+        borderRadius: 10,
+    },
+
+    toggleoff: {
+        flexDirection: "row",
+        backgroundColor: "#EEEFF0",
+        width: 162,
+        height: 40,
+    },
+    button: {
+        flex: 1,
+        paddingVertical: 15,
+        marginHorizontal: 8,
+        borderRadius: 24,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    buttonText: {
+        color: "#ffffff",
+        fontWeight: "bold",
+        textAlign: "center",
+        fontSize: 14,
+    },
+    orderDetail: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
+    orderStatus: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
+    leaf: {
+        position: "absolute",
+        right: 0,
+    },
+
+    statusText: {
+        textAlign: "right",
+        paddingVertical: 10,
+        marginHorizontal: 10,
+    },
+    cardContainer: {
+        height: 200,
+        width: 350,
+        backgroundColor: "#074A74",
+        borderRadius: 5,
+        marginBottom: 10,
+        marginTop: 10,
+        padding: 10,
+        alignSelf: "center",
+        paddingLeft: 15,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 5,
+    },
+    amortizationContainer: {
+        backgroundColor: "#fff",
+        marginHorizontal: 15,
+        flex: 1,
+    },
+    amorHeader: {
+        fontFamily: "Montserrat_700Bold",
+        color: "#074A74",
+        fontSize: 19,
+        marginVertical: 10,
+    },
+    statusBar: {
+        height: 15,
+        width: "100%",
+        backgroundColor: "#EFF5F9",
+        opacity: 0.7,
+        borderWidth: 2,
+        borderRadius: 10,
+        marginVertical: 15,
+    },
+    repaymentStatus: {
+        backgroundColor: "#074A74",
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
+    modalContainer: {
+        height: Dimensions.get("screen").height / 2.1,
+        alignItems: "center",
+        marginTop: "auto",
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        backgroundColor: "white",
+    },
+    modalContent: {
+        paddingVertical: 20,
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        alignItems: "center",
+        backgroundColor: "white",
+    },
+    modalHeading: {
+        fontFamily: "Montserrat_700Bold",
+        fontSize: 30,
+        textAlign: "center",
+        color: "black",
+        marginTop: 20,
+    },
+    modalHeaderCloseText: {
+        backgroundColor: "white",
+        textAlign: "center",
+        paddingLeft: 5,
+        paddingRight: 5,
+        width: 30,
+        fontSize: 15,
+        borderRadius: 50,
+    },
+});

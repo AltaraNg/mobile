@@ -22,7 +22,9 @@ export type RootStackParamList = {
     OrderDetails: { order: object };
     OrderConfirmation: { order: object };
     OrderSuccess: { order: object }
+    VerificationPassed: { order: object }
     ViewNotification: { notification: object };
+    UploadDocument: { down_payment: Number; loan_amount: Number; repayment: Number; repayment_cycle_id };
     Main: undefined;
     OTP: { phone_number: string };
     Login: undefined;
@@ -42,11 +44,14 @@ export type RootTabParamList = {
     ViewProfile: { user: object };
     EditProfile: { user: object };
     CreateProfile: { user: object };
-    UploadDocument: { order: object; user: object };
+    VerificationPassed: { order: object }
+    UploadDocument: { down_payment: Number; loan_amount: Number; repayment: Number; repayment_cycle_id };    
     OrderRequest: { order: string };
     OrderDetails: { order: object };
     OrderConfirmation: { order: object };
-    OrderSuccess: { order: object }
+    OrderSuccess: { order: object };
+    Calculator: { order: object };
+
 };
 
 export type DrawerParamList = {
@@ -58,6 +63,8 @@ export type DrawerParamList = {
     OrderRequest: { order: string };
     History: { order: undefined };
     OrderDetails: { order: object };
+    Calculator: { order: object };
+
 };
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
     BottomTabScreenProps<RootTabParamList, Screen>,

@@ -161,7 +161,7 @@ export default function Calculator({ navigation }: Props) {
         }
         getCalc(sliderValue, value);
     };
-    const toggleSwitchM = () => {
+    const toggleSwitchM = () => { 
         setIsBiMonthly((previousState) => !previousState);
         getCalc();
     };

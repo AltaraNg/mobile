@@ -44,6 +44,7 @@
       "minify": false,
       "port": 19000
     },
+    "jsEngine": "hermes",
     "plugins": [
       [
         "expo-build-properties",

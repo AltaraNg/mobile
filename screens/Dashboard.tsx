@@ -5,7 +5,7 @@ import { Hamburger, Debited, Credited } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import React, { useState, useEffect, useContext } from "react";
 import { Text, View } from "../components/Themed";
-import { DrawerParamList } from "../types";
+import { DrawerParamList, RootStackParamList } from "../types";
 import Cards from "../components/Cards";
 import { AuthContext } from "../context/AuthContext";
 import { OrderContext } from "../context/OrderContext";
@@ -13,7 +13,7 @@ import { FlatList } from "react-native";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import axios from "axios";
 
-type Props = DrawerScreenProps<DrawerParamList, "Home">;
+type Props = DrawerScreenProps<RootStackParamList, "Dashboard">;
 
 export default function Dashboard({ navigation }: Props) {
     const { authData, showLoader, setShowLoader } = useContext(AuthContext);
@@ -22,35 +22,17 @@ export default function Dashboard({ navigation }: Props) {
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [orders, setOrders] = useState(null);
+    const [creditChecker, setCreditChecker] = useState(authData?.user?.included?.creditCheckerVerifications[0]);
     const [nextExpectedRepayment, setNextRepayment] = useState({
         expected_amount: 0,
     });
     const amortization = orders?.included?.amortizations;
-    interface CreditChecker {
-        id: number;
-        customer_id: number;
-        initiated_by: number | null;
-        processed_by: number | null;
-        processed_at: string | null;
-        status: string;
-        reason: string | null;
-        created_at: string;
-        updated_at: string;
-        bnpl_vendor_product_id: number | null;
-        repayment_cycle_id: number;
-        repayment_duration_id: number;
-        down_payment_rate_id: number;
-        credit_check_no: string;
-        business_type_id: number;
-        product_id: number;
-    }
-
-    const creditChecker: CreditChecker = (authData.creditChecker && authData.creditChecker[0]) || {};
+    
 
     const toggleSideMenu = async () => {
         navigation.toggleDrawer();
     };
-
+ 
     const fetchOrder = async () => {
         setShowLoader(true);
 
@@ -59,9 +41,7 @@ export default function Dashboard({ navigation }: Props) {
             url: `/customers/${authData.user.id}/orders`,
             headers: { Authorization: `Bearer ${authData.token}` },
         });
-        setUser(authData?.user);
-        // setCreditChecker((authData as any)?.creditChecker[0] ?? nu);
-        //  console.log(creditChecker, "creditChecker");
+        setUser(authData?.user);        
         const order = response.data.data[0].included.orders[0];
         setOrders(order);
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
@@ -78,7 +58,7 @@ export default function Dashboard({ navigation }: Props) {
         setRefreshing(false);
     };
     const performAction = () => {
-        orders?.included ? navigation.navigate("OrderDetails", orders) : navigation.navigate("Calculator");
+        creditChecker?.status === 'passed' ? navigation.navigate("VerificationPassed", creditChecker) : navigation.navigate("Calculator");
     };
 
     const paid_repayment = amortization?.map((item: { actual_amount: number }) => {
@@ -95,6 +75,9 @@ export default function Dashboard({ navigation }: Props) {
     });
     const totalDebt = total_expected_repayment - totalPaid;
     const progressBar = (totalPaid + orders?.attributes?.down_payment / total_expected_repayment) * 100;
+    const testNav = () => {
+        navigation.navigate("OrderConfirmation");
+    }
     const recentActivities = [
         {
             id: "1",
@@ -107,7 +90,7 @@ export default function Dashboard({ navigation }: Props) {
             name: "Monthly Repayment",
             date: "01/11/2023",
             amount: "₦9,500",
-        },
+        }, 
         {
             id: "3",
             name: "Loan Approved",
@@ -176,7 +159,7 @@ export default function Dashboard({ navigation }: Props) {
                             performAction={performAction}
                         />
                     </View>
-                    <Text style={[styles.name, creditChecker.id && { color: "grey" }]}>
+                    <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>
                         {orders?.included ? "Recent Activities" : "Recommended Loans"}
                     </Text>
                     {orders?.included ? (
@@ -223,7 +206,7 @@ export default function Dashboard({ navigation }: Props) {
                         />
                     ) : (
                         <View style={{ backgroundColor: "transparent", position: "relative" }}>
-                            {creditChecker.id && (
+                            {creditChecker?.id && (
                                 <View
                                     style={{
                                         position: "absolute",

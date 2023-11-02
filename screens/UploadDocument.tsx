@@ -6,7 +6,7 @@ import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
 import { RootTabParamList } from "../types";
 import SideMenu from "./SideMenu";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext, useAuth } from "../context/AuthContext";
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
@@ -16,6 +16,8 @@ const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 
 export default function UploadDocument({ navigation, route }: Props) {
+    const auth = useAuth();
+
     const order: object = route.params;
     const { authData, setAuthData } = useContext(AuthContext);
     const [loading, setLoader] = useState(null);
@@ -32,6 +34,8 @@ export default function UploadDocument({ navigation, route }: Props) {
             url: `/auth/user`,
             headers: { Authorization: `Bearer ${authData.token}` },
         });
+        auth.saveProfile(response.data.data[0]);
+
         setAuthData((prevState: object) => {
             return {
                 ...prevState,
