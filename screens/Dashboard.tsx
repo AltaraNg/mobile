@@ -5,17 +5,19 @@ import { Hamburger, Debited, Credited } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import React, { useState, useEffect, useContext } from "react";
 import { Text, View } from "../components/Themed";
-import { DrawerParamList, RootStackParamList } from "../types";
+import { DrawerParamList, RootStackParamList, RootStackScreenProps } from "../types";
 import Cards from "../components/Cards";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext, useAuth } from "../context/AuthContext";
 import { OrderContext } from "../context/OrderContext";
 import { FlatList } from "react-native";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import axios from "axios";
 
-type Props = DrawerScreenProps<RootStackParamList, "Dashboard">;
+type Props = RootStackScreenProps<"Dashboard">;
 
 export default function Dashboard({ navigation }: Props) {
+    const auth = useAuth();
+
     const { authData, showLoader, setShowLoader } = useContext(AuthContext);
     const { fetchOrderRequestContext, showLoader2 } = useContext(OrderContext);
     const [user, setUser] = useState(null);
@@ -35,29 +37,42 @@ export default function Dashboard({ navigation }: Props) {
     const fetchOrder = async () => {
         setShowLoader(true);
 
+        console.log('I got here');
         const response = await axios({
             method: "GET",
             url: `/customers/${authData.user.id}/orders`,
             headers: { Authorization: `Bearer ${authData.token}` },
         });
-        setUser(authData?.user);
         const order = response.data.data[0].included.orders[0];
+        let user = response.data.data[0];
+        auth.saveProfile(user);
         setOrders(order);
+        setUser(user);
+        setCreditChecker(user.included.creditCheckerVerifications[0]);
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
         setNextRepayment(nextRepayment);
         setShowLoader(false);
     };
 
-    const settUser = async () => {
-        await fetchOrder();
-        fetchOrderRequestContext();
-        setUser(authData?.user);
-        //const upload = Object?.values(authData?.user?.included?.verification || { item: false }).every((val) => val);
-        setShowLoader(false);
-        setRefreshing(false);
-    };
+    // const settUser = async () => {
+    //     await fetchOrder();
+    //     fetchOrderRequestContext();
+    //     setUser(authData?.user);
+    //     //const upload = Object?.values(authData?.user?.included?.verification || { item: false }).every((val) => val);
+    //     setShowLoader(false);
+    //     setRefreshing(false);
+    // };
     const performAction = () => {
-        creditChecker?.status === "passed" ? navigation.navigate("VerificationPassed", creditChecker) : navigation.navigate("Calculator");
+        if(creditChecker?.status === "passed" && !orders){
+            navigation.navigate("VerificationPassed", creditChecker)
+        }
+        else if(creditChecker?.status === "passed" && orders){
+            navigation.navigate("OrderDetails", orders);
+        }
+        else if(creditChecker?.status !== "pending"){
+            navigation.navigate("Calculator")
+        }
+        
     };
 
     const paid_repayment = amortization?.map((item: { actual_amount: number }) => {
@@ -114,12 +129,17 @@ export default function Dashboard({ navigation }: Props) {
         },
     ];
 
-    useEffect(() => {
-        settUser();
-    }, [authData]);
+    
     useEffect(() => {
         fetchOrder();
     }, []);
+
+    useEffect( () => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            fetchOrder();
+        });
+        return unsubscribe
+    }, [navigation]);
 
     return (
         <View style={styles.container}>
@@ -141,7 +161,7 @@ export default function Dashboard({ navigation }: Props) {
                 </TouchableOpacity>
             </View>
 
-            {showLoader || showLoader2 ? (
+            {showLoader ? (
                 <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
             ) : (
                 <View style={styles.main}>
@@ -156,6 +176,7 @@ export default function Dashboard({ navigation }: Props) {
                             progressBar={progressBar}
                             next_repayment={nextExpectedRepayment}
                             performAction={performAction}
+                            creditChecker={creditChecker}
                         />
                     </View>
                     <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>
@@ -167,7 +188,7 @@ export default function Dashboard({ navigation }: Props) {
                             data={recentActivities}
                             keyExtractor={(item) => item.id}
                             extraData={recentActivities}
-                            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={settUser} />}
+                            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />}
                             renderItem={({ item }) => (
                                 <View style={{ backgroundColor: "transparent" }}>
                                     <Pressable>
@@ -222,7 +243,7 @@ export default function Dashboard({ navigation }: Props) {
                                 data={recommendedLoans}
                                 keyExtractor={(item) => item.id}
                                 extraData={recommendedLoans}
-                                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={settUser} />}
+                                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />}
                                 renderItem={({ item }) => (
                                     <View style={{ backgroundColor: "transparent" }}>
                                         <Pressable>
@@ -295,19 +316,7 @@ export default function Dashboard({ navigation }: Props) {
                     )}
                 </View>
             )}
-            <Pressable onPress={testNav}>
-                <View style={{ backgroundColor: "transparent" }}>
-                    <Text
-                        style={{
-                            color: "#333333",
-                            fontFamily: "Montserrat_600SemiBold",
-                            textAlign: "center",
-                        }}
-                    >
-                        Test Nav
-                    </Text>
-                </View>
-            </Pressable>
+           
         </View>
     );
 }

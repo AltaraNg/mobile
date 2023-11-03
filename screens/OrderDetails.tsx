@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Dimensions, Modal, TouchableHighlight, TouchableOpacity } from "react-native";
+import { Pressable, StyleSheet, Dimensions, Modal, TouchableHighlight, TouchableOpacity, FlatList } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
@@ -7,7 +7,6 @@ import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import Leaf from "../assets/svgs/leaf.svg";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { FlatList } from "react-native-gesture-handler";
 import { OrderStatusPass, OrderStatusFail, OrderStatusPending, BackButton } from "../assets/svgs/svg";
 import Animated from "react-native-reanimated";
 

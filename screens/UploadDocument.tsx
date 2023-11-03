@@ -28,24 +28,9 @@ export default function UploadDocument({ navigation, route }: Props) {
     };
 
     function handleRequest() {}
-    const fetchUser = async () => {
-        const response = await axios({
-            method: "GET",
-            url: `/auth/user`,
-            headers: { Authorization: `Bearer ${authData.token}` },
-        });
-        auth.saveProfile(response.data.data[0]);
-
-        setAuthData((prevState: object) => {
-            return {
-                ...prevState,
-                creditChecker: response.data.data[0].included.creditCheckerVerifications,
-            };
-        });
-    };
+    
 
     const createOrderRequest = async () => {
-        setLoader(true);
         const data = {
             ...order,
             documents: authData.documents,
@@ -72,14 +57,15 @@ export default function UploadDocument({ navigation, route }: Props) {
                 headers: headers,
             })
             .then((res) => {
-                fetchUser();
-                navigation.navigate("Dashboard");
+                // fetchUser();
+                console.log(res.data.data);
+                ToastAndroid.showWithGravity("Loan request sent successfully", ToastAndroid.SHORT, ToastAndroid.CENTER);
+                navigation.navigate("Home");
             })
             .catch((err) => {
                 ToastAndroid.showWithGravity("Error creating order request", ToastAndroid.SHORT, ToastAndroid.CENTER);
             })
             .finally(() => {
-                setLoader(false);
             });
     };
 

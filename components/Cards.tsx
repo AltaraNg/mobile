@@ -7,9 +7,9 @@ import Animated from "react-native-reanimated";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 
-export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount }) {
+export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount, creditChecker }) {
     const { authData } = useContext(AuthContext);
-    const [creditChecker, setCreditChecker] = useState(authData?.user?.included?.creditCheckerVerifications[0]);
+    // const [creditChecker, setCreditChecker] = useState(authData?.user?.included?.creditCheckerVerifications[0]);
     const statesColor = {
         pending: "#FDC228",
         approved: "#074A74",
