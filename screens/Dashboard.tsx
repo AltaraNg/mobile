@@ -37,7 +37,7 @@ export default function Dashboard({ navigation }: Props) {
     const fetchOrder = async () => {
         setShowLoader(true);
 
-        console.log('I got here');
+        console.log("I got here");
         const response = await axios({
             method: "GET",
             url: `/customers/${authData.user.id}/orders`,
@@ -63,16 +63,13 @@ export default function Dashboard({ navigation }: Props) {
     //     setRefreshing(false);
     // };
     const performAction = () => {
-        if(creditChecker?.status === "passed" && !orders){
-            navigation.navigate("VerificationPassed", creditChecker)
-        }
-        else if(creditChecker?.status === "passed" && orders){
+        if (creditChecker?.status === "passed" && !orders) {
+            navigation.navigate("VerificationPassed", creditChecker);
+        } else if (creditChecker?.status === "passed" && orders) {
             navigation.navigate("OrderDetails", orders);
+        } else if (creditChecker?.status !== "pending") {
+            navigation.navigate("Calculator");
         }
-        else if(creditChecker?.status !== "pending"){
-            navigation.navigate("Calculator")
-        }
-        
     };
 
     const paid_repayment = amortization?.map((item: { actual_amount: number }) => {
@@ -129,16 +126,15 @@ export default function Dashboard({ navigation }: Props) {
         },
     ];
 
-    
     useEffect(() => {
         fetchOrder();
     }, []);
 
-    useEffect( () => {
-        const unsubscribe = navigation.addListener('focus', () => {
+    useEffect(() => {
+        const unsubscribe = navigation.addListener("focus", () => {
             fetchOrder();
         });
-        return unsubscribe
+        return unsubscribe;
     }, [navigation]);
 
     return (
@@ -316,7 +312,6 @@ export default function Dashboard({ navigation }: Props) {
                     )}
                 </View>
             )}
-           
         </View>
     );
 }

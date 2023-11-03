@@ -23,8 +23,7 @@ const signIn = (phone_number: string, otp: string, device_name: string, login_ty
     };
     return post(url, data)
         .then((res) => {
-            const loginInfo = res.data.data;
-            return loginInfo;
+            return res.data.data;
         })
         .catch((err) => {
             return err;
@@ -45,9 +44,7 @@ const SignPassword = (phone_number: string, password: string, device_name: strin
     };
     return post(url, data)
         .then((res) => {
-            const loginInfo = res.data.data;
-
-            return loginInfo;
+            return res.data.data;
         })
         .catch((err) => {
             if (customer == "old") {

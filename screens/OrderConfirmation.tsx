@@ -9,6 +9,7 @@ import { AuthContext } from "../context/AuthContext";
 
 const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
 const loanAppKey = process.env.EXPO_PUBLIC_LOAN_APP_KEY;
+const accountEmail = process.env.EXPO_PUBLIC_ACCOUNT_EMAIL;
 
 const instance = axios.create({
     baseURL: url,
@@ -43,7 +44,7 @@ export default function OrderConfirmation({ navigation, route }: Props) {
             <Paystack
                 paystackKey={paystackKey}
                 amount={order.down_payment}
-                billingEmail="accounts@altaracredit.com"
+                billingEmail={accountEmail}
                 activityIndicatorColor="green"
                 onCancel={(e) => {
                     navigation.navigate("Dashboard");

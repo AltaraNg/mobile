@@ -148,8 +148,7 @@ export default function Calculator({ navigation }: Props) {
             setCalculator(response?.data?.data?.price_calculator);
         } catch (error) {
             ToastAndroid.showWithGravity("Unable to fetch calculator. Please try again later", ToastAndroid.SHORT, ToastAndroid.CENTER);
-        }
-        finally{
+        } finally {
             setLoader(false);
         }
     };
@@ -194,7 +193,7 @@ export default function Calculator({ navigation }: Props) {
                         separator="."
                         precision={2}
                         minValue={0}
-                        onChangeText={() => { }}
+                        onChangeText={() => {}}
                     ></CurrencyInput>
                     <View
                         style={{
@@ -237,7 +236,6 @@ export default function Calculator({ navigation }: Props) {
                             <Text style={{ color: "#074A74" }}>Collateral</Text>
                         </View>
                     </View>
-
                 </View>
                 <View style={styles.section}>
                     <View
@@ -247,8 +245,7 @@ export default function Calculator({ navigation }: Props) {
                             paddingVertical: 15,
                             height: 100,
                             borderRadius: 10,
-                            marginVertical: 5
-
+                            marginVertical: 5,
                         }}
                     >
                         <Text
@@ -278,8 +275,7 @@ export default function Calculator({ navigation }: Props) {
                             alignItems: "center",
                             paddingVertical: 15,
                             borderRadius: 10,
-                            marginVertical: 5
-
+                            marginVertical: 5,
                         }}
                     >
                         <Text
@@ -310,17 +306,17 @@ export default function Calculator({ navigation }: Props) {
                         style={
                             downPayment === "₦0.00"
                                 ? [
-                                    {
-                                        backgroundColor: "rgba(7, 74, 116, 0.63)",
-                                    },
-                                    styles.button,
-                                ]
+                                      {
+                                          backgroundColor: "rgba(7, 74, 116, 0.63)",
+                                      },
+                                      styles.button,
+                                  ]
                                 : [
-                                    {
-                                        backgroundColor: "#074A74",
-                                    },
-                                    styles.button,
-                                ]
+                                      {
+                                          backgroundColor: "#074A74",
+                                      },
+                                      styles.button,
+                                  ]
                         }
                         onPress={doSome}
                         disabled={downPayment === "₦0.00"}
@@ -340,9 +336,6 @@ export default function Calculator({ navigation }: Props) {
                         )}
                     </Pressable>
                 </View>
-
-
-
             </View>
         </View>
     );
@@ -355,14 +348,14 @@ const styles = StyleSheet.create({
         paddingVertical: 30,
     },
     section: {
-        backgroundColor: "transparent"
+        backgroundColor: "transparent",
     },
     calculator: {
         flex: 1,
         marginTop: 20,
         backgroundColor: "white",
         paddingHorizontal: 20,
-        justifyContent: "space-between"
+        justifyContent: "space-between",
     },
     header: {
         fontFamily: "Montserrat_800ExtraBold",
@@ -390,7 +383,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginVertical: 10,
         width: Dimensions.get("window").width * 0.8,
-        textAlign: "center"
+        textAlign: "center",
     },
     label: {
         color: "#074A74",

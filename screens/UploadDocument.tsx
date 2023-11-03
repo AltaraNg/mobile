@@ -28,7 +28,6 @@ export default function UploadDocument({ navigation, route }: Props) {
     };
 
     function handleRequest() {}
-    
 
     const createOrderRequest = async () => {
         const data = {
@@ -58,15 +57,13 @@ export default function UploadDocument({ navigation, route }: Props) {
             })
             .then((res) => {
                 // fetchUser();
-                console.log(res.data.data);
                 ToastAndroid.showWithGravity("Loan request sent successfully", ToastAndroid.SHORT, ToastAndroid.CENTER);
                 navigation.navigate("Home");
             })
             .catch((err) => {
                 ToastAndroid.showWithGravity("Error creating order request", ToastAndroid.SHORT, ToastAndroid.CENTER);
             })
-            .finally(() => {
-            });
+            .finally(() => {});
     };
 
     return (
