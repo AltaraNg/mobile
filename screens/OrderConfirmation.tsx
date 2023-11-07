@@ -32,8 +32,7 @@ export default function OrderConfirmation({ navigation, route }: Props) {
                 data: order,
             });
             setShowLoader(false);
-
-            navigation.navigate("OrderDetails", result.data.data.loan);
+            navigation.navigate("Dashboard");
         } catch (error) {
             // navigation.navigate("Dashboard");
         }

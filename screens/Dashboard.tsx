@@ -19,8 +19,10 @@ export default function Dashboard({ navigation }: Props) {
     const auth = useAuth();
 
     const { authData, showLoader, setShowLoader } = useContext(AuthContext);
-    const { fetchOrderRequestContext, showLoader2 } = useContext(OrderContext);
+    
     const [user, setUser] = useState(null);
+    const [orderDetails, setOrderDetails] = useState(null);
+
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [orders, setOrders] = useState(null);
@@ -36,8 +38,6 @@ export default function Dashboard({ navigation }: Props) {
 
     const fetchOrder = async () => {
         setShowLoader(true);
-
-        console.log("I got here");
         const response = await axios({
             method: "GET",
             url: `/customers/${authData.user.id}/orders`,
@@ -51,7 +51,21 @@ export default function Dashboard({ navigation }: Props) {
         setCreditChecker(user.included.creditCheckerVerifications[0]);
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
         setNextRepayment(nextRepayment);
+        await previewOrder();
         setShowLoader(false);
+    };
+
+    const previewOrder = async () => {
+        try {
+            const result = await axios({
+                method: "GET",
+                url: `/credit-check-verification/${creditChecker?.id}`,
+                headers: { Authorization: `Bearer ${authData.token}` },
+            });
+            let details = result.data.data.creditCheckerVerification;
+            
+            setOrderDetails(details);
+        } catch (error) {}
     };
 
     // const settUser = async () => {
@@ -69,6 +83,9 @@ export default function Dashboard({ navigation }: Props) {
             navigation.navigate("OrderDetails", orders);
         } else if (creditChecker?.status !== "pending") {
             navigation.navigate("Calculator");
+        }
+        else if (creditChecker?.status === "pending") {
+            navigation.navigate("VerificationPending", creditChecker);
         }
     };
 
@@ -176,7 +193,7 @@ export default function Dashboard({ navigation }: Props) {
                         />
                     </View>
                     <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>
-                        {orders?.included ? "Recent Activities" : "Recommended Loans"}
+                        {orders?.included ? "Recent Activities" : creditChecker?.status === 'pending' ? "Loan Request" : "Recommended Loans"}
                     </Text>
                     {orders?.included ? (
                         <FlatList
@@ -220,7 +237,70 @@ export default function Dashboard({ navigation }: Props) {
                                 </View>
                             )}
                         />
-                    ) : (
+                    ) : creditChecker?.status === 'pending' ? (
+                        <View style={{ backgroundColor: "transparent", position: "relative" }}>
+                             <View
+                                                style={[
+                                                    styles.order,
+                                                    {
+                                                        backgroundColor: '#FFFDD2',
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        height: 130,
+                                                        paddingHorizontal: 10,
+                                                    },
+                                                ]}
+                                            >
+                                                <Image
+                                                    source={require("../assets/images/cashloan.png")}
+                                                    style={{ width: Dimensions.get("window").width * 0.3 }}
+                                                />
+                                                <View
+                                                    style={{
+                                                        backgroundColor: "transparent",
+                                                        paddingLeft: 5,
+                                                        width: Dimensions.get("window").width * 0.6,
+                                                    }}
+                                                >
+                                                    <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Loan</Text>
+                                                    <View
+                                                        style={{
+                                                            backgroundColor: "transparent",
+                                                            paddingVertical: 3,
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            flexDirection: "row",
+                                                            justifyContent: "flex-start",
+                                                        }}
+                                                    >
+                                                        <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
+                                                            <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Amount</Text>
+                                                            <Text
+                                                                style={[
+                                                                    styles.message,
+                                                                    { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
+                                                                ]}
+                                                            >
+                                                                {`₦${orderDetails?.product?.retail_price}`}
+                                                            </Text>
+                                                        </View>
+                                                        <View style={{ backgroundColor: "transparent" }}>
+                                                            <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>
+                                                                Downpayment
+                                                            </Text>
+                                                            <Text
+                                                                style={[
+                                                                    styles.message,
+                                                                    { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
+                                                                ]}
+                                                            >
+                                                                {`₦${(parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100}`}
+                                                            </Text>
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                            </View>
+                        </View>) : (
                         <View style={{ backgroundColor: "transparent", position: "relative" }}>
                             {creditChecker?.id && (
                                 <View

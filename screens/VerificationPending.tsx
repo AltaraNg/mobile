@@ -1,16 +1,11 @@
-import { RefreshControl, StyleSheet, Dimensions, FlatList, Pressable, Image } from "react-native";
+import { RefreshControl, StyleSheet, Dimensions, FlatList, Image } from "react-native";
 
-import { LinearGradient } from "expo-linear-gradient";
 import { useState, useContext, useEffect } from "react";
-import { Overlay } from "react-native-elements";
 import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { OrderStatusPass, OrderStatusFail, OrderStatusPending, BackButton } from "../assets/svgs/svg";
-import Animated from "react-native-reanimated";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import { get, post } from "../utilities/api";
 import AmortizationObject from "../components/AmortizationObject";
 
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
@@ -20,16 +15,13 @@ const instance = axios.create({
     baseURL: url,
 });
 
-export default function VerificationPassed({ navigation, route }: Props) {
+export default function VerificationPending({ navigation, route }: Props) {
     const { authData, showLoader, setShowLoader } = useContext(AuthContext);
     const [orderDetails, setOrderDetails] = useState({});
     const [amortization, setAmortization] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
 
     const creditChecker = route.params;
-
-    const width = Dimensions.get("window").width;
-    const height = Dimensions.get("window").height;
 
     const goBack = () => {
         navigation.goBack();
@@ -58,7 +50,7 @@ export default function VerificationPassed({ navigation, route }: Props) {
             setOrderDetails(details);
             setAmortization(getAmort.data.data.preview);
             setShowLoader(false);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const payDown = () => {
@@ -83,24 +75,24 @@ export default function VerificationPassed({ navigation, route }: Props) {
                 <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
             ) : (
                 <View style={styles.container}>
-                    <Text style={styles.header}>Verified successfully</Text>
+                    <Text style={styles.header}>Verification Pending</Text>
+
                     <View style={styles.cardContainer}>
-                        <Text style={styles.headerText}>Order Details</Text>
-                        <Text style={styles.modalText}>Product: {`₦${orderDetails?.product?.retail_price}`} loan</Text>
+                        <Text style={styles.headerText}>Loan Details</Text>
+                        <Text style={styles.modalText}>Amount: {`₦${orderDetails?.product?.retail_price}`}</Text>
                         <Text style={styles.modalText}>
                             Downpayment: {`₦${(parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100}`}
                         </Text>
                         <Text style={styles.modalText}>
                             Total Repayment:{" "}
-                            {`₦${
-                                parseInt(orderDetails?.product?.retail_price) -
+                            {`₦${parseInt(orderDetails?.product?.retail_price) -
                                 (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100
-                            }`}
+                                }`}
                         </Text>
                     </View>
 
                     <View style={styles.container}>
-                    <Text style={styles.amorHeader}>Repayments</Text>
+                        <Text style={styles.amorHeader}>Repayments</Text>
                         <FlatList
                             scrollEnabled={true}
                             data={amortization}
@@ -109,11 +101,7 @@ export default function VerificationPassed({ navigation, route }: Props) {
                             renderItem={({ item }) => <AmortizationObject item={item} />}
                         />
                     </View>
-                    <LinearGradient colors={["#074A74", "#089CA4"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
-                        <Pressable style={styles.button} onPress={payDown}>
-                            <Text style={styles.buttonText}>Pay Downpayment</Text>
-                        </Pressable>
-                    </LinearGradient>
+
                 </View>
             )}
         </View>
@@ -124,7 +112,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        paddingTop: 15,
+        paddingTop: 15
     },
     totalText: {
         fontWeight: "bold",
@@ -253,7 +241,8 @@ const styles = StyleSheet.create({
     cardContainer: {
         height: 200,
         width: 350,
-        backgroundColor: "#EAFFED",
+        // backgroundColor: "#074A74",
+        backgroundColor: '#FFFDD2',
         borderRadius: 5,
         marginBottom: 10,
         marginTop: 10,
@@ -275,7 +264,7 @@ const styles = StyleSheet.create({
         fontFamily: "Montserrat_700Bold",
         color: "#074A74",
         fontSize: 19,
-        marginVertical: 5,
+        marginVertical: 10,
         textAlign: 'center'
     },
     statusBar: {
