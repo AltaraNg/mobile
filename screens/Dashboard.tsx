@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, TouchableOpacity, RefreshControl, Image, Dimensions } from "react-native";
+import { Pressable, StyleSheet, TouchableOpacity, RefreshControl, Image, Dimensions, ScrollView } from "react-native";
 import { Overlay } from "react-native-elements";
 
 import { Hamburger, Debited, Credited } from "../assets/svgs/svg";
@@ -24,6 +24,8 @@ export default function Dashboard({ navigation }: Props) {
     const [orderDetails, setOrderDetails] = useState(null);
 
     const [refreshing, setRefreshing] = useState(false);
+    // const [amortization, setAmortization] = useState(null);
+
     const [modalVisible, setModalVisible] = useState(false);
     const [orders, setOrders] = useState(null);
     const [creditChecker, setCreditChecker] = useState(authData?.user?.included?.creditCheckerVerifications[0]);
@@ -77,11 +79,14 @@ export default function Dashboard({ navigation }: Props) {
     //     setRefreshing(false);
     // };
     const performAction = () => {
-        if (creditChecker?.status === "passed" && !orders) {
-            navigation.navigate("VerificationPassed", creditChecker);
-        } else if (creditChecker?.status === "passed" && orders) {
+        console.log(orders)
+        if(orders?.included?.orderStatus?.name === 'Active'){
             navigation.navigate("OrderDetails", orders);
-        } else if (creditChecker?.status !== "pending") {
+        }
+        else if (creditChecker?.status === "passed") {
+            navigation.navigate("VerificationPassed", creditChecker);
+        } 
+         else if (creditChecker?.status !== "pending") {
             navigation.navigate("Calculator");
         }
         else if (creditChecker?.status === "pending") {
@@ -192,12 +197,13 @@ export default function Dashboard({ navigation }: Props) {
                             creditChecker={creditChecker}
                         />
                     </View>
+                    <ScrollView>
                     <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>
                         {orders?.included ? "Recent Activities" : creditChecker?.status === 'pending' ? "Loan Request" : "Recommended Loans"}
                     </Text>
                     {orders?.included ? (
                         <FlatList
-                            scrollEnabled={true}
+                            scrollEnabled={false}
                             data={recentActivities}
                             keyExtractor={(item) => item.id}
                             extraData={recentActivities}
@@ -315,7 +321,7 @@ export default function Dashboard({ navigation }: Props) {
                                 ></View>
                             )}
                             <FlatList
-                                scrollEnabled={true}
+                                scrollEnabled={false}
                                 data={recommendedLoans}
                                 keyExtractor={(item) => item.id}
                                 extraData={recommendedLoans}
@@ -390,8 +396,57 @@ export default function Dashboard({ navigation }: Props) {
                             />
                         </View>
                     )}
+                    <View style={styles.main}>
+                    <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>
+                        Upcoming Repayments
+                    </Text>
+                    <FlatList
+                            scrollEnabled={false}
+                            data={amortization.slice(0, 3)}
+                            keyExtractor={(item) => item.id}
+                            extraData={amortization}
+                            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />}
+                            renderItem={({ item }) => (
+                                <View style={{ backgroundColor: "transparent" }}>
+                                    <Pressable>
+                                        <View style={styles.order}>
+                                            <View style={styles.details}>
+                                                <Credited />
+                                                <View style={styles.title}>
+                                                    <Text
+                                                        style={{
+                                                            color: "#333333",
+                                                            fontFamily: "Montserrat_600SemiBold",
+                                                        }}
+                                                        numberOfLines={1}
+                                                        ellipsizeMode={"tail"}
+                                                    >
+                                                        {item.expected_payment_date}{" "}
+                                                    </Text>
+                                                    {/* <Text style={{ color: "#000", fontSize: 11 }}>{item?.date}</Text> */}
+                                                </View>
+                                            </View>
+                                            <Text
+                                                style={{
+                                                    color: "#000",
+                                                    fontSize: 13,
+                                                    marginRight: 59,
+                                                    fontFamily: "Montserrat_600SemiBold",
+                                                }}
+                                            >
+                                                {item?.expected_amount}
+                                            </Text>
+                                        </View>
+                                    </Pressable>
+                                </View>
+                            )}
+                        />
+                    </View>
+                    </ScrollView>
                 </View>
+                
             )}
+            
         </View>
     );
 }
@@ -427,6 +482,10 @@ const styles = StyleSheet.create({
         marginTop: 80,
         marginRight: 24,
         backgroundColor: "transparent",
+    },
+    scrollView: {
+        backgroundColor: "transparent",
+
     },
     cards: {
         backgroundColor: "#EFF5F9",

@@ -5,6 +5,7 @@
  */
 import AntDesign from "@expo/vector-icons/AntDesign";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { SimpleLineIcons } from '@expo/vector-icons';
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -45,6 +46,7 @@ import OrderConfirmation from "../screens/OrderConfirmation";
 import OrderSuccess from "../screens/OrderSuccess";
 import VerificationPassed from "../screens/VerificationPassed";
 import VerificationPending from "../screens/VerificationPending";
+import { Support } from "../screens/Support";
 const url = process.env.EXPO_PUBLIC_API_URL;
 
 axios.defaults.baseURL = url;
@@ -240,6 +242,17 @@ function DrawerNavigator() {
                     }}
                 />
             )}
+
+            <DrawerNav.Screen
+                name="Support"
+                component={Support}
+                options={{
+                    drawerLabelStyle: { color: "#9C9696" },
+                    headerShown: false,
+                    drawerLabel: "Help & Support",
+                    drawerIcon: () => <SimpleLineIcons name="support" size={24} color="#9C9696" />,
+                }}
+            />
         </DrawerNav.Navigator>
     );
 }

@@ -65,6 +65,7 @@ export type DrawerParamList = {
     History: { order: undefined };
     OrderDetails: { order: object };
     Calculator: { order: object };
+    Support;
 };
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
     BottomTabScreenProps<RootTabParamList, Screen>,
