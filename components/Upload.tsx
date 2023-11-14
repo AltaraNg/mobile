@@ -6,6 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { logActivity } from "../utilities/globalFunctions";
 export default function Upload(props) {
     const url = process.env.EXPO_PUBLIC_API_URL;
     axios.defaults.baseURL = url;
@@ -63,6 +64,7 @@ export default function Upload(props) {
                     updatedState.documents.push({ name: props.type, url: res });
                     return updatedState;
                 });
+
                 ToastAndroid.showWithGravity(responseJson.message, ToastAndroid.SHORT, ToastAndroid.CENTER);
             } else {
                 setImage(null);

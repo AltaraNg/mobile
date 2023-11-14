@@ -1,4 +1,4 @@
-import { RefreshControl, StyleSheet, Dimensions, FlatList, Image } from "react-native";
+import { RefreshControl, StyleSheet, Dimensions, FlatList, Image, Pressable } from "react-native";
 
 import { useState, useContext, useEffect } from "react";
 import { Text, View } from "../components/Themed";
@@ -7,6 +7,8 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import AmortizationObject from "../components/AmortizationObject";
+import { Ionicons } from "@expo/vector-icons";
+import { formatAsMoney } from "../utilities/globalFunctions";
 
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
@@ -23,9 +25,7 @@ export default function VerificationPending({ navigation, route }: Props) {
 
     const creditChecker = route.params;
 
-    const goBack = () => {
-        navigation.goBack();
-    };
+
     const previewOrder = async () => {
         setShowLoader(true);
         try {
@@ -53,16 +53,10 @@ export default function VerificationPending({ navigation, route }: Props) {
         } catch (error) { }
     };
 
-    const payDown = () => {
-        let data: object = {
-            credit_checker_verification_id: orderDetails?.id,
-            product_price: parseInt(orderDetails?.product?.retail_price),
-            down_payment: (parseInt(orderDetails?.product.retail_price) * orderDetails?.down_payment_rate.percent) / 100,
-            repayment:
-                parseInt(orderDetails?.product.retail_price) -
-                (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100,
-        };
-        navigation.navigate("OrderConfirmation", data);
+   
+
+    const goBack = () => {
+        navigation.navigate('Dashboard');
     };
 
     useEffect(() => {
@@ -71,23 +65,36 @@ export default function VerificationPending({ navigation, route }: Props) {
 
     return (
         <View style={styles.container}>
+
             {showLoader ? (
                 <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
             ) : (
                 <View style={styles.container}>
+                    <View
+                        style={{
+                            backgroundColor: "transparent",
+                            // marginLeft:
+                        }}
+                    >
+                        <Pressable onPress={goBack} style={{
+                            width: '20%'
+                        }}>
+                            <Ionicons name="ios-arrow-back-circle" size={30} color="#074A74" />
+                        </Pressable>
+                    </View>
                     <Text style={styles.header}>Verification Pending</Text>
 
                     <View style={styles.cardContainer}>
                         <Text style={styles.headerText}>Loan Details</Text>
-                        <Text style={styles.modalText}>Amount: {`₦${orderDetails?.product?.retail_price}`}</Text>
+                        <Text style={styles.modalText}>Amount: {`₦${formatAsMoney(orderDetails?.product?.retail_price)}`}</Text>
                         <Text style={styles.modalText}>
-                            Downpayment: {`₦${(parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100}`}
+                            Downpayment: {`₦${formatAsMoney((parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100)}`}
                         </Text>
                         <Text style={styles.modalText}>
                             Total Repayment:{" "}
-                            {`₦${parseInt(orderDetails?.product?.retail_price) -
+                            {`₦${formatAsMoney(parseInt(orderDetails?.product?.retail_price) -
                                 (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100
-                                }`}
+            )}`}
                         </Text>
                     </View>
 

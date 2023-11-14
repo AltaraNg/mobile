@@ -12,6 +12,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
 type Props = NativeStackScreenProps<RootTabParamList, "Dashboard">;
 import Upload from "../components/Upload";
+import { logActivity } from "../utilities/globalFunctions";
 const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 
@@ -55,10 +56,10 @@ export default function UploadDocument({ navigation, route }: Props) {
             .post("submit/loan/request", data, {
                 headers: headers,
             })
-            .then((res) => {
+            .then(async (res) => {
                 // fetchUser();
-                ToastAndroid.showWithGravity("Loan request sent successfully", ToastAndroid.SHORT, ToastAndroid.CENTER);
-                navigation.navigate("Home");
+                ToastAndroid.showWithGravity("Loan request sent successfully, Awaiting Verification", ToastAndroid.LONG, ToastAndroid.CENTER);
+                navigation.navigate("VerificationPending", res?.data?.data?.credit_check_verification);
             })
             .catch((err) => {
                 ToastAndroid.showWithGravity("Error creating order request", ToastAndroid.SHORT, ToastAndroid.CENTER);

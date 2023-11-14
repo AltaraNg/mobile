@@ -10,6 +10,8 @@ import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import businessTypes from "../lib/calculator.json";
 import repaymentDurations from "../lib/repaymentDuration.json";
+import { Ionicons } from "@expo/vector-icons";
+import { logActivity } from "../utilities/globalFunctions";
 
 // import {cashLoan, calculate} from '../lib/calculator';
 const url = process.env.EXPO_PUBLIC_API_URL;
@@ -50,6 +52,8 @@ export default function Calculator({ navigation }: Props) {
     };
 
     async function doSome() {
+        await logActivity(authData.token, 8);
+
         navigation.navigate("UploadDocument", {
             down_payment: parseInt(downPayment.replace(/[^0-9]/g, ""), 10),
             loan_amount: inputValue,
@@ -152,6 +156,9 @@ export default function Calculator({ navigation }: Props) {
             setLoader(false);
         }
     };
+    const goBack = () => {
+        navigation.goBack();
+    };
 
     const onInputValueChange = async (value: number) => {
         setInputValue(value);
@@ -181,6 +188,18 @@ export default function Calculator({ navigation }: Props) {
         <View style={styles.container}>
             <View style={styles.calculator}>
                 <View style={styles.section}>
+                <View
+                    style={{
+                        backgroundColor: "transparent",
+                        // marginLeft:
+                    }}
+                >
+                    <Pressable onPress={goBack} style={{
+                        width: '20%'
+                    }}>
+                        <Ionicons name="ios-arrow-back-circle" size={30} color="#074A74" />
+                    </Pressable>
+                </View>
                     <Text style={styles.header}>Calculator</Text>
 
                     <Text style={{ color: "#074A74" }}>How much do you want to loan?</Text>

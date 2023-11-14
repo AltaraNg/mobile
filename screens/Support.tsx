@@ -78,35 +78,43 @@ export const Support = ({ navigation }: Props) => {
 
             <View style={styles.menu}>
                 <Text style={{
-                    paddingHorizontal: 15
+                    paddingHorizontal: 5
                 }}>
-                    <MaterialCommunityIcons name="home-city-outline" size={36} color="#074A74" />
+                    <MaterialCommunityIcons name="home-city-outline" size={48} color="#074A74" />
                 </Text>
                 <Text style={{
-                    fontSize: 18
+                    fontSize: 18,
+                    fontFamily: 'Montserrat_500Medium',
+                    marginHorizontal: 10
                 }}>46 Raymond Njoku, Ikoyi,
                     Ikoyi, Lagos, Nigeria.</Text>
             </View>
 
             <View style={styles.menu}>
                 <Text style={{
-                    paddingHorizontal: 15
+                    paddingHorizontal: 5,
+
                 }}>
-                    <FontAwesome name="phone-square" size={36} color="#074A74" />
+                    <FontAwesome name="phone-square" size={48} color="#074A74" />
                 </Text>
                 <Text style={{
-                    fontSize: 18
+                    fontSize: 18,
+                    fontFamily: 'Montserrat_500Medium'
+
                 }}>+234 905 5493 652</Text>
             </View>
 
             <View style={styles.menu}>
                 <Text style={{
-                    paddingHorizontal: 15
+                    paddingHorizontal: 5,
+
                 }}>
-                    <MaterialCommunityIcons name="email-variant" size={36} color="#074A74" />
+                    <MaterialCommunityIcons name="email-variant" size={48} color="#074A74" />
                 </Text>
                 <Text style={{
-                    fontSize: 18
+                    fontSize: 18,
+                    fontFamily: 'Montserrat_500Medium'
+
                 }}>accounts@altaracredit.com</Text>
             </View>
 
@@ -116,16 +124,22 @@ export const Support = ({ navigation }: Props) => {
 
                 <Text style={{
                     fontSize: 18,
-                    marginVertical: 5
+                    marginVertical: 5,
+                    fontFamily: 'Montserrat_500Medium'
+
                 }}>Monday - Friday: 9:00 AM - 6:00 PM</Text>
                  <Text style={{
                     fontSize: 18,
-                    marginVertical: 5
+                    marginVertical: 5,
+                    fontFamily: 'Montserrat_500Medium'
+                    
 
                 }}>Saturday: 10:00 AM - 4:00 PM</Text>
                  <Text style={{
                     fontSize: 18,
-                    marginVertical: 5
+                    marginVertical: 5,
+                    fontFamily: 'Montserrat_500Medium'
+
 
                 }}>Sunday: Closed</Text>
             </View>

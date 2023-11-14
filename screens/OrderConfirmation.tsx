@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { logActivity } from "../utilities/globalFunctions";
 
 const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
 const loanAppKey = process.env.EXPO_PUBLIC_LOAN_APP_KEY;

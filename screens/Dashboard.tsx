@@ -1,17 +1,17 @@
-import { Pressable, StyleSheet, TouchableOpacity, RefreshControl, Image, Dimensions, ScrollView } from "react-native";
+import { Pressable, StyleSheet, TouchableOpacity, RefreshControl, Image, Dimensions, ScrollView, FlatList } from "react-native";
 import { Overlay } from "react-native-elements";
+import { MaterialIcons } from '@expo/vector-icons';
 
-import { Hamburger, Debited, Credited } from "../assets/svgs/svg";
+import { Hamburger, Debited, Credited, SmallCancel } from "../assets/svgs/svg";
 import Header from "../components/Header";
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Text, View } from "../components/Themed";
-import { DrawerParamList, RootStackParamList, RootStackScreenProps } from "../types";
+import { RootStackScreenProps } from "../types";
 import Cards from "../components/Cards";
 import { AuthContext, useAuth } from "../context/AuthContext";
-import { OrderContext } from "../context/OrderContext";
-import { FlatList } from "react-native";
-import { DrawerScreenProps } from "@react-navigation/drawer";
 import axios from "axios";
+import { timeFromNow } from "../utilities/moment";
+import { formatAsMoney, logActivity } from "../utilities/globalFunctions";
 
 type Props = RootStackScreenProps<"Dashboard">;
 
@@ -19,8 +19,9 @@ export default function Dashboard({ navigation }: Props) {
     const auth = useAuth();
 
     const { authData, showLoader, setShowLoader } = useContext(AuthContext);
-    
+
     const [user, setUser] = useState(null);
+    const [recentActivities, setRecentActivities] = useState(null);
     const [orderDetails, setOrderDetails] = useState(null);
 
     const [refreshing, setRefreshing] = useState(false);
@@ -54,8 +55,43 @@ export default function Dashboard({ navigation }: Props) {
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
         setNextRepayment(nextRepayment);
         await previewOrder();
+        await recentActivity();
         setShowLoader(false);
     };
+
+    const recentActivity = async () => {
+        const response = await axios({
+            method: "GET",
+            url: `/recent/activities`,
+            headers: { Authorization: `Bearer ${authData.token}` },
+        });
+        let activities = response?.data?.data?.activities;
+        console.log(activities);
+        let filteredList = activities.filter(item => {
+            return item.mobile_app_activity.is_admin === 0;
+        })
+        setRecentActivities(filteredList);
+    }
+
+    const listEmptyCOmponent = () => {
+        return (
+            <View style={{
+                backgroundColor: 'transparent',
+                marginHorizontal: 30,
+                marginVertical: 15
+                // flexDirection: 'row'
+            }}>
+                <Text style={{
+                    color: '#074A74',
+                    fontFamily: "Montserrat_400Regular",
+                    textAlign: 'center'
+
+                }}>
+                    You have no recent activity to view. Start getting busy
+                </Text>
+            </View>
+        )
+    }
 
     const previewOrder = async () => {
         try {
@@ -65,28 +101,28 @@ export default function Dashboard({ navigation }: Props) {
                 headers: { Authorization: `Bearer ${authData.token}` },
             });
             let details = result.data.data.creditCheckerVerification;
-            
+
             setOrderDetails(details);
-        } catch (error) {}
+        } catch (error) { }
     };
 
-    // const settUser = async () => {
-    //     await fetchOrder();
-    //     fetchOrderRequestContext();
-    //     setUser(authData?.user);
-    //     //const upload = Object?.values(authData?.user?.included?.verification || { item: false }).every((val) => val);
-    //     setShowLoader(false);
-    //     setRefreshing(false);
-    // };
-    const performAction = () => {
-        console.log(orders)
-        if(orders?.included?.orderStatus?.name === 'Active'){
+    const actionActivity = async (item) => {
+        console.log(item)
+        if (item?.mobile_app_activity?.name === "Loan Request") {
+            navigation.navigate("VerificationPending", item?.meta?.credit_check);
+        }
+    }
+
+
+    const performAction = async () => {
+        if (orders?.included?.orderStatus?.name === 'Active') {
             navigation.navigate("OrderDetails", orders);
         }
         else if (creditChecker?.status === "passed") {
             navigation.navigate("VerificationPassed", creditChecker);
-        } 
-         else if (creditChecker?.status !== "pending") {
+        }
+        else if (creditChecker?.status !== "pending") {
+            await logActivity(authData.token, 9);
             navigation.navigate("Calculator");
         }
         else if (creditChecker?.status === "pending") {
@@ -111,26 +147,7 @@ export default function Dashboard({ navigation }: Props) {
     const testNav = () => {
         navigation.navigate("OrderConfirmation");
     };
-    const recentActivities = [
-        {
-            id: "1",
-            name: "Monthly Repayment",
-            date: "01/11/2023",
-            amount: "₦9,600",
-        },
-        {
-            id: "2",
-            name: "Monthly Repayment",
-            date: "01/11/2023",
-            amount: "₦9,500",
-        },
-        {
-            id: "3",
-            name: "Loan Approved",
-            date: "01/11/2023",
-            amount: "₦100,000",
-        },
-    ];
+
     const recommendedLoans = [
         {
             id: "1",
@@ -198,255 +215,281 @@ export default function Dashboard({ navigation }: Props) {
                         />
                     </View>
                     <ScrollView>
-                    <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>
-                        {orders?.included ? "Recent Activities" : creditChecker?.status === 'pending' ? "Loan Request" : "Recommended Loans"}
-                    </Text>
-                    {orders?.included ? (
-                        <FlatList
-                            scrollEnabled={false}
-                            data={recentActivities}
-                            keyExtractor={(item) => item.id}
-                            extraData={recentActivities}
-                            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />}
-                            renderItem={({ item }) => (
-                                <View style={{ backgroundColor: "transparent" }}>
-                                    <Pressable>
-                                        <View style={styles.order}>
-                                            <View style={styles.details}>
-                                                {item.name.includes("Approved") ? <Credited /> : <Debited />}
-                                                <View style={styles.title}>
-                                                    <Text
-                                                        style={{
-                                                            color: "#333333",
-                                                            fontFamily: "Montserrat_600SemiBold",
-                                                        }}
-                                                        numberOfLines={1}
-                                                        ellipsizeMode={"tail"}
-                                                    >
-                                                        {item.name}{" "}
-                                                    </Text>
-                                                    <Text style={{ color: "#000", fontSize: 11 }}>{item?.date}</Text>
-                                                </View>
-                                            </View>
-                                            <Text
-                                                style={{
-                                                    color: "#000",
-                                                    fontSize: 13,
-                                                    marginRight: 59,
-                                                    fontFamily: "Montserrat_600SemiBold",
-                                                }}
-                                            >
-                                                {item?.amount}
-                                            </Text>
-                                        </View>
-                                    </Pressable>
-                                </View>
-                            )}
-                        />
-                    ) : creditChecker?.status === 'pending' ? (
-                        <View style={{ backgroundColor: "transparent", position: "relative" }}>
-                             <View
-                                                style={[
-                                                    styles.order,
-                                                    {
-                                                        backgroundColor: '#FFFDD2',
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        height: 130,
-                                                        paddingHorizontal: 10,
-                                                    },
-                                                ]}
-                                            >
-                                                <Image
-                                                    source={require("../assets/images/cashloan.png")}
-                                                    style={{ width: Dimensions.get("window").width * 0.3 }}
-                                                />
-                                                <View
-                                                    style={{
-                                                        backgroundColor: "transparent",
-                                                        paddingLeft: 5,
-                                                        width: Dimensions.get("window").width * 0.6,
-                                                    }}
-                                                >
-                                                    <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Loan</Text>
-                                                    <View
-                                                        style={{
-                                                            backgroundColor: "transparent",
-                                                            paddingVertical: 3,
-                                                            display: "flex",
-                                                            alignItems: "center",
-                                                            flexDirection: "row",
-                                                            justifyContent: "flex-start",
-                                                        }}
-                                                    >
-                                                        <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
-                                                            <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Amount</Text>
-                                                            <Text
-                                                                style={[
-                                                                    styles.message,
-                                                                    { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
-                                                                ]}
-                                                            >
-                                                                {`₦${orderDetails?.product?.retail_price}`}
-                                                            </Text>
-                                                        </View>
-                                                        <View style={{ backgroundColor: "transparent" }}>
-                                                            <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>
-                                                                Downpayment
-                                                            </Text>
-                                                            <Text
-                                                                style={[
-                                                                    styles.message,
-                                                                    { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
-                                                                ]}
-                                                            >
-                                                                {`₦${(parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100}`}
-                                                            </Text>
-                                                        </View>
-                                                    </View>
-                                                </View>
-                                            </View>
-                        </View>) : (
-                        <View style={{ backgroundColor: "transparent", position: "relative" }}>
-                            {creditChecker?.id && (
-                                <View
-                                    style={{
-                                        position: "absolute",
-                                        width: Dimensions.get("window").width * 1,
-                                        height: Dimensions.get("window").height * 0.6,
-                                        zIndex: 1,
-                                        backgroundColor: "#fafafa",
-                                        opacity: 0.7,
-                                    }}
-                                ></View>
-                            )}
-                            <FlatList
-                                scrollEnabled={false}
-                                data={recommendedLoans}
-                                keyExtractor={(item) => item.id}
-                                extraData={recommendedLoans}
-                                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />}
-                                renderItem={({ item }) => (
-                                    <View style={{ backgroundColor: "transparent" }}>
-                                        <Pressable>
-                                            <View
-                                                style={[
-                                                    styles.order,
-                                                    {
-                                                        backgroundColor: item.color,
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        height: 130,
-                                                        paddingHorizontal: 10,
-                                                    },
-                                                ]}
-                                            >
-                                                <Image
-                                                    source={require("../assets/images/cashloan.png")}
-                                                    style={{ width: Dimensions.get("window").width * 0.3 }}
-                                                />
-                                                <View
-                                                    style={{
-                                                        backgroundColor: "transparent",
-                                                        paddingLeft: 5,
-                                                        width: Dimensions.get("window").width * 0.6,
-                                                    }}
-                                                >
-                                                    <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Loan</Text>
-                                                    <View
-                                                        style={{
-                                                            backgroundColor: "transparent",
-                                                            paddingVertical: 3,
-                                                            display: "flex",
-                                                            alignItems: "center",
-                                                            flexDirection: "row",
-                                                            justifyContent: "flex-start",
-                                                        }}
-                                                    >
-                                                        <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
-                                                            <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Amount</Text>
-                                                            <Text
-                                                                style={[
-                                                                    styles.message,
-                                                                    { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
-                                                                ]}
-                                                            >
-                                                                {item.amount}
-                                                            </Text>
-                                                        </View>
-                                                        <View style={{ backgroundColor: "transparent" }}>
-                                                            <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>
-                                                                Downpayment
-                                                            </Text>
-                                                            <Text
-                                                                style={[
-                                                                    styles.message,
-                                                                    { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
-                                                                ]}
-                                                            >
-                                                                {item.downpayment}
-                                                            </Text>
-                                                        </View>
-                                                    </View>
-                                                </View>
-                                            </View>
-                                        </Pressable>
-                                    </View>
+                        {amortization?.length > 0 && (
+                            <View style={styles.main}>
+                                {amortization?.length > 0 && (
+                                    <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>
+                                        Upcoming Repayments
+                                    </Text>
                                 )}
-                            />
-                        </View>
-                    )}
-                    <View style={styles.main}>
-                    <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>
-                        Upcoming Repayments
-                    </Text>
-                    <FlatList
-                            scrollEnabled={false}
-                            data={amortization.slice(0, 3)}
-                            keyExtractor={(item) => item.id}
-                            extraData={amortization}
-                            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />}
-                            renderItem={({ item }) => (
-                                <View style={{ backgroundColor: "transparent" }}>
-                                    <Pressable>
-                                        <View style={styles.order}>
-                                            <View style={styles.details}>
-                                                <Credited />
-                                                <View style={styles.title}>
+
+                                <FlatList
+                                    scrollEnabled={false}
+                                    data={amortization?.slice(0, 3)}
+                                    keyExtractor={(item) => item.id}
+                                    extraData={amortization}
+                                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />}
+                                    renderItem={({ item }) => (
+                                        <View style={{ backgroundColor: "transparent" }}>
+                                            <Pressable>
+                                                <View style={styles.order}>
+                                                    <View style={styles.details}>
+                                                        <Credited />
+                                                        <View style={styles.title}>
+                                                            <Text
+                                                                style={{
+                                                                    color: "#333333",
+                                                                    fontFamily: "Montserrat_600SemiBold",
+                                                                }}
+                                                                numberOfLines={1}
+                                                                ellipsizeMode={"tail"}
+                                                            >
+                                                                {item.expected_payment_date}{" "}
+                                                            </Text>
+                                                            {/* <Text style={{ color: "#000", fontSize: 11 }}>{item?.date}</Text> */}
+                                                        </View>
+                                                    </View>
                                                     <Text
                                                         style={{
-                                                            color: "#333333",
+                                                            color: "#000",
+                                                            fontSize: 13,
+                                                            marginRight: 59,
                                                             fontFamily: "Montserrat_600SemiBold",
                                                         }}
-                                                        numberOfLines={1}
-                                                        ellipsizeMode={"tail"}
                                                     >
-                                                        {item.expected_payment_date}{" "}
+                                                        {`₦${formatAsMoney(item.expected_amount)}`}
                                                     </Text>
-                                                    {/* <Text style={{ color: "#000", fontSize: 11 }}>{item?.date}</Text> */}
                                                 </View>
-                                            </View>
-                                            <Text
-                                                style={{
-                                                    color: "#000",
-                                                    fontSize: 13,
-                                                    marginRight: 59,
-                                                    fontFamily: "Montserrat_600SemiBold",
-                                                }}
-                                            >
-                                                {item?.expected_amount}
-                                            </Text>
+                                            </Pressable>
                                         </View>
-                                    </Pressable>
+                                    )}
+                                />
+                            </View>
+                        )}
+
+                        {creditChecker?.status === 'pending' && (
+                            <View style={{ backgroundColor: "transparent", position: "relative" }}>
+                                <Text style={[styles.name]}>
+                                    Loan Request
+                                </Text>
+                                <View
+                                    style={[
+                                        styles.order,
+                                        {
+                                            backgroundColor: '#FFFDD2',
+                                            display: "flex",
+                                            alignItems: "center",
+                                            height: 130,
+                                            paddingHorizontal: 10,
+                                        },
+                                    ]}
+                                >
+                                    <Image
+                                        source={require("../assets/images/cashloan.png")}
+                                        style={{ width: Dimensions.get("window").width * 0.3 }}
+                                    />
+                                    <View
+                                        style={{
+                                            backgroundColor: "transparent",
+                                            paddingLeft: 5,
+                                            width: Dimensions.get("window").width * 0.6,
+                                        }}
+                                    >
+                                        <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Loan</Text>
+                                        <View
+                                            style={{
+                                                backgroundColor: "transparent",
+                                                paddingVertical: 3,
+                                                display: "flex",
+                                                alignItems: "center",
+                                                flexDirection: "row",
+                                                justifyContent: "flex-start",
+                                            }}
+                                        >
+                                            <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
+                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Amount</Text>
+                                                <Text
+                                                    style={[
+                                                        styles.message,
+                                                        { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
+                                                    ]}
+                                                >
+                                                    {`₦${formatAsMoney(orderDetails?.product?.retail_price)}`}
+                                                </Text>
+                                            </View>
+                                            <View style={{ backgroundColor: "transparent" }}>
+                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>
+                                                    Downpayment
+                                                </Text>
+                                                <Text
+                                                    style={[
+                                                        styles.message,
+                                                        { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
+                                                    ]}
+                                                >
+                                                    {`₦${formatAsMoney((parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100)}`}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </View>
                                 </View>
-                            )}
-                        />
-                    </View>
+                            </View>
+                        )}
+
+                        {!creditChecker?.id && (
+                            <View style={{ backgroundColor: "transparent", position: "relative" }}>
+                                {creditChecker?.id && (
+                                    <View
+                                        style={{
+                                            position: "absolute",
+                                            width: Dimensions.get("window").width * 1,
+                                            height: Dimensions.get("window").height * 0.6,
+                                            zIndex: 1,
+                                            backgroundColor: "#fafafa",
+                                            opacity: 0.7,
+                                        }}
+                                    ></View>
+                                )}
+                                <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>
+                                    Recommended Loans
+                                </Text>
+                                <FlatList
+                                    scrollEnabled={false}
+                                    data={recommendedLoans}
+                                    keyExtractor={(item) => item.id}
+                                    extraData={recommendedLoans}
+                                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />}
+                                    renderItem={({ item }) => (
+                                        <View style={{ backgroundColor: "transparent" }}>
+                                            <Pressable>
+                                                <View
+                                                    style={[
+                                                        styles.order,
+                                                        {
+                                                            backgroundColor: item.color,
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            height: 130,
+                                                            paddingHorizontal: 10,
+                                                        },
+                                                    ]}
+                                                >
+                                                    <Image
+                                                        source={require("../assets/images/cashloan.png")}
+                                                        style={{ width: Dimensions.get("window").width * 0.3 }}
+                                                    />
+                                                    <View
+                                                        style={{
+                                                            backgroundColor: "transparent",
+                                                            paddingLeft: 5,
+                                                            width: Dimensions.get("window").width * 0.6,
+                                                        }}
+                                                    >
+                                                        <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Loan</Text>
+                                                        <View
+                                                            style={{
+                                                                backgroundColor: "transparent",
+                                                                paddingVertical: 3,
+                                                                display: "flex",
+                                                                alignItems: "center",
+                                                                flexDirection: "row",
+                                                                justifyContent: "flex-start",
+                                                            }}
+                                                        >
+                                                            <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
+                                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Amount</Text>
+                                                                <Text
+                                                                    style={[
+                                                                        styles.message,
+                                                                        { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
+                                                                    ]}
+                                                                >
+                                                                    {item.amount}
+                                                                </Text>
+                                                            </View>
+                                                            <View style={{ backgroundColor: "transparent" }}>
+                                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>
+                                                                    Downpayment
+                                                                </Text>
+                                                                <Text
+                                                                    style={[
+                                                                        styles.message,
+                                                                        { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
+                                                                    ]}
+                                                                >
+                                                                    {item.downpayment}
+                                                                </Text>
+                                                            </View>
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                            </Pressable>
+                                        </View>
+                                    )}
+                                />
+                            </View>
+                        )}
+
+
+
+
+                        {recentActivities?.length > 0 && (
+                            <View style={{ backgroundColor: 'transparent' }}>
+                                <Text style={[styles.name]}>
+                                    Recent Activities
+                                </Text>
+                                <FlatList
+                                    scrollEnabled={false}
+                                    data={recentActivities.slice(0, 3)}
+                                    ListEmptyComponent={listEmptyCOmponent}
+                                    keyExtractor={(item) => item.id}
+                                    extraData={recentActivities}
+                                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />}
+                                    renderItem={({ item }) => (
+                                        <View style={{ backgroundColor: "transparent" }}>
+                                            <Pressable onPress={() => {actionActivity(item)}}>
+                                                <View style={styles.order}>
+                                                    <View style={styles.details}>
+                                                        {item?.name?.includes("Approved") ? <Credited /> : <Debited />}
+                                                        <View style={styles.title}>
+                                                            <Text
+                                                                style={{
+                                                                    color: "#333333",
+                                                                    fontFamily: "Montserrat_600SemiBold",
+                                                                }}
+                                                                numberOfLines={1}
+                                                                ellipsizeMode={"tail"}
+                                                            >
+                                                                {item?.mobile_app_activity?.name}
+                                                            </Text>
+                                                            <Text style={{ color: "#000", fontSize: 11 }}>{timeFromNow(item?.created_at)}</Text>
+                                                        </View>
+                                                    </View>
+                                                    <Text
+                                                        style={{
+                                                            color: "#000",
+                                                            fontSize: 13,
+                                                            marginRight: 59,
+                                                            fontFamily: "Montserrat_600SemiBold",
+                                                        }}
+                                                    >
+
+                                                    </Text>
+                                                </View>
+                                            </Pressable>
+                                        </View>
+                                    )}
+                                />
+                            </View>
+
+
+                        )}
+
                     </ScrollView>
                 </View>
-                
+
             )}
-            
+
         </View>
     );
 }
