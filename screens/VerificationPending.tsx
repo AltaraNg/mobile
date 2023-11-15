@@ -6,9 +6,7 @@ import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import AmortizationObject from "../components/AmortizationObject";
-import { Ionicons } from "@expo/vector-icons";
-import { formatAsMoney } from "../utilities/globalFunctions";
+import { LinearGradient } from "expo-linear-gradient";
 
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
@@ -60,7 +58,7 @@ export default function VerificationPending({ navigation, route }: Props) {
     };
 
     useEffect(() => {
-        previewOrder();
+        // previewOrder();
     }, []);
 
     return (
@@ -70,45 +68,19 @@ export default function VerificationPending({ navigation, route }: Props) {
                 <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
             ) : (
                 <View style={styles.container}>
-                    <View
-                        style={{
-                            backgroundColor: "transparent",
-                            // marginLeft:
-                        }}
-                    >
-                        <Pressable onPress={goBack} style={{
-                            width: '20%'
-                        }}>
-                            <Ionicons name="ios-arrow-back-circle" size={30} color="#074A74" />
+                    <Image source={require("../assets/gifs/waiting.gif")} style={{
+                        alignSelf: 'center'
+                    }} />
+                    <Text style={styles.headerText}>Awaiting Verification</Text>
+                    <Text style={styles.modalText}>
+                    Thank you for submitting your loan application. Your request is currently being reviewed and processed. We appreciate your patience while our team verifies all the information you have provided.
+                    </Text>
+
+                    <LinearGradient colors={["#074A74", "#089CA4"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
+                        <Pressable style={styles.button} onPress={goBack}>
+                            <Text style={styles.buttonText}>Go Back</Text>
                         </Pressable>
-                    </View>
-                    <Text style={styles.header}>Verification Pending</Text>
-
-                    <View style={styles.cardContainer}>
-                        <Text style={styles.headerText}>Loan Details</Text>
-                        <Text style={styles.modalText}>Amount: {`₦${formatAsMoney(orderDetails?.product?.retail_price)}`}</Text>
-                        <Text style={styles.modalText}>
-                            Downpayment: {`₦${formatAsMoney((parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100)}`}
-                        </Text>
-                        <Text style={styles.modalText}>
-                            Total Repayment:{" "}
-                            {`₦${formatAsMoney(parseInt(orderDetails?.product?.retail_price) -
-                                (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100
-            )}`}
-                        </Text>
-                    </View>
-
-                    <View style={styles.container}>
-                        <Text style={styles.amorHeader}>Repayments</Text>
-                        <FlatList
-                            scrollEnabled={true}
-                            data={amortization}
-                            keyExtractor={(item: any) => item.id}
-                            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={previewOrder} />}
-                            renderItem={({ item }) => <AmortizationObject item={item} />}
-                        />
-                    </View>
-
+                    </LinearGradient>
                 </View>
             )}
         </View>
@@ -132,7 +104,7 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginHorizontal: 10,
         fontSize: 15,
-        textAlign: "left",
+        textAlign: "center",
         lineHeight: 35,
         display: "flex",
     },

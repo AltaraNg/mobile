@@ -23,6 +23,12 @@ export default function Dashboard({ navigation }: Props) {
     const [user, setUser] = useState(null);
     const [recentActivities, setRecentActivities] = useState(null);
     const [orderDetails, setOrderDetails] = useState(null);
+    const [totalDebt, setTotalDebt] = useState(0);
+    const [progressBar, setProgressBar] = useState(0);
+    const [hasActiveOrder, setHasActiveOrder] = useState(null);
+    const [hasCompletedOrder, setHasCompletedOrder] = useState(false);
+
+
 
     const [refreshing, setRefreshing] = useState(false);
     // const [amortization, setAmortization] = useState(null);
@@ -33,7 +39,9 @@ export default function Dashboard({ navigation }: Props) {
     const [nextExpectedRepayment, setNextRepayment] = useState({
         expected_amount: 0,
     });
-    const amortization = orders?.included?.amortizations;
+    let amortizationList = orders?.included?.amortizations;
+
+    const [amortization, setAmortization] = useState(amortizationList);
 
     const toggleSideMenu = async () => {
         navigation.toggleDrawer();
@@ -51,13 +59,40 @@ export default function Dashboard({ navigation }: Props) {
         auth.saveProfile(user);
         setOrders(order);
         setUser(user);
-        setCreditChecker(user.included.creditCheckerVerifications[0]);
+        setCreditChecker(user?.included?.creditCheckerVerifications[0]);
+
+        setHasActiveOrder(order?.included?.orderStatus.name === 'Active');
+        setHasCompletedOrder(order?.included?.orderStatus.name === 'Completed');
+
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
         setNextRepayment(nextRepayment);
+        let filteredAmoritzation = order?.included?.amortizations.filter((item) => {
+            return item.actual_amount === 0;
+        })
+        calculateDebt(order);
+        setAmortization(filteredAmoritzation);
         await previewOrder();
         await recentActivity();
         setShowLoader(false);
     };
+
+    const calculateDebt = (order) => {
+        const paid_repayment = order?.included?.amortizations?.map((item: { actual_amount: number }) => {
+            return item.actual_amount;
+        });
+        console.log(order, 'Paid')
+        const expected_repayment = order?.included?.amortizations?.map((item: { expected_amount: number }) => {
+            return item.expected_amount;
+        });
+        const total_expected_repayment = expected_repayment?.reduce((total, item) => {
+            return total + item;
+        });
+        const totalPaid = paid_repayment?.reduce((total, item) => {
+            return total + item;
+        });
+        setTotalDebt(total_expected_repayment - totalPaid);
+        setProgressBar((totalPaid + orders?.attributes?.down_payment / total_expected_repayment) * 100)
+    }
 
     const recentActivity = async () => {
         const response = await axios({
@@ -66,7 +101,6 @@ export default function Dashboard({ navigation }: Props) {
             headers: { Authorization: `Bearer ${authData.token}` },
         });
         let activities = response?.data?.data?.activities;
-        console.log(activities);
         let filteredList = activities.filter(item => {
             return item.mobile_app_activity.is_admin === 0;
         })
@@ -115,8 +149,12 @@ export default function Dashboard({ navigation }: Props) {
 
 
     const performAction = async () => {
-        if (orders?.included?.orderStatus?.name === 'Active') {
+        if (hasActiveOrder) {
             navigation.navigate("OrderDetails", orders);
+        }
+        if (hasCompletedOrder){
+            await logActivity(authData.token, 9);
+            navigation.navigate("Calculator");
         }
         else if (creditChecker?.status === "passed") {
             navigation.navigate("VerificationPassed", creditChecker);
@@ -130,20 +168,7 @@ export default function Dashboard({ navigation }: Props) {
         }
     };
 
-    const paid_repayment = amortization?.map((item: { actual_amount: number }) => {
-        return item.actual_amount;
-    });
-    const expected_repayment = amortization?.map((item: { expected_amount: number }) => {
-        return item.expected_amount;
-    });
-    const total_expected_repayment = expected_repayment?.reduce((total, item) => {
-        return total + item;
-    });
-    const totalPaid = paid_repayment?.reduce((total, item) => {
-        return total + item;
-    });
-    const totalDebt = total_expected_repayment - totalPaid;
-    const progressBar = (totalPaid + orders?.attributes?.down_payment / total_expected_repayment) * 100;
+
     const testNav = () => {
         navigation.navigate("OrderConfirmation");
     };
@@ -205,7 +230,8 @@ export default function Dashboard({ navigation }: Props) {
 
                     <View style={styles.cards}>
                         <Cards
-                            haveActiveOrder={orders?.included}
+                            hasCompletedOrder={hasCompletedOrder}
+                            haveActiveOrder={hasActiveOrder}
                             title="Loan Balance"
                             amount={!totalDebt ? "₦0.00" : `₦${totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}
                             progressBar={progressBar}
@@ -336,9 +362,9 @@ export default function Dashboard({ navigation }: Props) {
                             </View>
                         )}
 
-                        {!creditChecker?.id && (
+                        {(!creditChecker?.id || hasCompletedOrder) && (
                             <View style={{ backgroundColor: "transparent", position: "relative" }}>
-                                {creditChecker?.id && (
+                                {(!creditChecker?.id) && (
                                     <View
                                         style={{
                                             position: "absolute",
@@ -350,7 +376,7 @@ export default function Dashboard({ navigation }: Props) {
                                         }}
                                     ></View>
                                 )}
-                                <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>
+                                <Text style={[styles.name]}>
                                     Recommended Loans
                                 </Text>
                                 <FlatList
@@ -447,7 +473,7 @@ export default function Dashboard({ navigation }: Props) {
                                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />}
                                     renderItem={({ item }) => (
                                         <View style={{ backgroundColor: "transparent" }}>
-                                            <Pressable onPress={() => {actionActivity(item)}}>
+                                            <Pressable onPress={() => { actionActivity(item) }}>
                                                 <View style={styles.order}>
                                                     <View style={styles.details}>
                                                         {item?.name?.includes("Approved") ? <Credited /> : <Debited />}

@@ -7,7 +7,7 @@ import Animated from "react-native-reanimated";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 
-export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount, creditChecker }) {
+export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount, creditChecker, hasCompletedOrder }) {
     const { authData } = useContext(AuthContext);
     // const [creditChecker, setCreditChecker] = useState(authData?.user?.included?.creditCheckerVerifications[0]);
     const statesColor = {
@@ -15,6 +15,11 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
         approved: "#074A74",
         rejected: "#DB2721",
     };
+    if(hasCompletedOrder){
+        creditChecker = null;
+        haveActiveOrder = false;
+        amount = "₦0.00";
+    }
     interface CreditChecker {
         id: number;
         customer_id: number;
@@ -80,8 +85,9 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
             )}
             {haveActiveOrder && (
                 <Text>
-                    To pay {`₦${next_repayment?.expected_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on{" "}
-                    {next_repayment?.expected_payment_date}{" "}
+                    {next_repayment ? `To pay ${`₦${next_repayment?.expected_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on ${" "}
+                    ${next_repayment?.expected_payment_date} ${" "}` : `Repayment Completed`}
+                    
                 </Text>
             )}
         </View>
