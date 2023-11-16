@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, TouchableOpacity, RefreshControl, Image, Dimensions, ScrollView, FlatList } from "react-native";
 import { Overlay } from "react-native-elements";
-import { MaterialIcons } from '@expo/vector-icons';
-
-import { Hamburger, Debited, Credited, SmallCancel } from "../assets/svgs/svg";
+//import { MaterialIcons } from '@expo/vector-icons';
+import React from "react";
+import { Hamburger, Debited, Credited } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import { useState, useEffect, useContext } from "react";
 import { Text, View } from "../components/Themed";
@@ -28,9 +28,7 @@ export default function Dashboard({ navigation }: Props) {
     const [hasActiveOrder, setHasActiveOrder] = useState(null);
     const [hasCompletedOrder, setHasCompletedOrder] = useState(false);
 
-
-
-    const [refreshing, setRefreshing] = useState(false);
+    const refreshing = false;
     // const [amortization, setAmortization] = useState(null);
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -39,7 +37,7 @@ export default function Dashboard({ navigation }: Props) {
     const [nextExpectedRepayment, setNextRepayment] = useState({
         expected_amount: 0,
     });
-    let amortizationList = orders?.included?.amortizations;
+    const amortizationList = orders?.included?.amortizations;
 
     const [amortization, setAmortization] = useState(amortizationList);
 
@@ -55,20 +53,20 @@ export default function Dashboard({ navigation }: Props) {
             headers: { Authorization: `Bearer ${authData.token}` },
         });
         const order = response.data.data[0].included.orders[0];
-        let user = response.data.data[0];
+        const user = response.data.data[0];
         auth.saveProfile(user);
         setOrders(order);
         setUser(user);
         setCreditChecker(user?.included?.creditCheckerVerifications[0]);
-
-        setHasActiveOrder(order?.included?.orderStatus.name === 'Active');
-        setHasCompletedOrder(order?.included?.orderStatus.name === 'Completed');
+        console.log(order?.included?.orderStatus, "orderStatus");
+        setHasActiveOrder(order?.included?.orderStatus.name === "Active");
+        setHasCompletedOrder(order?.included?.orderStatus.name === "Completed");
 
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
         setNextRepayment(nextRepayment);
-        let filteredAmoritzation = order?.included?.amortizations.filter((item) => {
+        const filteredAmoritzation = order?.included?.amortizations.filter((item) => {
             return item.actual_amount === 0;
-        })
+        });
         calculateDebt(order);
         setAmortization(filteredAmoritzation);
         await previewOrder();
@@ -80,7 +78,6 @@ export default function Dashboard({ navigation }: Props) {
         const paid_repayment = order?.included?.amortizations?.map((item: { actual_amount: number }) => {
             return item.actual_amount;
         });
-        console.log(order, 'Paid')
         const expected_repayment = order?.included?.amortizations?.map((item: { expected_amount: number }) => {
             return item.expected_amount;
         });
@@ -91,8 +88,8 @@ export default function Dashboard({ navigation }: Props) {
             return total + item;
         });
         setTotalDebt(total_expected_repayment - totalPaid);
-        setProgressBar((totalPaid + orders?.attributes?.down_payment / total_expected_repayment) * 100)
-    }
+        setProgressBar((totalPaid + orders?.attributes?.down_payment / total_expected_repayment) * 100);
+    };
 
     const recentActivity = async () => {
         const response = await axios({
@@ -100,32 +97,35 @@ export default function Dashboard({ navigation }: Props) {
             url: `/recent/activities`,
             headers: { Authorization: `Bearer ${authData.token}` },
         });
-        let activities = response?.data?.data?.activities;
-        let filteredList = activities.filter(item => {
+        const activities = response?.data?.data?.activities;
+        const filteredList = activities.filter((item) => {
             return item.mobile_app_activity.is_admin === 0;
-        })
+        });
         setRecentActivities(filteredList);
-    }
+    };
 
     const listEmptyCOmponent = () => {
         return (
-            <View style={{
-                backgroundColor: 'transparent',
-                marginHorizontal: 30,
-                marginVertical: 15
-                // flexDirection: 'row'
-            }}>
-                <Text style={{
-                    color: '#074A74',
-                    fontFamily: "Montserrat_400Regular",
-                    textAlign: 'center'
-
-                }}>
+            <View
+                style={{
+                    backgroundColor: "transparent",
+                    marginHorizontal: 30,
+                    marginVertical: 15,
+                    // flexDirection: 'row'
+                }}
+            >
+                <Text
+                    style={{
+                        color: "#074A74",
+                        fontFamily: "Montserrat_400Regular",
+                        textAlign: "center",
+                    }}
+                >
                     You have no recent activity to view. Start getting busy
                 </Text>
             </View>
-        )
-    }
+        );
+    };
 
     const previewOrder = async () => {
         try {
@@ -134,43 +134,35 @@ export default function Dashboard({ navigation }: Props) {
                 url: `/credit-check-verification/${creditChecker?.id}`,
                 headers: { Authorization: `Bearer ${authData.token}` },
             });
-            let details = result.data.data.creditCheckerVerification;
+            const details = result.data.data.creditCheckerVerification;
 
             setOrderDetails(details);
-        } catch (error) { }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const actionActivity = async (item) => {
-        console.log(item)
         if (item?.mobile_app_activity?.name === "Loan Request") {
             navigation.navigate("VerificationPending", item?.meta?.credit_check);
         }
-    }
-
+    };
 
     const performAction = async () => {
         if (hasActiveOrder) {
             navigation.navigate("OrderDetails", orders);
         }
-        if (hasCompletedOrder){
+        if (hasCompletedOrder && !creditChecker?.status) {
             await logActivity(authData.token, 9);
             navigation.navigate("Calculator");
-        }
-        else if (creditChecker?.status === "passed") {
+        } else if (creditChecker?.status === "passed") {
             navigation.navigate("VerificationPassed", creditChecker);
-        }
-        else if (creditChecker?.status !== "pending") {
+        } else if (creditChecker?.status !== "pending") {
             await logActivity(authData.token, 9);
             navigation.navigate("Calculator");
-        }
-        else if (creditChecker?.status === "pending") {
+        } else if (creditChecker?.status === "pending") {
             navigation.navigate("VerificationPending", creditChecker);
         }
-    };
-
-
-    const testNav = () => {
-        navigation.navigate("OrderConfirmation");
     };
 
     const recommendedLoans = [
@@ -244,9 +236,7 @@ export default function Dashboard({ navigation }: Props) {
                         {amortization?.length > 0 && (
                             <View style={styles.main}>
                                 {amortization?.length > 0 && (
-                                    <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>
-                                        Upcoming Repayments
-                                    </Text>
+                                    <Text style={[styles.name, creditChecker?.id && { color: "grey" }]}>Upcoming Repayments</Text>
                                 )}
 
                                 <FlatList
@@ -293,16 +283,14 @@ export default function Dashboard({ navigation }: Props) {
                             </View>
                         )}
 
-                        {creditChecker?.status === 'pending' && (
+                        {creditChecker?.status === "pending" && (
                             <View style={{ backgroundColor: "transparent", position: "relative" }}>
-                                <Text style={[styles.name]}>
-                                    Loan Request
-                                </Text>
+                                <Text style={[styles.name]}>Loan Request</Text>
                                 <View
                                     style={[
                                         styles.order,
                                         {
-                                            backgroundColor: '#FFFDD2',
+                                            backgroundColor: "#FFFDD2",
                                             display: "flex",
                                             alignItems: "center",
                                             height: 130,
@@ -334,26 +322,17 @@ export default function Dashboard({ navigation }: Props) {
                                         >
                                             <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
                                                 <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Amount</Text>
-                                                <Text
-                                                    style={[
-                                                        styles.message,
-                                                        { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
-                                                    ]}
-                                                >
+                                                <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
                                                     {`₦${formatAsMoney(orderDetails?.product?.retail_price)}`}
                                                 </Text>
                                             </View>
                                             <View style={{ backgroundColor: "transparent" }}>
-                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>
-                                                    Downpayment
-                                                </Text>
-                                                <Text
-                                                    style={[
-                                                        styles.message,
-                                                        { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 },
-                                                    ]}
-                                                >
-                                                    {`₦${formatAsMoney((parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100)}`}
+                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Downpayment</Text>
+                                                <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
+                                                    {`₦${formatAsMoney(
+                                                        (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) /
+                                                            100
+                                                    )}`}
                                                 </Text>
                                             </View>
                                         </View>
@@ -361,10 +340,9 @@ export default function Dashboard({ navigation }: Props) {
                                 </View>
                             </View>
                         )}
-
-                        {(!creditChecker?.id || hasCompletedOrder) && (
+                        {(!creditChecker?.status || hasActiveOrder) && (
                             <View style={{ backgroundColor: "transparent", position: "relative" }}>
-                                {(!creditChecker?.id) && (
+                                {!creditChecker?.id && (
                                     <View
                                         style={{
                                             position: "absolute",
@@ -376,9 +354,7 @@ export default function Dashboard({ navigation }: Props) {
                                         }}
                                     ></View>
                                 )}
-                                <Text style={[styles.name]}>
-                                    Recommended Loans
-                                </Text>
+                                <Text style={[styles.name]}>Recommended Loans</Text>
                                 <FlatList
                                     scrollEnabled={false}
                                     data={recommendedLoans}
@@ -423,7 +399,9 @@ export default function Dashboard({ navigation }: Props) {
                                                             }}
                                                         >
                                                             <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
-                                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Amount</Text>
+                                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>
+                                                                    Amount
+                                                                </Text>
                                                                 <Text
                                                                     style={[
                                                                         styles.message,
@@ -456,14 +434,9 @@ export default function Dashboard({ navigation }: Props) {
                             </View>
                         )}
 
-
-
-
                         {recentActivities?.length > 0 && (
-                            <View style={{ backgroundColor: 'transparent' }}>
-                                <Text style={[styles.name]}>
-                                    Recent Activities
-                                </Text>
+                            <View style={{ backgroundColor: "transparent" }}>
+                                <Text style={[styles.name]}>Recent Activities</Text>
                                 <FlatList
                                     scrollEnabled={false}
                                     data={recentActivities.slice(0, 3)}
@@ -473,7 +446,11 @@ export default function Dashboard({ navigation }: Props) {
                                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchOrder} />}
                                     renderItem={({ item }) => (
                                         <View style={{ backgroundColor: "transparent" }}>
-                                            <Pressable onPress={() => { actionActivity(item) }}>
+                                            <Pressable
+                                                onPress={() => {
+                                                    actionActivity(item);
+                                                }}
+                                            >
                                                 <View style={styles.order}>
                                                     <View style={styles.details}>
                                                         {item?.name?.includes("Approved") ? <Credited /> : <Debited />}
@@ -498,24 +475,17 @@ export default function Dashboard({ navigation }: Props) {
                                                             marginRight: 59,
                                                             fontFamily: "Montserrat_600SemiBold",
                                                         }}
-                                                    >
-
-                                                    </Text>
+                                                    ></Text>
                                                 </View>
                                             </Pressable>
                                         </View>
                                     )}
                                 />
                             </View>
-
-
                         )}
-
                     </ScrollView>
                 </View>
-
             )}
-
         </View>
     );
 }
@@ -554,7 +524,6 @@ const styles = StyleSheet.create({
     },
     scrollView: {
         backgroundColor: "transparent",
-
     },
     cards: {
         backgroundColor: "#EFF5F9",

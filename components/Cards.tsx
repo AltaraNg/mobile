@@ -1,44 +1,27 @@
 import React from "react";
-import { StyleSheet, Pressable, Image, Dimensions } from "react-native";
+import { StyleSheet, Pressable, Image } from "react-native";
 import { Text, View } from "../components/Themed";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import Animated from "react-native-reanimated";
-import { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
+// import { useContext,  } from "react";
+// import { AuthContext } from "../context/AuthContext";
 
 export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount, creditChecker, hasCompletedOrder }) {
-    const { authData } = useContext(AuthContext);
+    // const { authData } = useContext(AuthContext);
     // const [creditChecker, setCreditChecker] = useState(authData?.user?.included?.creditCheckerVerifications[0]);
     const statesColor = {
         pending: "#FDC228",
-        approved: "#074A74",
+        passed: "#074A74",
         rejected: "#DB2721",
     };
-    if(hasCompletedOrder){
-        creditChecker = null;
+    if (hasCompletedOrder) {
+        //creditChecker = null;
         haveActiveOrder = false;
         amount = "₦0.00";
     }
-    interface CreditChecker {
-        id: number;
-        customer_id: number;
-        initiated_by: number | null;
-        processed_by: number | null;
-        processed_at: string | null;
-        status: string;
-        reason: string | null;
-        created_at: string;
-        updated_at: string;
-        bnpl_vendor_product_id: number | null;
-        repayment_cycle_id: number;
-        repayment_duration_id: number;
-        down_payment_rate_id: number;
-        credit_check_no: string;
-        business_type_id: number;
-        product_id: number;
-    }
 
+    console.log(creditChecker, "creditChecker?.status");
     // setCreditChecker({})
     const url = process.env.EXPO_PUBLIC_API_URL;
 
@@ -64,7 +47,7 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
                             <Text
                                 style={[styles.buttonText, { color: "#074A74" }, creditChecker?.id && { color: statesColor[creditChecker.status] }]}
                             >
-                                {haveActiveOrder ? "Track Order" : creditChecker?.id ? creditChecker.status : "Request Loan"}
+                                {haveActiveOrder ? "Track Order" : creditChecker?.status ? creditChecker.status : "Request Loan"}
                             </Text>
                         </Pressable>
                     </LinearGradient>
@@ -85,9 +68,10 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
             )}
             {haveActiveOrder && (
                 <Text>
-                    {next_repayment ? `To pay ${`₦${next_repayment?.expected_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on ${" "}
-                    ${next_repayment?.expected_payment_date} ${" "}` : `Repayment Completed`}
-                    
+                    {next_repayment
+                        ? `To pay ${`₦${next_repayment?.expected_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on ${" "}
+                    ${next_repayment?.expected_payment_date} ${" "}`
+                        : `Repayment Completed`}
                 </Text>
             )}
         </View>
@@ -161,5 +145,6 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         textAlign: "center",
         fontSize: 14,
+        textTransform: "capitalize",
     },
 });
