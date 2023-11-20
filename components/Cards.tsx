@@ -10,18 +10,14 @@ import Animated from "react-native-reanimated";
 export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount, creditChecker, hasCompletedOrder }) {
     // const { authData } = useContext(AuthContext);
     // const [creditChecker, setCreditChecker] = useState(authData?.user?.included?.creditCheckerVerifications[0]);
+    console.log(creditChecker, 'emo')
     const statesColor = {
         pending: "#FDC228",
         passed: "#074A74",
         rejected: "#DB2721",
     };
-    if (hasCompletedOrder) {
-        //creditChecker = null;
-        haveActiveOrder = false;
-        amount = "₦0.00";
-    }
+   
 
-    console.log(creditChecker, "creditChecker?.status");
     // setCreditChecker({})
     const url = process.env.EXPO_PUBLIC_API_URL;
 

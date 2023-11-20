@@ -12,6 +12,7 @@ import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { get, post } from "../utilities/api";
 import AmortizationObject from "../components/AmortizationObject";
+import { Ionicons } from "@expo/vector-icons";
 
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
@@ -83,6 +84,18 @@ export default function VerificationPassed({ navigation, route }: Props) {
                 <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
             ) : (
                 <View style={styles.container}>
+                    <View
+                    style={{
+                        backgroundColor: "transparent",
+                        // marginLeft:
+                    }}
+                >
+                    <Pressable onPress={goBack} style={{
+                        width: '20%'
+                    }}>
+                        <Ionicons name="ios-arrow-back-circle" size={30} color="#074A74" />
+                    </Pressable>
+                </View>
                     <Text style={styles.header}>Verified successfully</Text>
                     <View style={styles.cardContainer}>
                         <Text style={styles.headerText}>Order Details</Text>

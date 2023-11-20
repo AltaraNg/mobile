@@ -57,8 +57,8 @@ export default function Dashboard({ navigation }: Props) {
         auth.saveProfile(user);
         setOrders(order);
         setUser(user);
-        setCreditChecker(user?.included?.creditCheckerVerifications[0]);
-        console.log(order?.included?.orderStatus, "orderStatus");
+        setCreditChecker(user?.included?.creditCheckerVerifications.splice(-1)[0]);
+        console.log(user?.included?.creditCheckerVerifications, "I got heere");
         setHasActiveOrder(order?.included?.orderStatus.name === "Active");
         setHasCompletedOrder(order?.included?.orderStatus.name === "Completed");
 
@@ -144,7 +144,13 @@ export default function Dashboard({ navigation }: Props) {
 
     const actionActivity = async (item) => {
         if (item?.mobile_app_activity?.name === "Loan Request") {
+            console.log(creditChecker, 'item')
+            if(creditChecker.status === 'pending'){
             navigation.navigate("VerificationPending", item?.meta?.credit_check);
+            }
+            else if(creditChecker.status === 'passed' && creditChecker.loan_id === null)
+            navigation.navigate("VerificationPassed", item?.meta?.credit_check);
+
         }
     };
 
@@ -152,7 +158,7 @@ export default function Dashboard({ navigation }: Props) {
         if (hasActiveOrder) {
             navigation.navigate("OrderDetails", orders);
         }
-        if (hasCompletedOrder && !creditChecker?.status) {
+        else if (hasCompletedOrder &&  creditChecker?.status === "passed") {
             await logActivity(authData.token, 9);
             navigation.navigate("Calculator");
         } else if (creditChecker?.status === "passed") {
@@ -225,7 +231,7 @@ export default function Dashboard({ navigation }: Props) {
                             hasCompletedOrder={hasCompletedOrder}
                             haveActiveOrder={hasActiveOrder}
                             title="Loan Balance"
-                            amount={!totalDebt ? "₦0.00" : `₦${totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}
+                            amount={!totalDebt || !creditChecker?.loan_id ? "₦0.00" : `₦${totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}
                             progressBar={progressBar}
                             next_repayment={nextExpectedRepayment}
                             performAction={performAction}
@@ -342,7 +348,7 @@ export default function Dashboard({ navigation }: Props) {
                         )}
                         {(!creditChecker?.status || hasActiveOrder) && (
                             <View style={{ backgroundColor: "transparent", position: "relative" }}>
-                                {!creditChecker?.id && (
+                                {creditChecker?.id && (
                                     <View
                                         style={{
                                             position: "absolute",
