@@ -10,7 +10,6 @@ import Animated from "react-native-reanimated";
 export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount, creditChecker, hasCompletedOrder }) {
     // const { authData } = useContext(AuthContext);
     // const [creditChecker, setCreditChecker] = useState(authData?.user?.included?.creditCheckerVerifications[0]);
-    console.log(creditChecker, 'emo')
     const statesColor = {
         pending: "#FDC228",
         passed: "#074A74",
@@ -65,8 +64,7 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
             {haveActiveOrder && (
                 <Text>
                     {next_repayment
-                        ? `To pay ${`₦${next_repayment?.expected_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on ${" "}
-                    ${next_repayment?.expected_payment_date} ${" "}`
+                        ? `To pay ${`₦${next_repayment?.expected_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on ${" "}${next_repayment?.expected_payment_date} ${" "}`
                         : `Repayment Completed`}
                 </Text>
             )}
