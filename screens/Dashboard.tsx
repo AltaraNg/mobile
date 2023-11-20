@@ -266,7 +266,7 @@ export default function Dashboard({ navigation }: Props) {
                                                                 numberOfLines={1}
                                                                 ellipsizeMode={"tail"}
                                                             >
-                                                                {item.expected_payment_date}{" "}
+                                                                {timeFromNow(item.expected_payment_date)}{" "}
                                                             </Text>
                                                             {/* <Text style={{ color: "#000", fontSize: 11 }}>{item?.date}</Text> */}
                                                         </View>
