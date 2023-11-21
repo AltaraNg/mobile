@@ -11,7 +11,6 @@ export const logActivity = async (token, activity_id) => {
                 meta: {},
             },
         });
-        console.log(result.data);
     } catch (error) {
         console.log(error);
     }

@@ -4,26 +4,20 @@ import { Text, View } from "../components/Themed";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import Animated from "react-native-reanimated";
-// import { useContext,  } from "react";
-// import { AuthContext } from "../context/AuthContext";
 
 export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount, creditChecker, hasCompletedOrder }) {
-    // const { authData } = useContext(AuthContext);
-    // const [creditChecker, setCreditChecker] = useState(authData?.user?.included?.creditCheckerVerifications[0]);
+
     const statesColor = {
         pending: "#FDC228",
         passed: "#074A74",
         rejected: "#DB2721",
     };
-   
 
-    // setCreditChecker({})
+
     const url = process.env.EXPO_PUBLIC_API_URL;
 
     axios.defaults.baseURL = url;
-    // useEffect(() => {
-    //     checkVerification();
-    // }, [authData]);
+
 
     return (
         <View style={[styles.container, haveActiveOrder ? { height: 150 } : { height: 100, paddingTop: 10 }]}>

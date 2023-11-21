@@ -303,7 +303,7 @@ export default function OrderDetails({ navigation, route }: Props) {
                         marginTop: 35,
                     }}
                 >
-                    Product Price
+                    Loan
                 </Text>
                 <Text
                     style={{

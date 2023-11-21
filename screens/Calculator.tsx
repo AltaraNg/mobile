@@ -27,6 +27,7 @@ export default function Calculator({ navigation }: Props) {
     const [calculator, setCalculator] = useState([]);
     const [downPayment, setDownPayment] = useState("");
     const [repayment, setRepayment] = useState("");
+    const [productPrice, setProductPrice] = useState(0);
     const [completeRepayment, setCompleteRepayment] = useState(0);
     const [isBiMonthly, setIsBiMonthly] = useState(false);
     const [isCollateral, setIsCollateral] = useState(false);
@@ -79,8 +80,10 @@ export default function Calculator({ navigation }: Props) {
                     x.repayment_duration_id === rDur.id
                 );
             });
+            console.log(params, 'params')
             if (params) {
-                const { actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(input, data, params, 0);
+                const { total, actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(input, data, params, 0);
+                setProductPrice(total);
                 setDownPayment("₦" + actualDownpayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                 setCompleteRepayment(rePayment);
                 if (isBiMonthly) {
@@ -124,6 +127,7 @@ export default function Calculator({ navigation }: Props) {
             rePayment = actualRepayment;
         }
         total = actualRepayment + actualDownpayment;
+        console.log(biMonthlyRepayment, 'calc')
         return { total, actualDownpayment, rePayment, biMonthlyRepayment };
     };
 

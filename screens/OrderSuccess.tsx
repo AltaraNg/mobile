@@ -1,9 +1,7 @@
 import { StyleSheet } from "react-native";
-import { Paystack } from "react-native-paystack-webview";
 import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { post } from "../utilities/api";
 
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 

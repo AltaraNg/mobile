@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, TouchableOpacity, RefreshControl, Image, Dimensi
 import { Overlay } from "react-native-elements";
 //import { MaterialIcons } from '@expo/vector-icons';
 import React from "react";
-import { Hamburger, Debited, Credited } from "../assets/svgs/svg";
+import { Hamburger, Debited, Credited, Warning } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import { useState, useEffect, useContext } from "react";
 import { Text, View } from "../components/Themed";
@@ -57,9 +57,9 @@ export default function Dashboard({ navigation }: Props) {
         auth.saveProfile(user);
         setOrders(order);
         setUser(user);
-        setCreditChecker(user?.included?.creditCheckerVerifications.splice(-1)[0]);
-        console.log(user?.included?.creditCheckerVerifications, "I got heere");
-        setHasActiveOrder(order?.included?.orderStatus.name === "Active");
+        let cCheck = user?.included?.creditCheckerVerifications.splice(-1)[0];
+        setCreditChecker(cCheck);
+        setHasActiveOrder(order?.included?.orderStatus?.name === "Active");
         setHasCompletedOrder(order?.included?.orderStatus.name === "Completed");
 
         const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
@@ -69,8 +69,9 @@ export default function Dashboard({ navigation }: Props) {
         });
         calculateDebt(order);
         setAmortization(filteredAmoritzation);
-        await previewOrder();
         await recentActivity();
+        await previewOrder(cCheck?.id);
+
         setShowLoader(false);
     };
 
@@ -127,29 +128,31 @@ export default function Dashboard({ navigation }: Props) {
         );
     };
 
-    const previewOrder = async () => {
-        try {
-            const result = await axios({
-                method: "GET",
-                url: `/credit-check-verification/${creditChecker?.id}`,
-                headers: { Authorization: `Bearer ${authData.token}` },
-            });
-            const details = result.data.data.creditCheckerVerification;
+    const previewOrder = async (id) => {
+        if (id) {
+            try {
+                const result = await axios({
+                    method: "GET",
+                    url: `/credit-check-verification/${id}`,
+                    headers: { Authorization: `Bearer ${authData.token}` },
+                });
+                const details = result.data.data.creditCheckerVerification;
 
-            setOrderDetails(details);
-        } catch (error) {
-            console.log(error);
+                setOrderDetails(details);
+            } catch (error) {
+
+            }
         }
+
     };
 
     const actionActivity = async (item) => {
         if (item?.mobile_app_activity?.name === "Loan Request") {
-            console.log(creditChecker, 'item')
-            if(creditChecker.status === 'pending'){
-            navigation.navigate("VerificationPending", item?.meta?.credit_check);
+            if (creditChecker.status === 'pending') {
+                navigation.navigate("VerificationPending", item?.meta?.credit_check);
             }
-            else if(creditChecker.status === 'passed' && creditChecker.loan_id === null)
-            navigation.navigate("VerificationPassed", item?.meta?.credit_check);
+            else if (creditChecker.status === 'passed' && creditChecker.loan_id === null)
+                navigation.navigate("VerificationPassed", item?.meta?.credit_check);
 
         }
     };
@@ -158,7 +161,7 @@ export default function Dashboard({ navigation }: Props) {
         if (hasActiveOrder) {
             navigation.navigate("OrderDetails", orders);
         }
-        else if (hasCompletedOrder &&  creditChecker?.status === "passed") {
+        else if (hasCompletedOrder && creditChecker?.status === "passed" && creditChecker?.loan_id !== null) {
             await logActivity(authData.token, 9);
             navigation.navigate("Calculator");
         } else if (creditChecker?.status === "passed") {
@@ -256,7 +259,7 @@ export default function Dashboard({ navigation }: Props) {
                                             <Pressable>
                                                 <View style={styles.order}>
                                                     <View style={styles.details}>
-                                                        <Credited />
+                                                        <Warning />
                                                         <View style={styles.title}>
                                                             <Text
                                                                 style={{
@@ -268,15 +271,15 @@ export default function Dashboard({ navigation }: Props) {
                                                             >
                                                                 {timeFromNow(item.expected_payment_date)}{" "}
                                                             </Text>
-                                                            {/* <Text style={{ color: "#000", fontSize: 11 }}>{item?.date}</Text> */}
                                                         </View>
                                                     </View>
                                                     <Text
                                                         style={{
                                                             color: "#000",
                                                             fontSize: 13,
-                                                            marginRight: 59,
+                                                            marginRight: 10,
                                                             fontFamily: "Montserrat_600SemiBold",
+                                                            textAlign: 'right'
                                                         }}
                                                     >
                                                         {`₦${formatAsMoney(item.expected_amount)}`}
@@ -337,7 +340,7 @@ export default function Dashboard({ navigation }: Props) {
                                                 <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
                                                     {`₦${formatAsMoney(
                                                         (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) /
-                                                            100
+                                                        100
                                                     )}`}
                                                 </Text>
                                             </View>
@@ -346,7 +349,7 @@ export default function Dashboard({ navigation }: Props) {
                                 </View>
                             </View>
                         )}
-                        {(!creditChecker?.status || hasActiveOrder) && (
+                        {(creditChecker?.status !== "pending" && !hasActiveOrder) && (
                             <View style={{ backgroundColor: "transparent", position: "relative" }}>
                                 {creditChecker?.id && (
                                     <View
