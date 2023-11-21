@@ -11,9 +11,7 @@ export const logActivity = async (token, activity_id) => {
                 meta: {},
             },
         });
-    } catch (error) {
-        console.log(error);
-    }
+    } catch (error) {}
 };
 
 export const formatAsMoney = (figure) => {

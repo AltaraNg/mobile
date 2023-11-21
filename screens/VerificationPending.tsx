@@ -1,5 +1,4 @@
-import { RefreshControl, StyleSheet, Dimensions, FlatList, Image, Pressable } from "react-native";
-
+import { StyleSheet, Dimensions, Image, Pressable } from "react-native";
 import { useState, useContext, useEffect } from "react";
 import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
@@ -9,57 +8,15 @@ import axios from "axios";
 import { LinearGradient } from "expo-linear-gradient";
 
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
-const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
-const loanAppKey = process.env.EXPO_PUBLIC_LOAN_APP_KEY;
-const instance = axios.create({
-    baseURL: url,
-});
 
 export default function VerificationPending({ navigation, route }: Props) {
-    const { authData, showLoader, setShowLoader } = useContext(AuthContext);
-    const [orderDetails, setOrderDetails] = useState({});
-    const [amortization, setAmortization] = useState(null);
-    const [refreshing, setRefreshing] = useState(false);
-
-    const creditChecker = route.params;
-
-
-    const previewOrder = async () => {
-        setShowLoader(true);
-        try {
-            const result = await axios({
-                method: "GET",
-                url: `/credit-check-verification/${creditChecker?.id}`,
-                headers: { Authorization: `Bearer ${authData.token}` },
-            });
-            let details = result.data.data.creditCheckerVerification;
-            const getAmort = await instance({
-                method: "POST",
-                headers: { "LOAN-APP-API-KEY": loanAppKey },
-                url: "/mobile-app/amortization/preview",
-                data: {
-                    credit_checker_verification_id: details.id,
-                    product_price: parseInt(details.product.retail_price),
-                    down_payment: (parseInt(details.product.retail_price) * details.down_payment_rate.percent) / 100,
-                    repayment:
-                        parseInt(details.product.retail_price) - (parseInt(details.product.retail_price) * details.down_payment_rate.percent) / 100,
-                },
-            });
-            setOrderDetails(details);
-            setAmortization(getAmort.data.data.preview);
-            setShowLoader(false);
-        } catch (error) { }
-    };
-
-   
+    const { showLoader } = useContext(AuthContext);
 
     const goBack = () => {
         navigation.navigate('Dashboard');
     };
 
-    useEffect(() => {
-        // previewOrder();
-    }, []);
+
 
     return (
         <View style={styles.container}>
@@ -73,7 +30,7 @@ export default function VerificationPending({ navigation, route }: Props) {
                     }} />
                     <Text style={styles.headerText}>Awaiting Verification</Text>
                     <Text style={styles.modalText}>
-                    Thank you for submitting your loan application. Your request is currently being reviewed and processed. We appreciate your patience while our team verifies all the information you have provided.
+                        Thank you for submitting your loan application. Your request is currently being reviewed and processed. We appreciate your patience while our team verifies all the information you have provided.
                     </Text>
 
                     <LinearGradient colors={["#074A74", "#089CA4"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>

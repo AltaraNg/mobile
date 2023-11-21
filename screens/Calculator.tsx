@@ -80,7 +80,6 @@ export default function Calculator({ navigation }: Props) {
                     x.repayment_duration_id === rDur.id
                 );
             });
-            console.log(params, 'params')
             if (params) {
                 const { total, actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(input, data, params, 0);
                 setProductPrice(total);
@@ -127,7 +126,6 @@ export default function Calculator({ navigation }: Props) {
             rePayment = actualRepayment;
         }
         total = actualRepayment + actualDownpayment;
-        console.log(biMonthlyRepayment, 'calc')
         return { total, actualDownpayment, rePayment, biMonthlyRepayment };
     };
 
