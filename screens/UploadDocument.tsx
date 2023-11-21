@@ -1,64 +1,71 @@
-import { Pressable, StyleSheet, TouchableOpacity, Image, Dimensions, ScrollView } from "react-native";
+import { Pressable, StyleSheet, TouchableOpacity, Image, Dimensions, ScrollView, ToastAndroid } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Header from "../components/Header";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import Hamburger from "../assets/svgs/hamburger.svg";
 import { Text, View } from "../components/Themed";
 import { RootTabParamList } from "../types";
 import SideMenu from "./SideMenu";
 import { AuthContext, useAuth } from "../context/AuthContext";
+
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
 type Props = NativeStackScreenProps<RootTabParamList, "Dashboard">;
 import Upload from "../components/Upload";
+import { logActivity } from "../utilities/globalFunctions";
 const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 
-export default function UploadDocument({ navigation }: Props) {
+export default function UploadDocument({ navigation, route }: Props) {
     const auth = useAuth();
 
-    const { authData } = useContext(AuthContext);
-    const [user, setUser] = useState(null);
-    const [loading] = useState(null);
+    const order: object = route.params;
+    const { authData, setAuthData } = useContext(AuthContext);
+    const [loading, setLoader] = useState(null);
     const [showMenu] = useState(false);
-    const [uploaded, setUploaded] = useState(null);
 
-    const toggleSideMenu = async () => {
+    const toggleSideMenu = () => {
         navigation.toggleDrawer();
     };
 
-    // const backAction = () => {
-    // 	if (Platform.OS === 'ios') return;
-    // 	setTimeout(() => {}, 3000);
+    function handleRequest() {}
 
-    // 	if (exitApp === 0) {
-    // 		setExitApp(exitApp + 1);
-
-    // 		ToastAndroid.showWithGravity(
-    // 			'press back button again to exit app',
-    // 			ToastAndroid.SHORT,
-    // 			ToastAndroid.CENTER
-    // 		);
-    // 	} else {
-    // 		BackHandler.exitApp();
-    // 	}
-    // };
-
-    const checkVerification = async () => {
-        setUser(authData.user.attributes);
-        const upload = Object.values(authData.user.included.verification).every((val) => val);
-        setUploaded(upload);
-        if (upload) {
-            auth.saveProfile(authData.user);
-        }
+    const createOrderRequest = async () => {
+        const data = {
+            ...order,
+            documents: authData.documents,
+            guarantors: [
+                {
+                    first_name: "Guarantor First Name",
+                    last_name: "Guarantor Last Name",
+                    phone_number: "090876661661",
+                    home_address: "23, Odogbolu, Altara Junction",
+                },
+                {
+                    first_name: "Second Guarantor Sed Name",
+                    last_name: "Second Guarantor Last Name",
+                    phone_number: "090876661662",
+                    home_address: "23, Odogbolu, Altara Junction",
+                },
+            ],
+        };
+        const headers = {
+            Authorization: `Bearer ${authData.token}`,
+        };
+        axios
+            .post("submit/loan/request", data, {
+                headers: headers,
+            })
+            .then(async (res) => {
+                // fetchUser();
+                ToastAndroid.showWithGravity("Loan request sent successfully, Awaiting Verification", ToastAndroid.LONG, ToastAndroid.CENTER);
+                navigation.navigate("VerificationPending", res?.data?.data?.credit_check_verification);
+            })
+            .catch((err) => {
+                ToastAndroid.showWithGravity("Error creating order request", ToastAndroid.SHORT, ToastAndroid.CENTER);
+            })
+            .finally(() => {});
     };
-    function handleRequest() {
-        // fetchUser()
-    }
-
-    useEffect(() => {
-        checkVerification();
-    }, [authData]);
 
     return (
         <ScrollView style={styles.container}>
@@ -71,14 +78,14 @@ export default function UploadDocument({ navigation }: Props) {
                     </Pressable>
                 </TouchableOpacity>
             </View>
-            {user && (
+            {
                 <ScrollView
                     style={{
                         backgroundColor: "#fff",
                     }}
                 >
                     <View style={styles.main}>
-                        <Text style={styles.title}>Upload Document</Text>
+                        <Text style={styles.title}>Verification</Text>
                         <Text style={styles.simple}>Hurray! This is the last step👍</Text>
                         <View
                             style={{
@@ -101,7 +108,7 @@ export default function UploadDocument({ navigation }: Props) {
                             }}
                         >
                             <Upload onRequest={handleRequest} document="Guarantor's ID" type="guarantor_id" />
-                            <Upload onRequest={handleRequest} document="Bank Statement" type="proof_of_income" />
+                            <Upload onRequest={handleRequest} document="Proof of Income" type="proof_of_income" />
                         </View>
                         <View
                             style={{
@@ -114,15 +121,11 @@ export default function UploadDocument({ navigation }: Props) {
                         >
                             <LinearGradient
                                 colors={["#074A77", "#089CA4"]}
-                                style={!uploaded ? [styles.buttonContainer, { opacity: 0.5 }] : styles.buttonContainer}
+                                style={styles.buttonContainer}
                                 start={{ x: 1, y: 0.5 }}
                                 end={{ x: 0, y: 0.5 }}
                             >
-                                <Pressable
-                                    style={[styles.button]}
-                                    disabled={!uploaded}
-                                    //onPress={completeRegistration}
-                                >
+                                <Pressable style={[styles.button]} onPress={createOrderRequest}>
                                     {loading ? (
                                         <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
                                     ) : (
@@ -133,7 +136,7 @@ export default function UploadDocument({ navigation }: Props) {
                         </View>
                     </View>
                 </ScrollView>
-            )}
+            }
         </ScrollView>
     );
 }

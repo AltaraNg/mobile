@@ -3,44 +3,21 @@ import { StyleSheet, Pressable, Image } from "react-native";
 import { Text, View } from "../components/Themed";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
-//import { useContext, useState, useEffect } from "react";
-//import { AuthContext } from "../context/AuthContext";
-//import { OrderContext } from "../context/OrderContext";
 import Animated from "react-native-reanimated";
 
-export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount }) {
+export default function Cards({ haveActiveOrder, performAction, next_repayment, title, progressBar, amount, creditChecker, hasCompletedOrder }) {
+
+    const statesColor = {
+        pending: "#FDC228",
+        passed: "#074A74",
+        rejected: "#DB2721",
+    };
+
+
     const url = process.env.EXPO_PUBLIC_API_URL;
+
     axios.defaults.baseURL = url;
 
-    // async function doSome() {
-    //     if (type === "cash") {
-    //         navigation.navigate("Calculator");
-    //     } else {
-    //         setLoader(true);
-    //         try {
-    //             const res = await axios({
-    //                 method: "POST",
-    //                 data: {
-    //                     order_type: type,
-    //                 },
-    //                 url: "/submit/request",
-    //                 headers: { Authorization: `Bearer ${authData.token}` },
-    //             });
-    //             if (res.status === 200) {
-    //                 setOrderRequest();
-    //                 onRequest(res.data, "success", type);
-    //                 setLoader(false);
-    //             }
-    //         } catch (error) {
-    //             setLoader(false);
-    //             onRequest(error.response.data, "failed", type);
-    //         }
-    //     }
-    // }
-    // const checkOrder = () => {
-    //     const isPending = orderRequest?.some((item) => item.status === "pending");
-    //     isPending ? setShowButton(false) : setShowButton(true);
-    // };
 
     return (
         <View style={[styles.container, haveActiveOrder ? { height: 150 } : { height: 100, paddingTop: 10 }]}>
@@ -56,7 +33,11 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
                 <View style={{ flexDirection: "row", backgroundColor: "transparent" }}>
                     <LinearGradient colors={["#fff", "#DADADA"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
                         <Pressable style={[styles.button]} onPress={performAction}>
-                            <Text style={[styles.buttonText, { color: "#074A74" }]}>{haveActiveOrder ? "Track Order" : "Request Loan"}</Text>
+                            <Text
+                                style={[styles.buttonText, { color: "#074A74" }, creditChecker?.id && { color: statesColor[creditChecker.status] }]}
+                            >
+                                {haveActiveOrder ? "Track Order" : creditChecker?.status ? creditChecker.status : "Request Loan"}
+                            </Text>
                         </Pressable>
                     </LinearGradient>
                 </View>
@@ -76,8 +57,9 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
             )}
             {haveActiveOrder && (
                 <Text>
-                    To pay {`₦${next_repayment?.expected_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on{" "}
-                    {next_repayment?.expected_payment_date}{" "}
+                    {next_repayment
+                        ? `To pay ${`₦${next_repayment?.expected_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`} on ${" "}${next_repayment?.expected_payment_date} ${" "}`
+                        : `Repayment Completed`}
                 </Text>
             )}
         </View>
@@ -101,7 +83,8 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
     container: {
-        width: 300,
+        width: "87%",
+        height: "auto",
         backgroundColor: "#074A74",
         borderRadius: 5,
         marginBottom: 17,
@@ -150,5 +133,6 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         textAlign: "center",
         fontSize: 14,
+        textTransform: "capitalize",
     },
 });

@@ -10,6 +10,8 @@ import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import businessTypes from "../lib/calculator.json";
 import repaymentDurations from "../lib/repaymentDuration.json";
+import { Ionicons } from "@expo/vector-icons";
+import { logActivity } from "../utilities/globalFunctions";
 
 // import {cashLoan, calculate} from '../lib/calculator';
 const url = process.env.EXPO_PUBLIC_API_URL;
@@ -18,14 +20,15 @@ axios.defaults.baseURL = url;
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 
 export default function Calculator({ navigation }: Props) {
-    const { authData, setShowLoader } = useContext(AuthContext);
+    const { authData } = useContext(AuthContext);
     const [loader, setLoader] = useState(false);
     const [inputValue, setInputValue] = useState(0);
     const [sliderValue, setSliderValue] = useState(6);
     const [calculator, setCalculator] = useState([]);
     const [downPayment, setDownPayment] = useState("");
     const [repayment, setRepayment] = useState("");
-
+    const [productPrice, setProductPrice] = useState(0);
+    const [completeRepayment, setCompleteRepayment] = useState(0);
     const [isBiMonthly, setIsBiMonthly] = useState(false);
     const [isCollateral, setIsCollateral] = useState(false);
     const cashBusinessTypes = businessTypes.filter((item) => {
@@ -50,7 +53,14 @@ export default function Calculator({ navigation }: Props) {
     };
 
     async function doSome() {
-        navigation.navigate("UploadDocument");
+        await logActivity(authData.token, 8);
+
+        navigation.navigate("UploadDocument", {
+            down_payment: parseInt(downPayment.replace(/[^0-9]/g, ""), 10),
+            loan_amount: inputValue,
+            repayment: completeRepayment,
+            repayment_cycle_id: isBiMonthly ? 1 : 2,
+        });
         setLoader(true);
     }
 
@@ -71,9 +81,11 @@ export default function Calculator({ navigation }: Props) {
                 );
             });
             if (params) {
-                const { actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(input, data, params, 0);
+                const { total, actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(input, data, params, 0);
+                setProductPrice(total);
                 setDownPayment("₦" + actualDownpayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-                if (!isBiMonthly) {
+                setCompleteRepayment(rePayment);
+                if (isBiMonthly) {
                     setRepayment("₦" + (rePayment / val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                 } else {
                     setRepayment("₦" + biMonthlyRepayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
@@ -133,7 +145,6 @@ export default function Calculator({ navigation }: Props) {
     };
 
     const fetchCalculator = async () => {
-        setShowLoader(true);
         try {
             const response = await axios({
                 method: "GET",
@@ -143,14 +154,20 @@ export default function Calculator({ navigation }: Props) {
             setCalculator(response?.data?.data?.price_calculator);
         } catch (error) {
             ToastAndroid.showWithGravity("Unable to fetch calculator. Please try again later", ToastAndroid.SHORT, ToastAndroid.CENTER);
+        } finally {
+            setLoader(false);
         }
+    };
+    const goBack = () => {
+        navigation.goBack();
     };
 
     const onInputValueChange = async (value: number) => {
         setInputValue(value);
         if (value >= 500000) {
-            setSliderValue(12);
-            getCalc(12, value);
+            let duration = 12;
+            setSliderValue(duration);
+            getCalc(duration, value);
             return;
         }
         getCalc(sliderValue, value);
@@ -172,151 +189,174 @@ export default function Calculator({ navigation }: Props) {
     return (
         <View style={styles.container}>
             <View style={styles.calculator}>
-                <Text style={styles.header}>Calculator</Text>
-
-                <Text style={{ color: "#074A74" }}>How much do you want to loan?</Text>
-                <CurrencyInput
-                    style={[styles.input, { width: Dimensions.get("window").width * 0.92 }]}
-                    value={inputValue}
-                    onChangeValue={onInputValueChange}
-                    prefix="₦"
-                    delimiter=","
-                    separator="."
-                    precision={2}
-                    onChangeText={() => {}}
-                ></CurrencyInput>
+                <View style={styles.section}>
                 <View
                     style={{
-                        flexDirection: "row",
-                        backgroundColor: "white",
-                        justifyContent: "space-between",
-                        marginVertical: 20,
+                        backgroundColor: "transparent",
+                        // marginLeft:
                     }}
                 >
+                    <Pressable onPress={goBack} style={{
+                        width: '20%'
+                    }}>
+                        <Ionicons name="ios-arrow-back-circle" size={30} color="#074A74" />
+                    </Pressable>
+                </View>
+                    <Text style={styles.header}>Calculator</Text>
+
+                    <Text style={{ color: "#074A74" }}>How much do you want to loan?</Text>
+                    <CurrencyInput
+                        style={[styles.input, { width: Dimensions.get("window").width * 0.92 }]}
+                        value={inputValue}
+                        onChangeValue={onInputValueChange}
+                        prefix="₦"
+                        delimiter=","
+                        separator="."
+                        precision={2}
+                        minValue={0}
+                        onChangeText={() => {}}
+                    ></CurrencyInput>
                     <View
                         style={{
                             flexDirection: "row",
                             backgroundColor: "white",
-                            alignItems: "center",
+                            justifyContent: "space-between",
+                            marginVertical: 20,
                         }}
                     >
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={isBiMonthly ? "#074A74" : "#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleSwitchM}
-                            value={isBiMonthly}
-                        />
-                        <Text style={{ color: "#074A74" }}>Bi-Monthly</Text>
-                    </View>
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            backgroundColor: "white",
-                            alignItems: "center",
-                        }}
-                    >
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={isCollateral ? "#074A74" : "#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleSwitchC}
-                            value={isCollateral}
-                        />
-                        <Text style={{ color: "#074A74" }}>Collateral</Text>
-                    </View>
-                </View>
-
-                <View
-                    style={{
-                        backgroundColor: "#D9D9D9",
-                        alignItems: "center",
-                        paddingVertical: 15,
-                        height: 100,
-                    }}
-                >
-                    <Text
-                        style={{
-                            color: "#074A74",
-                            fontFamily: "Montserrat_500Medium",
-                            fontSize: 10,
-                            marginBottom: 10,
-                        }}
-                    >
-                        {downPayment === "₦0.00" ? "" : "Your Downpayment"}
-                    </Text>
-                    <Text
-                        style={{
-                            color: "#074A74",
-                            fontFamily: "Montserrat_800ExtraBold",
-                            fontSize: 25,
-                        }}
-                    >
-                        {downPayment}
-                    </Text>
-                </View>
-                <View
-                    style={{
-                        backgroundColor: "rgba(7, 74, 116, 0.63)",
-                        height: 100,
-                        alignItems: "center",
-                        paddingVertical: 15,
-                    }}
-                >
-                    <Text
-                        style={{
-                            color: "white",
-                            fontFamily: "Montserrat_600SemiBold",
-                            fontSize: 12,
-                            marginBottom: 10,
-                            textAlign: "center",
-                        }}
-                    >
-                        {repayment === "₦0.00" ? "" : `Your Monthly Repayment for the next ${sliderValue} months`}
-                    </Text>
-                    <Text
-                        style={{
-                            color: "white",
-                            fontFamily: "Montserrat_800ExtraBold",
-                            fontSize: 25,
-                        }}
-                    >
-                        {repayment}
-                    </Text>
-                </View>
-                <Pressable
-                    style={
-                        downPayment === "₦0.00"
-                            ? [
-                                  {
-                                      backgroundColor: "rgba(7, 74, 116, 0.63)",
-                                  },
-                                  styles.button,
-                              ]
-                            : [
-                                  {
-                                      backgroundColor: "#074A74",
-                                  },
-                                  styles.button,
-                              ]
-                    }
-                    onPress={doSome}
-                    disabled={downPayment === "₦0.00"}
-                >
-                    {loader ? (
                         <View
                             style={{
+                                flexDirection: "row",
+                                backgroundColor: "white",
                                 alignItems: "center",
-                                justifyContent: "center",
-                                backgroundColor: "transparent",
                             }}
                         >
-                            <Image source={require("../assets/gifs/loader.gif")} style={{ width: 60, height: 27 }} />
+                            <Switch
+                                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                thumbColor={isBiMonthly ? "#074A74" : "#f4f3f4"}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={toggleSwitchM}
+                                value={isBiMonthly}
+                            />
+                            <Text style={{ color: "#074A74" }}>Bi-Monthly</Text>
                         </View>
-                    ) : (
-                        <Text style={{ fontSize: 16, fontFamily: "Montserrat_600SemiBold" }}>Apply</Text>
-                    )}
-                </Pressable>
+                        <View
+                            style={{
+                                flexDirection: "row",
+                                backgroundColor: "white",
+                                alignItems: "center",
+                            }}
+                        >
+                            <Switch
+                                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                thumbColor={isCollateral ? "#074A74" : "#f4f3f4"}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={toggleSwitchC}
+                                value={isCollateral}
+                            />
+                            <Text style={{ color: "#074A74" }}>Collateral</Text>
+                        </View>
+                    </View>
+                </View>
+                <View style={styles.section}>
+                    <View
+                        style={{
+                            backgroundColor: "#D9D9D9",
+                            alignItems: "center",
+                            paddingVertical: 15,
+                            height: 100,
+                            borderRadius: 10,
+                            marginVertical: 5,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                color: "#074A74",
+                                fontFamily: "Montserrat_500Medium",
+                                fontSize: 10,
+                                marginBottom: 10,
+                            }}
+                        >
+                            {downPayment === "₦0.00" ? "" : "Your Downpayment"}
+                        </Text>
+                        <Text
+                            style={{
+                                color: "#074A74",
+                                fontFamily: "Montserrat_800ExtraBold",
+                                fontSize: 25,
+                            }}
+                        >
+                            {downPayment}
+                        </Text>
+                    </View>
+                    <View
+                        style={{
+                            backgroundColor: "rgba(7, 74, 116, 0.63)",
+                            height: 100,
+                            alignItems: "center",
+                            paddingVertical: 15,
+                            borderRadius: 10,
+                            marginVertical: 5,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                color: "white",
+                                fontFamily: "Montserrat_600SemiBold",
+                                fontSize: 12,
+                                marginBottom: 10,
+                                textAlign: "center",
+                            }}
+                        >
+                            {repayment === "₦0.00" ? "" : `Your Monthly Repayment for the next ${sliderValue} months`}
+                        </Text>
+                        <Text
+                            style={{
+                                color: "white",
+                                fontFamily: "Montserrat_800ExtraBold",
+                                fontSize: 25,
+                            }}
+                        >
+                            {repayment}
+                        </Text>
+                    </View>
+                </View>
+
+                <View style={styles.section}>
+                    <Pressable
+                        style={
+                            downPayment === "₦0.00"
+                                ? [
+                                      {
+                                          backgroundColor: "rgba(7, 74, 116, 0.63)",
+                                      },
+                                      styles.button,
+                                  ]
+                                : [
+                                      {
+                                          backgroundColor: "#074A74",
+                                      },
+                                      styles.button,
+                                  ]
+                        }
+                        onPress={doSome}
+                        disabled={downPayment === "₦0.00"}
+                    >
+                        {loader ? (
+                            <View
+                                style={{
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    backgroundColor: "transparent",
+                                }}
+                            >
+                                <Image source={require("../assets/gifs/loader.gif")} style={{ width: 60, height: 27 }} />
+                            </View>
+                        ) : (
+                            <Text style={{ fontSize: 16, fontFamily: "Montserrat_600SemiBold", textAlign: "center" }}>Apply</Text>
+                        )}
+                    </Pressable>
+                </View>
             </View>
         </View>
     );
@@ -328,12 +368,15 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 30,
     },
+    section: {
+        backgroundColor: "transparent",
+    },
     calculator: {
         flex: 1,
-
         marginTop: 20,
         backgroundColor: "white",
         paddingHorizontal: 20,
+        justifyContent: "space-between",
     },
     header: {
         fontFamily: "Montserrat_800ExtraBold",
@@ -356,15 +399,12 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     button: {
-        alignItems: "center",
+        alignSelf: "center",
         paddingVertical: 15,
         borderRadius: 5,
         marginVertical: 10,
-        position: "absolute",
-        bottom: 0,
-        right: Dimensions.get("window").width * 0.1,
         width: Dimensions.get("window").width * 0.8,
-        justifyContent: "center",
+        textAlign: "center",
     },
     label: {
         color: "#074A74",

@@ -1,0 +1,47 @@
+[
+    {
+        "id": 1,
+        "name": "Loan Request",
+        "slug": "loan_request"
+    },
+    {
+        "id": 2,
+        "name": "Send Verfication",
+        "slug": "send_verification"
+    },
+    {
+        "id": 3,
+        "name": "Make Downpayment",
+        "slug": "make_downpayment"
+    },
+    {
+        "id": 4,
+        "name": "Edit Profile",
+        "slug": "edit_profile"
+    },
+    {
+        "id": 5,
+        "name": "Upload Documents",
+        "slug": "upload_documents"
+    },
+    {
+        "id": 6,
+        "name": "View Loan Details",
+        "slug": "view_loan_details"
+    },
+    {
+        "id": 7,
+        "name": "Make Repayment",
+        "slug": "make_repayment"
+    },
+    {
+        "id": 9,
+        "name": "Navigate to calculator",
+        "slug": "navigate_to_calculator"
+    },
+    {
+        "id": 8,
+        "name": "Navigate to upload",
+        "slug": "navigate_to_upload"
+    }
+]

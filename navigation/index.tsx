@@ -5,6 +5,7 @@
  */
 import AntDesign from "@expo/vector-icons/AntDesign";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { SimpleLineIcons } from '@expo/vector-icons';
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -41,6 +42,11 @@ import { FlagsProvider } from "flagged";
 import OrderDetails from "../screens/OrderDetails";
 import ViewNotification from "../screens/ViewNotification";
 import Calculator from "../screens/Calculator";
+import OrderConfirmation from "../screens/OrderConfirmation";
+import OrderSuccess from "../screens/OrderSuccess";
+import VerificationPassed from "../screens/VerificationPassed";
+import VerificationPending from "../screens/VerificationPending";
+import { Support } from "../screens/Support";
 const url = process.env.EXPO_PUBLIC_API_URL;
 
 axios.defaults.baseURL = url;
@@ -136,6 +142,11 @@ function RootNavigator() {
                 <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: "Oops!" }} />
                 <Stack.Screen name="OrderDetails" component={OrderDetails} options={{ headerShown: false }} />
                 <Stack.Screen name="ViewNotification" component={ViewNotification} options={{ headerShown: false }} />
+                <Stack.Screen name="OrderConfirmation" component={OrderConfirmation} options={{ headerShown: false }} />
+                <Stack.Screen name="VerificationPassed" component={VerificationPassed} options={{ headerShown: false }} />
+                <Stack.Screen name="VerificationPending" component={VerificationPending} options={{ headerShown: false }} />
+
+                <Stack.Screen name="OrderSuccess" component={OrderSuccess} options={{ headerShown: false }} />
                 <Stack.Screen name="Calculator" component={Calculator} options={{ headerShown: false }} />
                 <Stack.Screen name="Cards" component={Cards} options={{ headerShown: false }} />
 
@@ -159,8 +170,8 @@ const DrawerNav = createDrawerNavigator<DrawerParamList>();
 function DrawerNavigator() {
     const { authData } = useContext(AuthContext);
     const [user, setUser] = useState(null);
-    const [uploaded, setUploaded] = useState<boolean>(false);  
-    
+    const [uploaded, setUploaded] = useState<boolean>(false);
+
     return (
         <DrawerNav.Navigator
             initialRouteName={authData?.user?.attributes?.on_boarded ? "Home" : "CreateProfile"}
@@ -231,6 +242,17 @@ function DrawerNavigator() {
                     }}
                 />
             )}
+
+            <DrawerNav.Screen
+                name="Support"
+                component={Support}
+                options={{
+                    drawerLabelStyle: { color: "#9C9696" },
+                    headerShown: false,
+                    drawerLabel: "Help & Support",
+                    drawerIcon: () => <SimpleLineIcons name="support" size={24} color="#9C9696" />,
+                }}
+            />
         </DrawerNav.Navigator>
     );
 }

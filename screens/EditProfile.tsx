@@ -48,6 +48,8 @@ export default function Dashboard({ navigation }: Props) {
         city?: string;
         date_of_registration?: string;
         employment_status;
+        date_of_birth?: string;
+        civil_status?: string;
         gender?: string;
         on_boarded?: boolean;
         phone_number?: string;
@@ -128,7 +130,7 @@ export default function Dashboard({ navigation }: Props) {
     const fetchUser = async () => {
         setLoading2(true);
         try {
-            const fetchedUser = authData?.user?.attributes
+            const fetchedUser = authData?.user?.attributes;
             setUser(fetchedUser);
             const { reg_id, middle_name, email_address, on_boarded, staff_id, ...rest } = fetchedUser || ({} as Obj);
             setUserData({ ...rest, ...{ state: "none" } });
@@ -139,7 +141,6 @@ export default function Dashboard({ navigation }: Props) {
             setLoading2(false);
         }
     };
-
 
     const prefilledData = (data) => {
         return data == "N/A" ? "" : data;
@@ -186,7 +187,7 @@ export default function Dashboard({ navigation }: Props) {
     }, [userData]);
 
     return (
-        <View style={styles.container}> 
+        <View style={styles.container}>
             {showMenu && <SideMenu Logout="Logout" />}
             <View style={styles.header}>
                 <Header navigation={navigation}></Header>
