@@ -31,15 +31,18 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
                 </View>
 
                 <View style={{ flexDirection: "row", backgroundColor: "transparent" }}>
-                    <LinearGradient colors={["#fff", "#DADADA"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
-                        <Pressable style={[styles.button]} onPress={performAction}>
-                            <Text
-                                style={[styles.buttonText, { color: "#074A74" }, creditChecker?.id && { color: statesColor[creditChecker.status] }]}
-                            >
-                                {haveActiveOrder ? "Track Order" : creditChecker?.status ? creditChecker.status : "Request Loan"}
-                            </Text>
-                        </Pressable>
-                    </LinearGradient>
+                    {(!haveActiveOrder && creditChecker?.status !== "pending" && creditChecker?.status !== "passed") && (
+                        <LinearGradient colors={["#fff", "#DADADA"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
+                            <Pressable style={[styles.button]} onPress={performAction}>
+                                <Text
+                                    style={[styles.buttonText, { color: "#074A74" }, creditChecker?.id && { color: statesColor[creditChecker.status] }]}
+                                >
+                                    {haveActiveOrder ? "Track Order" : creditChecker?.status === "pending" ? "" : creditChecker?.status ? creditChecker?.status : "Request Loan"}
+                                </Text>
+                            </Pressable>
+                        </LinearGradient>
+                    )}
+
                 </View>
             </View>
             {haveActiveOrder && (
