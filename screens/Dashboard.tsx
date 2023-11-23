@@ -66,7 +66,6 @@ export default function Dashboard({ navigation }: Props) {
         setOrders(order);
         setUser(user);
         let cCheck = user?.included?.creditCheckerVerifications.splice(-1)[0];
-        console.log(cCheck, "user");
         setCreditChecker(cCheck);
         setHasActiveOrder(order?.included?.orderStatus?.name === "Active");
         setHasCompletedOrder(order?.included?.orderStatus.name === "Completed");
@@ -80,7 +79,6 @@ export default function Dashboard({ navigation }: Props) {
         setAmortization(filteredAmoritzation);
         await recentActivity();
         let details = await previewOrder(cCheck?.id);
-        console.log(details)
         await fetchCalculator(details);
 
 
@@ -106,7 +104,6 @@ export default function Dashboard({ navigation }: Props) {
     };
 
     const fetchCalculator = async (details) => {
-        console.log('i got here');
         try {
             const response = await axios({
                 method: "GET",
@@ -132,11 +129,9 @@ export default function Dashboard({ navigation }: Props) {
                     x.repayment_duration_id === rDur.id
                 );
             });
-            console.log(params, 'params');
 
             if (params) {
                 const { total, actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(details?.product?.retail_price, data, params, 0);
-                console.log(total, actualDownpayment, rePayment, biMonthlyRepayment, orderDetails)
                 setProspectiveLoan({
                     loan_requested: details?.product?.retail_price,
                     actual_amount: total,
