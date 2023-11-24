@@ -16,6 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import businessTypes from "../lib/calculator.json";
 import repaymentDurations from "../lib/repaymentDuration.json";
 import { cashLoan } from "../lib/calculator";
+import { Feather } from "@expo/vector-icons";
 
 type Props = RootStackScreenProps<"Dashboard">;
 
@@ -133,7 +134,7 @@ export default function Dashboard({ navigation }: Props) {
             if (params) {
                 const { total, actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(details?.product?.retail_price, data, params, 0);
                 setProspectiveLoan({
-                    loan_requested: details?.product?.retail_price,
+                    loan_requested: details?.product?.retail_price, 
                     actual_amount: total,
                     down_payment: actualDownpayment,
                     repayment: rePayment
@@ -430,10 +431,11 @@ export default function Dashboard({ navigation }: Props) {
                                         },
                                     ]}
                                 >
-                                    <Image
+                                    {/* <Image
                                         source={require("../assets/gifs/orderCompleted.gif")}
                                         style={{ width: Dimensions.get("window").width * 0.2, height: Dimensions.get("window").height * 0.1 }}
-                                    />
+                                    /> */}
+                                    <Feather name="check-circle" size={Dimensions.get("window").height * 0.1} color="green" />
                                     <View
                                         style={{
                                             backgroundColor: "transparent",
@@ -441,7 +443,7 @@ export default function Dashboard({ navigation }: Props) {
                                             width: Dimensions.get("window").width * 0.6,
                                         }}
                                     >
-                                        <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>You have been verified successfully</Text>
+                                        <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Your request has been approved. Click the button to proceed to pay downpayment</Text>
 
 
 
@@ -755,8 +757,9 @@ const styles = StyleSheet.create({
         width: 120,
         height: 40,
         alignSelf: "flex-end",
-        marginRight: 20,
-        marginTop: 20,
+        marginRight: 10,
+        marginVertical: 10,
+
     },
     button: {
         paddingVertical: 4,
