@@ -13,7 +13,6 @@ import repaymentDurations from "../lib/repaymentDuration.json";
 import { Ionicons } from "@expo/vector-icons";
 import { logActivity } from "../utilities/globalFunctions";
 
-// import {cashLoan, calculate} from '../lib/calculator';
 const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 
@@ -55,7 +54,7 @@ export default function Calculator({ navigation }: Props) {
     async function doSome() {
         await logActivity(authData.token, 8);
 
-        navigation.navigate("UploadDocument", {
+        navigation.navigate("Guarantors", {
             down_payment: parseInt(downPayment.replace(/[^0-9]/g, ""), 10),
             loan_amount: inputValue,
             repayment: completeRepayment,

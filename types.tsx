@@ -33,6 +33,8 @@ export type RootStackParamList = {
     Cards: { order: string };
     OrderRequest: { order: string };
     Calculator: { order: object };
+    Guarantors: {};
+
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, Screen>;
@@ -53,6 +55,7 @@ export type RootTabParamList = {
     OrderConfirmation: { order: object };
     OrderSuccess: { order: object };
     Calculator: { order: object };
+    Guarantors: {};
 };
 
 export type DrawerParamList = {

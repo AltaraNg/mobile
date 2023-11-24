@@ -47,6 +47,7 @@ import OrderSuccess from "../screens/OrderSuccess";
 import VerificationPassed from "../screens/VerificationPassed";
 import VerificationPending from "../screens/VerificationPending";
 import { Support } from "../screens/Support";
+import Guarantors from "../screens/Guarantors";
 const url = process.env.EXPO_PUBLIC_API_URL;
 
 axios.defaults.baseURL = url;
@@ -148,6 +149,7 @@ function RootNavigator() {
 
                 <Stack.Screen name="OrderSuccess" component={OrderSuccess} options={{ headerShown: false }} />
                 <Stack.Screen name="Calculator" component={Calculator} options={{ headerShown: false }} />
+                <Stack.Screen name="Guarantors" component={Guarantors} options={{ headerShown: false }} />
                 <Stack.Screen name="Cards" component={Cards} options={{ headerShown: false }} />
 
                 <Stack.Group
