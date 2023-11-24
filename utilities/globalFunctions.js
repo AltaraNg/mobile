@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const logActivity = async (token, activity_id) => {
     try {
-        const result = await axios({
+        await axios({
             method: "POST",
             url: `/app/audit`,
             headers: { Authorization: `Bearer ${token}` },
@@ -11,9 +11,14 @@ export const logActivity = async (token, activity_id) => {
                 meta: {},
             },
         });
-    } catch (error) {}
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 export const formatAsMoney = (figure) => {
-    return figure?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return figure
+        ?.toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
