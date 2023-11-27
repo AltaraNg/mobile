@@ -1,17 +1,14 @@
+import React from "react";
 import { RefreshControl, StyleSheet, Dimensions, FlatList, Pressable, Image } from "react-native";
-
 import { LinearGradient } from "expo-linear-gradient";
 import { useState, useContext, useEffect } from "react";
-import { Overlay } from "react-native-elements";
 import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { OrderStatusPass, OrderStatusFail, OrderStatusPending, BackButton } from "../assets/svgs/svg";
-import Animated from "react-native-reanimated";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import { get, post } from "../utilities/api";
-import AmortizationObject from "../components/AmortizationObject";
+import { Verified } from "../assets/svgs/svg";
+import { formatAsMoney } from "../utilities/globalFunctions";
 import { Ionicons } from "@expo/vector-icons";
 
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
@@ -25,12 +22,8 @@ export default function VerificationPassed({ navigation, route }: Props) {
     const { authData, showLoader, setShowLoader } = useContext(AuthContext);
     const [orderDetails, setOrderDetails] = useState({});
     const [amortization, setAmortization] = useState(null);
-    const [refreshing, setRefreshing] = useState(false);
-
+    const refreshing = false;
     const creditChecker = route.params;
-
-    const width = Dimensions.get("window").width;
-    const height = Dimensions.get("window").height;
 
     const goBack = () => {
         navigation.goBack();
@@ -43,7 +36,7 @@ export default function VerificationPassed({ navigation, route }: Props) {
                 url: `/credit-check-verification/${creditChecker?.id}`,
                 headers: { Authorization: `Bearer ${authData.token}` },
             });
-            let details = result.data.data.creditCheckerVerification;
+            const details = result.data.data.creditCheckerVerification;
             const getAmort = await instance({
                 method: "POST",
                 headers: { "LOAN-APP-API-KEY": loanAppKey },
@@ -59,11 +52,14 @@ export default function VerificationPassed({ navigation, route }: Props) {
             setOrderDetails(details);
             setAmortization(getAmort.data.data.preview);
             setShowLoader(false);
-        } catch (error) {}
+        } catch (error) {
+            setShowLoader(false);
+            throw error;
+        }
     };
 
     const payDown = () => {
-        let data: object = {
+        const data: object = {
             credit_checker_verification_id: orderDetails?.id,
             product_price: parseInt(orderDetails?.product?.retail_price),
             down_payment: (parseInt(orderDetails?.product.retail_price) * orderDetails?.down_payment_rate.percent) / 100,
@@ -85,42 +81,109 @@ export default function VerificationPassed({ navigation, route }: Props) {
             ) : (
                 <View style={styles.container}>
                     <View
-                    style={{
-                        backgroundColor: "transparent",
-                        // marginLeft:
-                    }}
-                >
-                    <Pressable onPress={goBack} style={{
-                        width: '20%'
-                    }}>
-                        <Ionicons name="ios-arrow-back-circle" size={30} color="#074A74" />
-                    </Pressable>
-                </View>
-                    <Text style={styles.header}>Verified successfully</Text>
+                        style={{
+                            backgroundColor: "transparent",
+                            paddingVertical: 20,
+                            position: "relative",
+                        }}
+                    >
+                        <Pressable
+                            onPress={goBack}
+                            style={{
+                                width: "20%",
+                                padding: 15,
+                                position: "absolute",
+                                bottom: 0,
+                                zIndex: 10,
+                            }}
+                        >
+                            <Ionicons name="ios-arrow-back-circle" size={30} color="#074A74" />
+                        </Pressable>
+                        <View
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                flexDirection: "row",
+                                justifyContent: "center",
+                                backgroundColor: "transparent",
+                            }}
+                        >
+                            <Text style={[styles.header, { marginRight: 3 }]}>Verified</Text>
+                            <Verified />
+                        </View>
+                    </View>
+
                     <View style={styles.cardContainer}>
-                        <Text style={styles.headerText}>Order Details</Text>
-                        <Text style={styles.modalText}>Product: {`₦${orderDetails?.product?.retail_price}`} loan</Text>
-                        <Text style={styles.modalText}>
-                            Downpayment: {`₦${(parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100}`}
+                        <Image style={[styles.leaf, { bottom: 0 }]} source={require("../assets/images/big_leaf.png")} />
+                        <Image style={[styles.leaf, { left: 0 }]} source={require("../assets/images/leaf.png")} />
+                        <Text style={[styles.modalText, { textAlign: "right" }]}>
+                            Downpayment:{" "}
+                            <Text style={{ fontFamily: "Montserrat_700Bold" }}>
+                                {" "}
+                                {`₦${formatAsMoney(
+                                    (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100
+                                )}`}
+                            </Text>
                         </Text>
-                        <Text style={styles.modalText}>
+                        <View style={{ backgroundColor: "transparent" }}>
+                            <Text style={[styles.modalText, { lineHeight: 15 }]}>Loan Amount:</Text>
+                            <Text style={[styles.modalText, { fontSize: 22, fontFamily: "Montserrat_700Bold", lineHeight: 25 }]}>{`₦${formatAsMoney(
+                                parseFloat(orderDetails?.product?.retail_price)
+                            )}`}</Text>
+                        </View>
+
+                        <Text style={[styles.modalText, { textAlign: "right" }]}>
                             Total Repayment:{" "}
-                            {`₦${
-                                parseInt(orderDetails?.product?.retail_price) -
-                                (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100
-                            }`}
+                            <Text style={{ fontFamily: "Montserrat_700Bold" }}>
+                                {`₦${formatAsMoney(
+                                    parseInt(orderDetails?.product?.retail_price) -
+                                        (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100
+                                )}`}
+                            </Text>{" "}
                         </Text>
                     </View>
 
                     <View style={styles.container}>
-                    <Text style={styles.amorHeader}>Repayments</Text>
-                        <FlatList
-                            scrollEnabled={true}
-                            data={amortization}
-                            keyExtractor={(item: any) => item.id}
-                            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={previewOrder} />}
-                            renderItem={({ item }) => <AmortizationObject item={item} />}
-                        />
+                        <View
+                            style={{
+                                backgroundColor: "transparent",
+                                padding: 15,
+                                marginHorizontal: 20,
+                                borderRadius: 2,
+                                paddingBottom: 40,
+                                shadowColor: "#D9D9D9",
+                                elevation: 2,
+                            }}
+                        >
+                            <Text style={[styles.amorHeader, { textAlign: "left", color: "#474A57" }]}>Repayments</Text>
+                            <FlatList
+                                scrollEnabled={true}
+                                data={amortization}
+                                numColumns={2}
+                                keyExtractor={(item, index) => index.toString()}
+                                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={previewOrder} />}
+                                renderItem={({ item }) => (
+                                    <View
+                                        style={{
+                                            backgroundColor: "transparent",
+                                            padding: 15,
+                                            borderRadius: 2,
+                                            width: "50%",
+                                            borderColor: "#D9D9D9",
+                                            borderWidth: 1,
+                                            shadowColor: "#D9D9D9",
+                                        }}
+                                    >
+                                        <Text style={{ color: "#474A57", textAlign: "center", fontSize: 12 }}>
+                                            {new Date(item.expected_payment_date).toLocaleDateString()}
+                                        </Text>
+                                        <Text
+                                            style={{ color: "#474A57", textAlign: "center", fontFamily: "Montserrat_600SemiBold" }}
+                                        >{`₦${formatAsMoney(item.expected_amount)}`}</Text>
+                                    </View>
+                                )}
+                            />
+                        </View>
                     </View>
                     <LinearGradient colors={["#074A74", "#089CA4"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
                         <Pressable style={styles.button} onPress={payDown}>
@@ -145,13 +208,13 @@ const styles = StyleSheet.create({
         color: "#9C9696",
     },
     modalText: {
-        color: "#074A74",
-        fontFamily: "Montserrat_500Medium",
+        color: "white",
+        fontFamily: "Montserrat_400Regular",
         marginTop: 5,
         marginHorizontal: 10,
-        fontSize: 15,
+        fontSize: 12,
         textAlign: "left",
-        lineHeight: 35,
+        lineHeight: 20,
         display: "flex",
     },
     total: {
@@ -168,9 +231,8 @@ const styles = StyleSheet.create({
     },
     header: {
         backgroundColor: "white",
-        padding: 20,
-        fontSize: 25,
-        color: '#074A74',
+        fontSize: 18,
+        color: "#4A525C",
 
         flexDirection: "row",
         justifyContent: "flex-start",
@@ -263,16 +325,19 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         marginHorizontal: 10,
     },
+    leaf: {
+        position: "absolute",
+        right: 0,
+    },
     cardContainer: {
-        height: 200,
-        width: 350,
-        backgroundColor: "#EAFFED",
-        borderRadius: 5,
+        height: 120,
+        width: Dimensions.get("screen").width * 0.91,
+        backgroundColor: "#074A74",
+        borderRadius: 2,
         marginBottom: 10,
         marginTop: 10,
-        padding: 10,
+        padding: 7,
         alignSelf: "center",
-        paddingLeft: 15,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.8,
@@ -289,7 +354,7 @@ const styles = StyleSheet.create({
         color: "#074A74",
         fontSize: 19,
         marginVertical: 5,
-        textAlign: 'center'
+        textAlign: "center",
     },
     statusBar: {
         height: 15,
