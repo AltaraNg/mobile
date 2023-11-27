@@ -120,23 +120,25 @@ export default function VerificationPassed({ navigation, route }: Props) {
                             Downpayment:{" "}
                             <Text style={{ fontFamily: "Montserrat_700Bold" }}>
                                 {" "}
-                                {`₦${((parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100).toFixed(2)}`}
+                                {`₦${formatAsMoney(
+                                    (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100
+                                )}`}
                             </Text>
                         </Text>
                         <View style={{ backgroundColor: "transparent" }}>
                             <Text style={[styles.modalText, { lineHeight: 15 }]}>Loan Amount:</Text>
-                            <Text style={[styles.modalText, { fontSize: 22, fontFamily: "Montserrat_700Bold", lineHeight: 25 }]}>{`₦${parseFloat(
-                                orderDetails?.product?.retail_price
-                            ).toFixed(2)}`}</Text>
+                            <Text style={[styles.modalText, { fontSize: 22, fontFamily: "Montserrat_700Bold", lineHeight: 25 }]}>{`₦${formatAsMoney(
+                                parseFloat(orderDetails?.product?.retail_price)
+                            )}`}</Text>
                         </View>
 
                         <Text style={[styles.modalText, { textAlign: "right" }]}>
                             Total Repayment:{" "}
                             <Text style={{ fontFamily: "Montserrat_700Bold" }}>
-                                {`₦${(
+                                {`₦${formatAsMoney(
                                     parseInt(orderDetails?.product?.retail_price) -
-                                    (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100
-                                ).toFixed(2)}`}
+                                        (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100
+                                )}`}
                             </Text>{" "}
                         </Text>
                     </View>
