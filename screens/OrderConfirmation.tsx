@@ -32,8 +32,8 @@ export default function OrderConfirmation({ navigation, route }: Props) {
                 headers: { "LOAN-APP-API-KEY": loanAppKey },
                 data: order,
             });
-            setShowLoader(false);
             navigation.navigate("PaymentCompleted");
+            setShowLoader(false);
         } catch (error) {
             // navigation.navigate("Dashboard");
         }
