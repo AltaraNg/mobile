@@ -5,11 +5,11 @@
  */
 import AntDesign from "@expo/vector-icons/AntDesign";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import { SimpleLineIcons } from '@expo/vector-icons';
+import { SimpleLineIcons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useRef } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import { ColorSchemeName } from "react-native";
@@ -42,6 +42,7 @@ import { FlagsProvider } from "flagged";
 import OrderDetails from "../screens/OrderDetails";
 import ViewNotification from "../screens/ViewNotification";
 import Calculator from "../screens/Calculator";
+import PaymentCompleted from "../screens/PaymentCompleted";
 import OrderConfirmation from "../screens/OrderConfirmation";
 import OrderSuccess from "../screens/OrderSuccess";
 import VerificationPassed from "../screens/VerificationPassed";
@@ -70,8 +71,7 @@ function getHeaderTitle(route) {
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
     const navigationRef = useNavigationContainerRef();
     const routeNameRef = useRef<string | null>(null);
-    const app_id = process.env.EXPO_PUBLIC_APP_ID;
-    const app_token = process.env.EXPO_PUBLIC_APP_TOKEN;
+
     return (
         <AuthProvider>
             <OrderProvider>
@@ -83,7 +83,6 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
                         //when you switch routes set the name of the current screen to the name of the screen
                     }}
                     onStateChange={async () => {
-                        const previousRouteName = routeNameRef.current;
                         const currentRouteName = navigationRef.getCurrentRoute()?.name;
 
                         // if (previousRouteName !== currentRouteName) {
@@ -145,11 +144,10 @@ function RootNavigator() {
                 <Stack.Screen name="OrderConfirmation" component={OrderConfirmation} options={{ headerShown: false }} />
                 <Stack.Screen name="VerificationPassed" component={VerificationPassed} options={{ headerShown: false }} />
                 <Stack.Screen name="VerificationPending" component={VerificationPending} options={{ headerShown: false }} />
-
                 <Stack.Screen name="OrderSuccess" component={OrderSuccess} options={{ headerShown: false }} />
                 <Stack.Screen name="Calculator" component={Calculator} options={{ headerShown: false }} />
+                <Stack.Screen name="PaymentCompleted" component={PaymentCompleted} options={{ headerShown: false }} />
                 <Stack.Screen name="Cards" component={Cards} options={{ headerShown: false }} />
-
                 <Stack.Group
                     screenOptions={{
                         presentation: "transparentModal",
@@ -169,8 +167,7 @@ const DrawerNav = createDrawerNavigator<DrawerParamList>();
 
 function DrawerNavigator() {
     const { authData } = useContext(AuthContext);
-    const [user, setUser] = useState(null);
-    const [uploaded, setUploaded] = useState<boolean>(false);
+    const uploaded = false;
 
     return (
         <DrawerNav.Navigator
@@ -272,7 +269,7 @@ function DrawerNavigator() {
 const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
 function BottomTabNavigator() {
-    const { totalUnread, fetchNotification } = useAuth();
+    const { totalUnread } = useAuth();
 
     // fetchNotification();
     return (
