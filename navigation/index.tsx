@@ -71,8 +71,7 @@ function getHeaderTitle(route) {
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
     const navigationRef = useNavigationContainerRef();
     const routeNameRef = useRef<string | null>(null);
-    // const app_id = process.env.EXPO_PUBLIC_APP_ID;
-    // const app_token = process.env.EXPO_PUBLIC_APP_TOKEN;
+
     return (
         <AuthProvider>
             <OrderProvider>
@@ -84,7 +83,6 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
                         //when you switch routes set the name of the current screen to the name of the screen
                     }}
                     onStateChange={async () => {
-                        //const previousRouteName = routeNameRef.current;
                         const currentRouteName = navigationRef.getCurrentRoute()?.name;
 
                         // if (previousRouteName !== currentRouteName) {
@@ -169,7 +167,6 @@ const DrawerNav = createDrawerNavigator<DrawerParamList>();
 
 function DrawerNavigator() {
     const { authData } = useContext(AuthContext);
-    //  const [user, setUser] = useState(null);
     const uploaded = false;
 
     return (
