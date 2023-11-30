@@ -30,13 +30,17 @@ export default function FormItem({guarantor, index}) {
                             fontSize: 16
                         }}>{index+1}{getOrdinal(index+1)} Guarantor</Text>
                     </View>
-
+                    <View style={{backgroundColor: "trransparent", flexDirection: 'row'}}>
                     {expanded ? (<FontAwesome name="caret-up" size={24} color="#074A74" style={{ justifyContent: "flex-end" }} />) : (<FontAwesome name="caret-down" size={24} color="#074A74" style={{ justifyContent: "flex-end" }} />)}
+                    <FontAwesome name="trash" size={24} color="#DB2721" style={{marginLeft: 20}} />
+                    </View>
+                    
                 </View>
 
             </TouchableWithoutFeedback>
             <CollapsableContainer expanded={expanded}>
-                <View style={{ marginTop: 20, backgroundColor: 'transparent' }}>
+                <View style={{ marginTop: 20, backgroundColor: 'transparent', 
+            marginHorizontal: 0 }}>
                     <View style={styles.data}>
                         <Text style={[styles.label]}>First Name</Text>
                         <TextInput

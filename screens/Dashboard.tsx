@@ -332,7 +332,7 @@ export default function Dashboard({ navigation }: Props) {
                                             <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
                                                 <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Amount</Text>
                                                 <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
-                                                    {`₦${formatAsMoney(orderDetails?.product?.retail_price)}`}
+                                                    {`₦${formatAsMoney(parseInt(orderDetails?.product?.retail_price))}`}
                                                 </Text>
                                             </View>
                                             <View style={{ backgroundColor: "transparent" }}>
@@ -340,7 +340,7 @@ export default function Dashboard({ navigation }: Props) {
                                                 <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
                                                     {`₦${formatAsMoney(
                                                         (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) /
-                                                            100
+                                                        100
                                                     )}`}
                                                 </Text>
                                             </View>

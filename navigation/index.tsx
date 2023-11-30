@@ -148,6 +148,7 @@ function RootNavigator() {
                 <Stack.Screen name="OrderSuccess" component={OrderSuccess} options={{ headerShown: false }} />
                 <Stack.Screen name="Calculator" component={Calculator} options={{ headerShown: false }} />
                 <Stack.Screen name="Guarantors" component={Guarantors} options={{ headerShown: false }} />
+                <Stack.Screen name="UploadDocument" component={UploadDocument} options={{ headerShown: false }} />
                 <Stack.Screen name="PaymentCompleted" component={PaymentCompleted} options={{ headerShown: false }} />
                 <Stack.Screen name="Cards" component={Cards} options={{ headerShown: false }} />
                 <Stack.Group

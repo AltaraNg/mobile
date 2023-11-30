@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, ToastAndroid } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { View, Text, StyleSheet, Image, ToastAndroid, TouchableOpacity } from "react-native";
 import { ArrowUp } from "../assets/svgs/svg";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { logActivity } from "../utilities/globalFunctions";
 export default function Upload(props) {
     const url = process.env.EXPO_PUBLIC_API_URL;
     axios.defaults.baseURL = url;

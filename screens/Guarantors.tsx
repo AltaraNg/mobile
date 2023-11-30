@@ -1,30 +1,37 @@
-import React from "react";
 import { Dimensions, Image, Pressable, StyleSheet, Switch, ToastAndroid } from "react-native";
 
 import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import CurrencyInput from "react-native-currency-input";
 import { useContext, useEffect, useState } from "react";
 import Leaf from "../assets/svgs/leaf.svg";
 
 import axios from "axios";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { BackButton, BackButton2 } from "../assets/svgs/svg";
 import FormItem from "../components/FormItem";
+import { LinearGradient } from "expo-linear-gradient";
+import { logActivity } from "../utilities/globalFunctions";
+
 
 const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 
-type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
+type Props = NativeStackScreenProps<RootStackParamList, "UploadDocument">;
 
-export default function Guarantors({ navigation }: Props) {
-    const [guarantorList, setGuarantorList] = useState([{}])
+export default function Guarantors({ navigation, route }: Props) {
+    const [guarantorList, setGuarantorList] = useState([{}]);
+    const [loading, setLoading] = useState(false);
+    const orderDetails: { down_payment: number; loan_amount: number; repayment: number; repayment_cycle_id } = route.params;
+
     const goBack = () => {
         navigation.goBack();
     };
     const addMore = () => {
         setGuarantorList([...guarantorList, {}])
+    };
+    const goToUploads = () => {
+        console.log("I got here")
+        navigation.navigate("UploadDocument", orderDetails);
     }
 
 
@@ -55,45 +62,76 @@ export default function Guarantors({ navigation }: Props) {
 
             </View>
             <View style={styles.overlay}>
-                <View style={styles.textHeader}>
-                    <Text style={{
-                        textAlign: 'center',
-                        color: '#074A74',
-                        fontFamily: "Montserrat_700Bold",
-                        fontSize: 22
-                    }}>Enter Your Guarantors</Text>
-                    <Text style={{
-                        textAlign: 'center',
-                        fontFamily: 'Roboto',
-                        fontWeight: "500",
-                        color: "#474A57",
-                        fontSize: 15
+                <View style={{
+                    backgroundColor: "transparent"
+                }}>
+                    <View style={styles.textHeader}>
+                        <Text style={{
+                            textAlign: 'center',
+                            color: '#074A74',
+                            fontFamily: "Montserrat_700Bold",
+                            fontSize: 22
+                        }}>Enter Your Guarantors</Text>
+                        <Text style={{
+                            textAlign: 'center',
+                            fontFamily: 'Roboto',
+                            fontWeight: "500",
+                            color: "#474A57",
+                            fontSize: 15
 
+                        }}>
+                            Click + to add more
+                        </Text>
+                    </View>
+
+                    <View style={{ backgroundColor: "transparent", marginHorizontal: 0 }}>
+                        {guarantorList.map((guarantor, index) => (
+                            <FormItem key={index} guarantor={guarantor} index={index}></FormItem>
+                        ))}
+
+                    </View>
+                </View>
+                <View
+                    style={{
+                        backgroundColor: "transparent",
+                        flexDirection: "column"
                     }}>
-                        Click + to add more
-                    </Text>
+
+                    {guarantorList.length < 2 && (
+                        <Pressable style={{
+                            backgroundColor: "transparent",
+                            alignSelf: "flex-end",
+                            marginHorizontal: 20,
+                            marginVertical: 30
+
+
+                        }} onPress={addMore}>
+                            <AntDesign name="pluscircle" size={36} color="#074A74" />
+
+                        </Pressable>
+                    )}
+                    <LinearGradient
+                        colors={["#074A74", "#089CA4"]}
+                        style={styles.buttonContainer}
+                        start={{ x: 1, y: 0.5 }}
+                        end={{ x: 0, y: 0.5 }}
+                    >
+                        <Pressable style={[styles.button]} onPress={goToUploads}>
+                            {loading ? (
+                                <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
+                            ) : (
+                                <Text style={styles.buttonText}>Next</Text>
+                            )}
+                        </Pressable>
+                    </LinearGradient>
+
                 </View>
 
-                <View style={{ backgroundColor: "transparent" }}>
-                    {guarantorList.map((guarantor, index) => (
-                        <FormItem key={index} guarantor={guarantor} index={index}></FormItem>
-                    ))}
 
-                </View>
+
 
 
             </View>
-            {guarantorList.length < 2 && (
-                <Pressable style={{
-                    backgroundColor: "transparent",
-                    position: "absolute",
-                    bottom: 10,
-                    right: 10
-                }} onPress={addMore}>
-                    <AntDesign name="pluscircle" size={36} color="#074A74" />
-
-                </Pressable>
-            )}
 
         </View>
     );
@@ -114,21 +152,48 @@ const styles = StyleSheet.create({
         position: "absolute",
         right: 0,
     },
+    image: {
+        width: Dimensions.get("window").height * 0.08,
+        height: Dimensions.get("window").height * 0.08,
+        marginVertical: -15,
+    },
     overlay: {
         position: "absolute",
         width: "100%",
+        justifyContent: "space-between",
         backgroundColor: "white",
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
 
         top: Dimensions.get("window").height * 0.18,
-        height: "100%"
+        height: "85%"
 
     },
     textHeader: {
         backgroundColor: 'transparent',
         paddingVertical: 40,
 
-    }
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        marginHorizontal: 40,
+        borderColor: "#074A74",
+        borderWidth: 1,
+        borderRadius: 10,
+    },
+    button: {
+        flex: 1,
+        paddingVertical: 15,
+        marginHorizontal: 8,
+        borderRadius: 24,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    buttonText: {
+        color: "#ffffff",
+        fontWeight: "bold",
+        textAlign: "center",
+        fontSize: 18,
+    },
 
 });
