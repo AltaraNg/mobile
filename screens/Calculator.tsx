@@ -60,7 +60,7 @@ export default function Calculator({ navigation }: Props) {
             repayment: completeRepayment,
             repayment_cycle_id: isBiMonthly ? 1 : 2,
         });
-        setLoader(true);
+        // setLoader(true);
     }
 
     const getCalc = (val = sliderValue, input = inputValue) => {

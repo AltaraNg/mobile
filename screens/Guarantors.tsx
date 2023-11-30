@@ -9,8 +9,9 @@ import { useContext, useEffect, useState } from "react";
 import Leaf from "../assets/svgs/leaf.svg";
 
 import axios from "axios";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { BackButton, BackButton2 } from "../assets/svgs/svg";
+import FormItem from "../components/FormItem";
 
 const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
@@ -18,9 +19,13 @@ axios.defaults.baseURL = url;
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 
 export default function Guarantors({ navigation }: Props) {
+    const [guarantorList, setGuarantorList] = useState([{}])
     const goBack = () => {
         navigation.goBack();
     };
+    const addMore = () => {
+        setGuarantorList([...guarantorList, {}])
+    }
 
 
     useEffect(() => {
@@ -69,8 +74,27 @@ export default function Guarantors({ navigation }: Props) {
                     </Text>
                 </View>
 
+                <View style={{ backgroundColor: "transparent" }}>
+                    {guarantorList.map((guarantor, index) => (
+                        <FormItem key={index} guarantor={guarantor} index={index}></FormItem>
+                    ))}
+
+                </View>
+
 
             </View>
+            {guarantorList.length < 2 && (
+                <Pressable style={{
+                    backgroundColor: "transparent",
+                    position: "absolute",
+                    bottom: 10,
+                    right: 10
+                }} onPress={addMore}>
+                    <AntDesign name="pluscircle" size={36} color="#074A74" />
+
+                </Pressable>
+            )}
+
         </View>
     );
 }
@@ -104,7 +128,7 @@ const styles = StyleSheet.create({
     textHeader: {
         backgroundColor: 'transparent',
         paddingVertical: 40,
-       
+
     }
 
 });
