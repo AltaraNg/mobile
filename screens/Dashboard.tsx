@@ -12,6 +12,11 @@ import { AuthContext, useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { timeFromNow } from "../utilities/moment";
 import { formatAsMoney, logActivity } from "../utilities/globalFunctions";
+import { LinearGradient } from "expo-linear-gradient";
+import businessTypes from "../lib/calculator.json";
+import repaymentDurations from "../lib/repaymentDuration.json";
+import { cashLoan } from "../lib/calculator";
+import { Feather } from "@expo/vector-icons";
 
 type Props = RootStackScreenProps<"Dashboard">;
 
@@ -23,10 +28,14 @@ export default function Dashboard({ navigation }: Props) {
     const [user, setUser] = useState(null);
     const [recentActivities, setRecentActivities] = useState(null);
     const [orderDetails, setOrderDetails] = useState(null);
+    const [prospectiveLoan, setProspectiveLoan] = useState(null);
+
     const [totalDebt, setTotalDebt] = useState(0);
     const [progressBar, setProgressBar] = useState(0);
     const [hasActiveOrder, setHasActiveOrder] = useState(null);
     const [hasCompletedOrder, setHasCompletedOrder] = useState(false);
+    const [calculator, setCalculator] = useState([]);
+
 
     const refreshing = false;
     // const [amortization, setAmortization] = useState(null);
@@ -70,7 +79,10 @@ export default function Dashboard({ navigation }: Props) {
         calculateDebt(order);
         setAmortization(filteredAmoritzation);
         await recentActivity();
-        await previewOrder(cCheck?.id);
+        let details = await previewOrder(cCheck?.id);
+        await fetchCalculator(details);
+
+
 
         setShowLoader(false);
     };
@@ -90,6 +102,56 @@ export default function Dashboard({ navigation }: Props) {
         });
         setTotalDebt(total_expected_repayment - totalPaid);
         setProgressBar((totalPaid + orders?.attributes?.down_payment / total_expected_repayment) * 100);
+    };
+
+    const fetchCalculator = async (details) => {
+        try {
+            const response = await axios({
+                method: "GET",
+                url: `/price-calculators`,
+                headers: { Authorization: `Bearer ${authData?.token}` },
+            });
+            let calculator = response?.data?.data?.price_calculator;
+            setCalculator(calculator);
+            const rDur = repaymentDurations.find((item) => {
+                return item.id === creditChecker?.repayment_duration_id;
+            });
+            const businessType = businessTypes.find((item) => {
+                return item.id === creditChecker?.business_type_id;
+            });
+            const data = {
+                repayment_duration_id: rDur,
+                payment_type_id: downPaymentRate,
+            };
+            const params = calculator.find((x) => {
+                return (
+                    x.business_type_id === businessType.id &&
+                    x.down_payment_rate_id === downPaymentRate.id &&
+                    x.repayment_duration_id === rDur.id
+                );
+            });
+
+            if (params) {
+                const { total, actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(details?.product?.retail_price, data, params, 0);
+                setProspectiveLoan({
+                    loan_requested: details?.product?.retail_price, 
+                    actual_amount: total,
+                    down_payment: actualDownpayment,
+                    repayment: rePayment
+                })
+
+            }
+
+        } catch (error) {
+        } finally {
+        }
+    };
+
+    const downPaymentRate = {
+        id: 2,
+        name: "twenty",
+        percent: 20,
+        status: 1,
     };
 
     const recentActivity = async () => {
@@ -137,8 +199,10 @@ export default function Dashboard({ navigation }: Props) {
                     headers: { Authorization: `Bearer ${authData.token}` },
                 });
                 const details = result.data.data.creditCheckerVerification;
-
                 setOrderDetails(details);
+
+                return details;
+
             } catch (error) {
                 setShowLoader(false);
                 throw error;
@@ -170,6 +234,10 @@ export default function Dashboard({ navigation }: Props) {
             navigation.navigate("VerificationPending", creditChecker);
         }
     };
+
+    const performActionOnProceed = () => {
+        navigation.navigate("VerificationPassed", creditChecker);
+    }
 
     const recommendedLoans = [
         {
@@ -294,7 +362,6 @@ export default function Dashboard({ navigation }: Props) {
 
                         {creditChecker?.status === "pending" && (
                             <View style={{ backgroundColor: "transparent", position: "relative" }}>
-                                <Text style={[styles.name]}>Loan Request</Text>
                                 <View
                                     style={[
                                         styles.order,
@@ -303,13 +370,13 @@ export default function Dashboard({ navigation }: Props) {
                                             display: "flex",
                                             alignItems: "center",
                                             height: 130,
-                                            paddingHorizontal: 10,
+                                            paddingHorizontal: 19,
                                         },
                                     ]}
                                 >
                                     <Image
                                         source={require("../assets/images/cashloan.png")}
-                                        style={{ width: Dimensions.get("window").width * 0.3 }}
+                                        style={{ width: Dimensions.get("window").width * 0.2 }}
                                     />
                                     <View
                                         style={{
@@ -318,7 +385,9 @@ export default function Dashboard({ navigation }: Props) {
                                             width: Dimensions.get("window").width * 0.6,
                                         }}
                                     >
-                                        <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Loan</Text>
+                                        <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Loan Request {`₦${formatAsMoney(prospectiveLoan?.loan_requested)}`}</Text>
+                                        
+
                                         <View
                                             style={{
                                                 backgroundColor: "transparent",
@@ -330,18 +399,15 @@ export default function Dashboard({ navigation }: Props) {
                                             }}
                                         >
                                             <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
-                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Amount</Text>
-                                                <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
-                                                    {`₦${formatAsMoney(orderDetails?.product?.retail_price)}`}
-                                                </Text>
-                                            </View>
-                                            <View style={{ backgroundColor: "transparent" }}>
                                                 <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Downpayment</Text>
                                                 <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
-                                                    {`₦${formatAsMoney(
-                                                        (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) /
-                                                            100
-                                                    )}`}
+                                                    {`₦${formatAsMoney(prospectiveLoan?.down_payment)}`}
+                                                </Text>
+                                            </View>
+                                            <View style={{ backgroundColor: "transparent", alignSelf: "flex-end" }}>
+                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Repayment</Text>
+                                                <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
+                                                    {`₦${formatAsMoney(prospectiveLoan?.repayment)}`}
                                                 </Text>
                                             </View>
                                         </View>
@@ -349,7 +415,52 @@ export default function Dashboard({ navigation }: Props) {
                                 </View>
                             </View>
                         )}
-                        {creditChecker?.status !== "pending" && !hasActiveOrder && (
+
+                        {creditChecker?.status === "passed" && (
+                            <View style={{ backgroundColor: "transparent", position: "relative" }}>
+                                <Text style={[styles.name]}>Loan Request</Text>
+                                <View
+                                    style={[
+                                        styles.order,
+                                        {
+                                            backgroundColor: "#EAFFED",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            height: 150,
+                                            paddingHorizontal: 10,
+                                        },
+                                    ]}
+                                >
+                                    {/* <Image
+                                        source={require("../assets/gifs/orderCompleted.gif")}
+                                        style={{ width: Dimensions.get("window").width * 0.2, height: Dimensions.get("window").height * 0.1 }}
+                                    /> */}
+                                    <Feather name="check-circle" size={Dimensions.get("window").height * 0.1} color="green" />
+                                    <View
+                                        style={{
+                                            backgroundColor: "transparent",
+                                            paddingLeft: 5,
+                                            width: Dimensions.get("window").width * 0.6,
+                                        }}
+                                    >
+                                        <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Your request has been approved. Click the button to proceed to pay downpayment</Text>
+
+
+
+                                        <LinearGradient colors={["#fff", "#DADADA"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
+                                            <Pressable style={[styles.button]} onPress={performActionOnProceed}>
+                                                <Text
+                                                    style={[styles.buttonText, { color: "#074A74" }]}
+                                                >
+                                                    Proceed
+                                                </Text>
+                                            </Pressable>
+                                        </LinearGradient>
+                                    </View>
+                                </View>
+                            </View>
+                        )}
+                        {((creditChecker?.status !== "pending" && creditChecker?.status !== "passed") && !hasActiveOrder) && (
                             <View style={{ backgroundColor: "transparent", position: "relative" }}>
                                 {creditChecker?.id && (
                                     <View
@@ -557,7 +668,8 @@ const styles = StyleSheet.create({
     },
     name: {
         marginHorizontal: 30,
-        fontSize: 20,
+        marginVertical: 5,
+        fontSize: 17,
         color: "#074A74",
         fontFamily: "Montserrat_700Bold",
     },
@@ -567,7 +679,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 30,
         fontSize: 12,
         color: "#72788D",
-        paddingBottom: 20,
+        paddingBottom: 10,
     },
     menu: {
         position: "absolute",
@@ -634,5 +746,30 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         textAlign: "center",
         color: "#000",
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        borderColor: "#074A74",
+        borderWidth: 1,
+        borderRadius: 100,
+        width: 120,
+        height: 40,
+        alignSelf: "flex-end",
+        marginRight: 10,
+        marginVertical: 10,
+
+    },
+    button: {
+        paddingVertical: 4,
+        borderRadius: 24,
+    },
+    buttonText: {
+        color: "#074A74",
+        fontWeight: "600",
+        textAlign: "center",
+        fontSize: 14,
+        textTransform: "capitalize",
     },
 });
