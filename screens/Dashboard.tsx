@@ -66,7 +66,7 @@ export default function Dashboard({ navigation }: Props) {
         auth.saveProfile(user);
         setOrders(order);
         setUser(user);
-        let cCheck = user?.included?.creditCheckerVerifications.splice(-1)[0];
+        const cCheck = user?.included?.creditCheckerVerifications.splice(-1)[0];
         setCreditChecker(cCheck);
         setHasActiveOrder(order?.included?.orderStatus?.name === "Active");
         setHasCompletedOrder(order?.included?.orderStatus.name === "Completed");
@@ -204,28 +204,25 @@ export default function Dashboard({ navigation }: Props) {
                 return details;
 
             } catch (error) {
-
+                setShowLoader(false);
+                throw error;
             }
         }
-
     };
 
     const actionActivity = async (item) => {
         if (item?.mobile_app_activity?.name === "Loan Request") {
-            if (creditChecker.status === 'pending') {
+            if (creditChecker.status === "pending") {
                 navigation.navigate("VerificationPending", item?.meta?.credit_check);
-            }
-            else if (creditChecker.status === 'passed' && creditChecker.loan_id === null)
+            } else if (creditChecker.status === "passed" && creditChecker.loan_id === null)
                 navigation.navigate("VerificationPassed", item?.meta?.credit_check);
-
         }
     };
 
     const performAction = async () => {
         if (hasActiveOrder) {
             navigation.navigate("OrderDetails", orders);
-        }
-        else if (hasCompletedOrder && creditChecker?.status === "passed" && creditChecker?.loan_id !== null) {
+        } else if (hasCompletedOrder && creditChecker?.status === "passed" && creditChecker?.loan_id !== null) {
             await logActivity(authData.token, 9);
             navigation.navigate("Calculator");
         } else if (creditChecker?.status === "passed") {
@@ -302,7 +299,9 @@ export default function Dashboard({ navigation }: Props) {
                             hasCompletedOrder={hasCompletedOrder}
                             haveActiveOrder={hasActiveOrder}
                             title="Loan Balance"
-                            amount={!totalDebt || !creditChecker?.loan_id ? "₦0.00" : `₦${totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}
+                            amount={
+                                !totalDebt || !creditChecker?.loan_id ? "₦0.00" : `₦${totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
+                            }
                             progressBar={progressBar}
                             next_repayment={nextExpectedRepayment}
                             performAction={performAction}
@@ -326,7 +325,7 @@ export default function Dashboard({ navigation }: Props) {
                                         <View style={{ backgroundColor: "transparent" }}>
                                             <Pressable>
                                                 <View style={styles.order}>
-                                                    <View style={styles.details}>
+                                                    <View style={[styles.details, { width: "50%" }]}>
                                                         <Warning />
                                                         <View style={styles.title}>
                                                             <Text
@@ -345,9 +344,10 @@ export default function Dashboard({ navigation }: Props) {
                                                         style={{
                                                             color: "#000",
                                                             fontSize: 13,
-                                                            marginRight: 10,
+                                                            paddingRight: 10,
                                                             fontFamily: "Montserrat_600SemiBold",
-                                                            textAlign: 'right'
+                                                            textAlign: "right",
+                                                            width: "50%",
                                                         }}
                                                     >
                                                         {`₦${formatAsMoney(item.expected_amount)}`}

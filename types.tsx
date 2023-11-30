@@ -25,10 +25,11 @@ export type RootStackParamList = {
     VerificationPassed: { order: object };
     VerificationPending: { order: object };
     ViewNotification: { notification: object };
-    UploadDocument: { down_payment: Number; loan_amount: Number; repayment: Number; repayment_cycle_id };
+    UploadDocument: { down_payment: number; loan_amount: number; repayment: number; repayment_cycle_id };
     Main: undefined;
     OTP: { phone_number: string };
     Login: undefined;
+    PaymentCompleted: undefined;
     LoginPassword: undefined;
     Cards: { order: string };
     OrderRequest: { order: string };
@@ -47,7 +48,7 @@ export type RootTabParamList = {
     CreateProfile: { user: object };
     VerificationPassed: { order: object };
     VerificationPending: { order: object };
-    UploadDocument: { down_payment: Number; loan_amount: Number; repayment: Number; repayment_cycle_id };
+    UploadDocument: { down_payment: number; loan_amount: number; repayment: number; repayment_cycle_id };
     OrderRequest: { order: string };
     OrderDetails: { order: object };
     OrderConfirmation: { order: object };

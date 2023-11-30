@@ -1,12 +1,12 @@
 import { StyleSheet } from "react-native";
 import { Paystack } from "react-native-paystack-webview";
 import { View } from "../components/Themed";
+import React from "react";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { logActivity } from "../utilities/globalFunctions";
 
 const url = process.env.EXPO_PUBLIC_PORTAL_API_URL;
 const loanAppKey = process.env.EXPO_PUBLIC_LOAN_APP_KEY;
@@ -18,7 +18,7 @@ const instance = axios.create({
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 
 export default function OrderConfirmation({ navigation, route }: Props) {
-    const { authData, showLoader, setShowLoader } = useContext(AuthContext);
+    const { setShowLoader } = useContext(AuthContext);
 
     const order: object = route.params;
     const paystackKey = process.env.EXPO_PUBLIC_PAYSTACK_KEY;
@@ -26,14 +26,14 @@ export default function OrderConfirmation({ navigation, route }: Props) {
     const createOrder = async () => {
         try {
             setShowLoader(true);
-            const result = await instance({
+            await instance({
                 method: "POST",
                 url: `/mobile-app/create/loan`,
                 headers: { "LOAN-APP-API-KEY": loanAppKey },
                 data: order,
             });
+            navigation.navigate("PaymentCompleted");
             setShowLoader(false);
-            navigation.navigate("Dashboard");
         } catch (error) {
             // navigation.navigate("Dashboard");
         }
@@ -46,7 +46,7 @@ export default function OrderConfirmation({ navigation, route }: Props) {
                 amount={order.down_payment}
                 billingEmail={accountEmail}
                 activityIndicatorColor="green"
-                onCancel={(e) => {
+                onCancel={() => {
                     navigation.navigate("Dashboard");
                 }}
                 onSuccess={() => {
