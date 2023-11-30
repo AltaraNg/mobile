@@ -1,6 +1,6 @@
 import React from "react";
 import { Dimensions, Image, Pressable, StyleSheet, Switch, ToastAndroid } from "react-native";
-
+import { LinearGradient } from "expo-linear-gradient";
 import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -26,7 +26,7 @@ export default function Calculator({ navigation }: Props) {
     const [calculator, setCalculator] = useState([]);
     const [downPayment, setDownPayment] = useState("");
     const [repayment, setRepayment] = useState("");
-    const [productPrice, setProductPrice] = useState(0);
+
     const [completeRepayment, setCompleteRepayment] = useState(0);
     const [isBiMonthly, setIsBiMonthly] = useState(false);
     const [isCollateral, setIsCollateral] = useState(false);
@@ -80,14 +80,31 @@ export default function Calculator({ navigation }: Props) {
                 );
             });
             if (params) {
-                const { total, actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(input, data, params, 0);
-                setProductPrice(total);
-                setDownPayment("₦" + actualDownpayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                const { actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(input, data, params, 0);
+                setDownPayment(
+                    "₦" +
+                        actualDownpayment
+                            .toFixed(2)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                );
                 setCompleteRepayment(rePayment);
                 if (isBiMonthly) {
-                    setRepayment("₦" + (rePayment / val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                    setRepayment(
+                        "₦" +
+                            (rePayment / val)
+                                .toFixed(2)
+                                .toString()
+                                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    );
                 } else {
-                    setRepayment("₦" + biMonthlyRepayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                    setRepayment(
+                        "₦" +
+                            biMonthlyRepayment
+                                .toFixed(2)
+                                .toString()
+                                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    );
                 }
             } else {
                 setDownPayment("₦0.00");
@@ -164,7 +181,7 @@ export default function Calculator({ navigation }: Props) {
     const onInputValueChange = async (value: number) => {
         setInputValue(value);
         if (value >= 500000) {
-            let duration = 12;
+            const duration = 12;
             setSliderValue(duration);
             getCalc(duration, value);
             return;
@@ -187,25 +204,35 @@ export default function Calculator({ navigation }: Props) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.calculator}>
-                <View style={styles.section}>
-                <View
+            <View
+                style={{
+                    backgroundColor: "transparent",
+                    height: Dimensions.get("window").height * 0.27,
+                    // marginLeft:
+                }}
+            >
+                <Image style={[styles.leaf, { bottom: 0 }]} source={require("../assets/images/big_leaf.png")} />
+                <Image style={[styles.leaf, { left: 0 }]} source={require("../assets/images/leaf.png")} />
+                <Pressable
+                    onPress={goBack}
                     style={{
-                        backgroundColor: "transparent",
-                        // marginLeft:
+                        width: "20%",
+                        margin: 15,
                     }}
                 >
-                    <Pressable onPress={goBack} style={{
-                        width: '20%'
-                    }}>
-                        <Ionicons name="ios-arrow-back-circle" size={30} color="#074A74" />
-                    </Pressable>
-                </View>
-                    <Text style={styles.header}>Calculator</Text>
-
+                    <Ionicons name="ios-arrow-back-circle" size={30} color="white" />
+                </Pressable>
+                <Text style={{ textAlign: "center", fontFamily: "Montserrat_600SemiBold" }}>Your Downpayment</Text>
+                <Text style={{ textAlign: "center", fontFamily: "Montserrat_700Bold", fontSize: 50, marginBottom: 20, marginTop: -5 }}>
+                    {downPayment || "₦0.00"}
+                </Text>
+                <Text style={{ textAlign: "center", fontFamily: "Montserrat_600SemiBold" }}>Monthly Repayment: {repayment || "₦0.00"}</Text>
+            </View>
+            <View style={styles.calculator}>
+                <View style={[styles.section, { marginTop: 60, paddingHorizontal: 20 }]}>
                     <Text style={{ color: "#074A74" }}>How much do you want to loan?</Text>
                     <CurrencyInput
-                        style={[styles.input, { width: Dimensions.get("window").width * 0.92 }]}
+                        style={[styles.input, { width: Dimensions.get("window").width * 0.9 }]}
                         value={inputValue}
                         onChangeValue={onInputValueChange}
                         prefix="₦"
@@ -220,7 +247,7 @@ export default function Calculator({ navigation }: Props) {
                             flexDirection: "row",
                             backgroundColor: "white",
                             justifyContent: "space-between",
-                            marginVertical: 20,
+                            marginVertical: 15,
                         }}
                     >
                         <View
@@ -256,73 +283,12 @@ export default function Calculator({ navigation }: Props) {
                             <Text style={{ color: "#074A74" }}>Collateral</Text>
                         </View>
                     </View>
-                </View>
-                <View style={styles.section}>
-                    <View
-                        style={{
-                            backgroundColor: "#D9D9D9",
-                            alignItems: "center",
-                            paddingVertical: 15,
-                            height: 100,
-                            borderRadius: 10,
-                            marginVertical: 5,
-                        }}
-                    >
-                        <Text
-                            style={{
-                                color: "#074A74",
-                                fontFamily: "Montserrat_500Medium",
-                                fontSize: 10,
-                                marginBottom: 10,
-                            }}
-                        >
-                            {downPayment === "₦0.00" ? "" : "Your Downpayment"}
-                        </Text>
-                        <Text
-                            style={{
-                                color: "#074A74",
-                                fontFamily: "Montserrat_800ExtraBold",
-                                fontSize: 25,
-                            }}
-                        >
-                            {downPayment}
-                        </Text>
-                    </View>
-                    <View
-                        style={{
-                            backgroundColor: "rgba(7, 74, 116, 0.63)",
-                            height: 100,
-                            alignItems: "center",
-                            paddingVertical: 15,
-                            borderRadius: 10,
-                            marginVertical: 5,
-                        }}
-                    >
-                        <Text
-                            style={{
-                                color: "white",
-                                fontFamily: "Montserrat_600SemiBold",
-                                fontSize: 12,
-                                marginBottom: 10,
-                                textAlign: "center",
-                            }}
-                        >
-                            {repayment === "₦0.00" ? "" : `Your Monthly Repayment for the next ${sliderValue} months`}
-                        </Text>
-                        <Text
-                            style={{
-                                color: "white",
-                                fontFamily: "Montserrat_800ExtraBold",
-                                fontSize: 25,
-                            }}
-                        >
-                            {repayment}
-                        </Text>
-                    </View>
+                    <Text style={{ color: "#074A74" }}>Duration: 6 Months</Text>
                 </View>
 
                 <View style={styles.section}>
-                    <Pressable
+                    <LinearGradient
+                        colors={["#074A74", "#089CA4"]}
                         style={
                             downPayment === "₦0.00"
                                 ? [
@@ -331,30 +297,27 @@ export default function Calculator({ navigation }: Props) {
                                       },
                                       styles.button,
                                   ]
-                                : [
-                                      {
-                                          backgroundColor: "#074A74",
-                                      },
-                                      styles.button,
-                                  ]
+                                : styles.button
                         }
-                        onPress={doSome}
-                        disabled={downPayment === "₦0.00"}
+                        start={{ x: 1, y: 0.5 }}
+                        end={{ x: 0, y: 0.5 }}
                     >
-                        {loader ? (
-                            <View
-                                style={{
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    backgroundColor: "transparent",
-                                }}
-                            >
-                                <Image source={require("../assets/gifs/loader.gif")} style={{ width: 60, height: 27 }} />
-                            </View>
-                        ) : (
-                            <Text style={{ fontSize: 16, fontFamily: "Montserrat_600SemiBold", textAlign: "center" }}>Apply</Text>
-                        )}
-                    </Pressable>
+                        <Pressable onPress={doSome} disabled={downPayment === "₦0.00"}>
+                            {loader ? (
+                                <View
+                                    style={{
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        backgroundColor: "transparent",
+                                    }}
+                                >
+                                    <Image source={require("../assets/gifs/loader.gif")} style={{ width: 60, height: 27 }} />
+                                </View>
+                            ) : (
+                                <Text style={{ fontSize: 16, fontFamily: "Montserrat_600SemiBold", textAlign: "center" }}>Apply</Text>
+                            )}
+                        </Pressable>
+                    </LinearGradient>
                 </View>
             </View>
         </View>
@@ -363,7 +326,7 @@ export default function Calculator({ navigation }: Props) {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "white",
+        backgroundColor: "#074A74",
         flex: 1,
         paddingVertical: 30,
     },
@@ -371,11 +334,17 @@ const styles = StyleSheet.create({
         backgroundColor: "transparent",
     },
     calculator: {
-        flex: 1,
         marginTop: 20,
         backgroundColor: "white",
-        paddingHorizontal: 20,
+        height: Dimensions.get("window").height * 0.7,
+        width: "100%",
+        borderTopLeftRadius: 50,
+        borderTopRightRadius: 50,
         justifyContent: "space-between",
+    },
+    leaf: {
+        position: "absolute",
+        right: 0,
     },
     header: {
         fontFamily: "Montserrat_800ExtraBold",
