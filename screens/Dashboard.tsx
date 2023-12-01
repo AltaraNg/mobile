@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, TouchableOpacity, RefreshControl, Image, Dimensi
 import { Overlay } from "react-native-elements";
 //import { MaterialIcons } from '@expo/vector-icons';
 import React from "react";
+import AnimatedDot from "../components/AnimatedDot";
 import { Hamburger, Debited, Credited, Warning } from "../assets/svgs/svg";
 import Header from "../components/Header";
 import { useState, useEffect, useContext } from "react";
@@ -16,7 +17,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import businessTypes from "../lib/calculator.json";
 import repaymentDurations from "../lib/repaymentDuration.json";
 import { cashLoan } from "../lib/calculator";
-import { Feather } from "@expo/vector-icons";
 
 type Props = RootStackScreenProps<"Dashboard">;
 
@@ -27,15 +27,12 @@ export default function Dashboard({ navigation }: Props) {
 
     const [user, setUser] = useState(null);
     const [recentActivities, setRecentActivities] = useState(null);
-    const [orderDetails, setOrderDetails] = useState(null);
     const [prospectiveLoan, setProspectiveLoan] = useState(null);
 
     const [totalDebt, setTotalDebt] = useState(0);
     const [progressBar, setProgressBar] = useState(0);
     const [hasActiveOrder, setHasActiveOrder] = useState(null);
     const [hasCompletedOrder, setHasCompletedOrder] = useState(false);
-    const [calculator, setCalculator] = useState([]);
-
 
     const refreshing = false;
     // const [amortization, setAmortization] = useState(null);
@@ -79,10 +76,8 @@ export default function Dashboard({ navigation }: Props) {
         calculateDebt(order);
         setAmortization(filteredAmoritzation);
         await recentActivity();
-        let details = await previewOrder(cCheck?.id);
+        const details = await previewOrder(cCheck?.id);
         await fetchCalculator(details);
-
-
 
         setShowLoader(false);
     };
@@ -105,45 +100,35 @@ export default function Dashboard({ navigation }: Props) {
     };
 
     const fetchCalculator = async (details) => {
-        try {
-            const response = await axios({
-                method: "GET",
-                url: `/price-calculators`,
-                headers: { Authorization: `Bearer ${authData?.token}` },
-            });
-            let calculator = response?.data?.data?.price_calculator;
-            setCalculator(calculator);
-            const rDur = repaymentDurations.find((item) => {
-                return item.id === creditChecker?.repayment_duration_id;
-            });
-            const businessType = businessTypes.find((item) => {
-                return item.id === creditChecker?.business_type_id;
-            });
-            const data = {
-                repayment_duration_id: rDur,
-                payment_type_id: downPaymentRate,
-            };
-            const params = calculator.find((x) => {
-                return (
-                    x.business_type_id === businessType.id &&
-                    x.down_payment_rate_id === downPaymentRate.id &&
-                    x.repayment_duration_id === rDur.id
-                );
-            });
+        const response = await axios({
+            method: "GET",
+            url: `/price-calculators`,
+            headers: { Authorization: `Bearer ${authData?.token}` },
+        });
+        const calculator = response?.data?.data?.price_calculator;
 
-            if (params) {
-                const { total, actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(details?.product?.retail_price, data, params, 0);
-                setProspectiveLoan({
-                    loan_requested: details?.product?.retail_price, 
-                    actual_amount: total,
-                    down_payment: actualDownpayment,
-                    repayment: rePayment
-                })
+        const rDur = repaymentDurations.find((item) => {
+            return item.id === creditChecker?.repayment_duration_id;
+        });
+        const businessType = businessTypes.find((item) => {
+            return item.id === creditChecker?.business_type_id;
+        });
+        const data = {
+            repayment_duration_id: rDur,
+            payment_type_id: downPaymentRate,
+        };
+        const params = calculator.find((x) => {
+            return x.business_type_id === businessType.id && x.down_payment_rate_id === downPaymentRate.id && x.repayment_duration_id === rDur.id;
+        });
 
-            }
-
-        } catch (error) {
-        } finally {
+        if (params) {
+            const { total, actualDownpayment, rePayment } = cashLoan(details?.product?.retail_price, data, params, 0);
+            setProspectiveLoan({
+                loan_requested: details?.product?.retail_price,
+                actual_amount: total,
+                down_payment: actualDownpayment,
+                repayment: rePayment,
+            });
         }
     };
 
@@ -199,10 +184,8 @@ export default function Dashboard({ navigation }: Props) {
                     headers: { Authorization: `Bearer ${authData.token}` },
                 });
                 const details = result.data.data.creditCheckerVerification;
-                setOrderDetails(details);
 
                 return details;
-
             } catch (error) {
                 setShowLoader(false);
                 throw error;
@@ -237,7 +220,7 @@ export default function Dashboard({ navigation }: Props) {
 
     const performActionOnProceed = () => {
         navigation.navigate("VerificationPassed", creditChecker);
-    }
+    };
 
     const recommendedLoans = [
         {
@@ -385,8 +368,9 @@ export default function Dashboard({ navigation }: Props) {
                                             width: Dimensions.get("window").width * 0.6,
                                         }}
                                     >
-                                        <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Loan Request {`₦${formatAsMoney(prospectiveLoan?.loan_requested)}`}</Text>
-                                        
+                                        <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>
+                                            Loan Request {`₦${formatAsMoney(prospectiveLoan?.loan_requested)}`}
+                                        </Text>
 
                                         <View
                                             style={{
@@ -423,44 +407,74 @@ export default function Dashboard({ navigation }: Props) {
                                     style={[
                                         styles.order,
                                         {
-                                            backgroundColor: "#EAFFED",
+                                            backgroundColor: "#EFFCF4",
                                             display: "flex",
-                                            alignItems: "center",
-                                            height: 150,
-                                            paddingHorizontal: 10,
+                                            flexDirection: "row",
+                                            height: "auto",
+                                            justifyContent: "space-between",
+                                            paddingHorizontal: 15,
                                         },
                                     ]}
                                 >
-                                    {/* <Image
-                                        source={require("../assets/gifs/orderCompleted.gif")}
-                                        style={{ width: Dimensions.get("window").width * 0.2, height: Dimensions.get("window").height * 0.1 }}
-                                    /> */}
-                                    <Feather name="check-circle" size={Dimensions.get("window").height * 0.1} color="green" />
                                     <View
                                         style={{
-                                            backgroundColor: "transparent",
-                                            paddingLeft: 5,
-                                            width: Dimensions.get("window").width * 0.6,
+                                            backgroundColor: "#EFFCF4",
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            justifyContent: "flex-start",
+                                            width: "65%",
                                         }}
                                     >
-                                        <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Your request has been approved. Click the button to proceed to pay downpayment</Text>
+                                        <View style={{ width: "5%", backgroundColor: "#EFFCF4" }}>
+                                            <AnimatedDot />
+                                        </View>
 
-
-
-                                        <LinearGradient colors={["#fff", "#DADADA"]} style={styles.buttonContainer} start={{ x: 1, y: 0.5 }} end={{ x: 0, y: 0.5 }}>
-                                            <Pressable style={[styles.button]} onPress={performActionOnProceed}>
-                                                <Text
-                                                    style={[styles.buttonText, { color: "#074A74" }]}
-                                                >
-                                                    Proceed
-                                                </Text>
+                                        <Text
+                                            style={{
+                                                width: "90%",
+                                                fontSize: 10,
+                                                color: "#4A525C",
+                                                marginLeft: 10,
+                                                fontFamily: "Montserrat_400Regular",
+                                            }}
+                                        >
+                                            Your request has been approved!!
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            backgroundColor: "#EFFCF4",
+                                        }}
+                                    >
+                                        <LinearGradient
+                                            colors={["#074A74", "#089CA4"]}
+                                            style={[
+                                                styles.buttonContainer,
+                                                {
+                                                    paddingVertical: 8,
+                                                    borderColor: "green",
+                                                    height: "auto",
+                                                    width: "auto",
+                                                    paddingHorizontal: 20,
+                                                    borderRadius: 7,
+                                                    marginVertical: 0,
+                                                    marginHorizontal: 0,
+                                                    marginRight: 0,
+                                                },
+                                            ]}
+                                            start={{ x: 1, y: 0.5 }}
+                                            end={{ x: 0, y: 0.5 }}
+                                        >
+                                            <Pressable style={{}} onPress={performActionOnProceed}>
+                                                <Text style={[styles.buttonText, { color: "#fff", fontSize: 10 }]}>Proceed</Text>
                                             </Pressable>
                                         </LinearGradient>
                                     </View>
                                 </View>
                             </View>
                         )}
-                        {((creditChecker?.status !== "pending" && creditChecker?.status !== "passed") && !hasActiveOrder) && (
+                        {creditChecker?.status !== "pending" && creditChecker?.status !== "passed" && !hasActiveOrder && (
                             <View style={{ backgroundColor: "transparent", position: "relative" }}>
                                 {creditChecker?.id && (
                                     <View
@@ -759,7 +773,6 @@ const styles = StyleSheet.create({
         alignSelf: "flex-end",
         marginRight: 10,
         marginVertical: 10,
-
     },
     button: {
         paddingVertical: 4,
