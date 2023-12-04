@@ -78,9 +78,9 @@ export default function Dashboard({ navigation }: Props) {
         });
         calculateDebt(order);
         setAmortization(filteredAmoritzation);
-        await recentActivity();
+        recentActivity();
         let details = await previewOrder(cCheck?.id);
-        await fetchCalculator(details);
+        fetchCalculator(details);
 
 
 
@@ -446,7 +446,7 @@ export default function Dashboard({ navigation }: Props) {
                                             width: Dimensions.get("window").width * 0.6,
                                         }}
                                     >
-                                        <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>Your request has been approved. Click the button to proceed to pay downpayment</Text>
+                                        <Text style={[styles.messageText, { marginHorizontal: 0, marginBottom: 6 }]}>Your request has been approved. Click the button to proceed to pay downpayment.</Text>
 
 
 
@@ -676,6 +676,16 @@ const styles = StyleSheet.create({
         color: "#074A74",
         fontFamily: "Montserrat_700Bold",
     },
+    messageText: {
+        marginHorizontal: 30,
+        marginVertical: 5,
+        paddingHorizontal: 5,
+        fontSize: 14,
+        color: "#074A74",
+        fontFamily: "Montserrat_400Regular",
+        textAlign: "left"
+
+    },
     message: {
         fontFamily: "Montserrat_400Regular",
         marginTop: 0,
@@ -759,7 +769,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         width: 120,
         height: 40,
-        alignSelf: "flex-end",
+        alignSelf: "center",
         marginRight: 10,
         marginVertical: 10,
 
