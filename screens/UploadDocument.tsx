@@ -12,7 +12,6 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
 type Props = NativeStackScreenProps<RootTabParamList, "Dashboard">;
 import Upload from "../components/Upload";
-import { logActivity } from "../utilities/globalFunctions";
 const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 
@@ -20,6 +19,7 @@ export default function UploadDocument({ navigation, route }: Props) {
     const auth = useAuth();
 
     const order: object = route.params;
+    console.log(order);
     const { authData, setAuthData } = useContext(AuthContext);
     const [loading, setLoader] = useState(null);
     const [showMenu] = useState(false);
@@ -34,20 +34,7 @@ export default function UploadDocument({ navigation, route }: Props) {
         const data = {
             ...order,
             documents: authData.documents,
-            guarantors: [
-                {
-                    first_name: "Guarantor First Name",
-                    last_name: "Guarantor Last Name",
-                    phone_number: "090876661661",
-                    home_address: "23, Odogbolu, Altara Junction",
-                },
-                {
-                    first_name: "Second Guarantor Sed Name",
-                    last_name: "Second Guarantor Last Name",
-                    phone_number: "090876661662",
-                    home_address: "23, Odogbolu, Altara Junction",
-                },
-            ],
+           
         };
         const headers = {
             Authorization: `Bearer ${authData.token}`,

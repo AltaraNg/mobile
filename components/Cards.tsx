@@ -37,7 +37,7 @@ export default function Cards({ haveActiveOrder, performAction, next_repayment, 
                                 <Text
                                     style={[styles.buttonText, { color: "#074A74" }, creditChecker?.id && { color: statesColor[creditChecker.status] }]}
                                 >
-                                    {haveActiveOrder ? "Track Order" : creditChecker?.status === "pending" ? "" : creditChecker?.status ? creditChecker?.status : "Request Loan"}
+                                    {haveActiveOrder ? "Track Order" : !creditChecker ? "Request Loan" : creditChecker?.status === "pending" ? "" : creditChecker?.status !== "completed" ? creditChecker?.status : "Request Loan"}
                                 </Text>
                             </Pressable>
                         </LinearGradient>

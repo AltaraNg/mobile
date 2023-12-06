@@ -25,7 +25,7 @@ export type RootStackParamList = {
     VerificationPassed: { order: object };
     VerificationPending: { order: object };
     ViewNotification: { notification: object };
-    UploadDocument: { down_payment: number; loan_amount: number; repayment: number; repayment_cycle_id };
+    UploadDocument: object;
     Main: undefined;
     OTP: { phone_number: string };
     Login: undefined;

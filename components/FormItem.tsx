@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Dimensions, Modal, TouchableWithoutFeedback, Image, TextInput } from "react-native";
+import { Pressable, StyleSheet, Dimensions, Modal, TouchableWithoutFeedback, Image, TextInput, Button } from "react-native";
 import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -11,43 +11,57 @@ import { getOrdinal } from "../utilities/globalFunctions";
 
 type Props = NativeStackScreenProps<RootStackParamList, "OrderDetails">;
 
-export default function FormItem({guarantor, index}) {
+export default function FormItem({ setGuarantor, index }) {
     const [expanded, setExpanded] = useState(false);
+    const [guarantorItem, setGuarantorItem] = useState({});
     const onItemPress = () => {
         setExpanded(!expanded);
     };
+    const handleChange = (text, label) => {
+
+        let ar = {};
+        ar[label] = text;
+        setGuarantorItem({ ...guarantorItem, ...ar });
+
+    }
+    const saveGuarantor = () => {
+        setGuarantor(guarantorItem);
+        setExpanded(!expanded);
+    }
 
     return (
         <View style={{ backgroundColor: "transparent", borderTopWidth: 1, borderBottomWidth: 1, marginHorizontal: 8, borderColor: '#958A8A' }}>
-            <TouchableWithoutFeedback onPress={onItemPress}>
-                <View style={{ backgroundColor: "transparent", flexDirection: 'row', paddingHorizontal: 15, paddingVertical: 5, alignItems: "center", justifyContent: 'space-between' }}>
-                    <View style={{ flexDirection: 'row', backgroundColor: "transparent", alignItems: "center" }}>
-                        <UserCirclePlus></UserCirclePlus>
-                        <Text style={{
-                            color: "black",
-                            marginHorizontal: 10,
-                            fontFamily: 'Roboto',
-                            fontSize: 16
-                        }}>{index+1}{getOrdinal(index+1)} Guarantor</Text>
-                    </View>
-                    <View style={{backgroundColor: "trransparent", flexDirection: 'row'}}>
-                    {expanded ? (<FontAwesome name="caret-up" size={24} color="#074A74" style={{ justifyContent: "flex-end" }} />) : (<FontAwesome name="caret-down" size={24} color="#074A74" style={{ justifyContent: "flex-end" }} />)}
-                    <FontAwesome name="trash" size={24} color="#DB2721" style={{marginLeft: 20}} />
-                    </View>
-                    
+            <View style={{ backgroundColor: "transparent", flexDirection: 'row', paddingHorizontal: 15, paddingVertical: 5, alignItems: "center", justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', backgroundColor: "transparent", alignItems: "center" }}>
+                    <UserCirclePlus></UserCirclePlus>
+                    <Text style={{
+                        color: "black",
+                        marginHorizontal: 10,
+                        fontFamily: 'Roboto',
+                        fontSize: 16
+                    }}>{index + 1}{getOrdinal(index + 1)} Guarantor</Text>
+                </View>
+                <View style={{ backgroundColor: "trransparent", flexDirection: 'row' }}>
+                    <TouchableWithoutFeedback onPress={onItemPress}>
+                        {expanded ? (<FontAwesome name="caret-up" size={24} color="#074A74" style={{ justifyContent: "flex-end" }} />) : (<FontAwesome name="caret-down" size={24} color="#074A74" style={{ justifyContent: "flex-end" }} />)}
+
+                    </TouchableWithoutFeedback>
+
+                    <FontAwesome name="trash" size={24} color="#DB2721" style={{ marginLeft: 20 }} />
                 </View>
 
-            </TouchableWithoutFeedback>
+            </View>
+
             <CollapsableContainer expanded={expanded}>
-                <View style={{ marginTop: 20, backgroundColor: 'transparent', 
-            marginHorizontal: 0 }}>
+                <View style={{
+                    marginTop: 20, backgroundColor: 'transparent',
+                    marginHorizontal: 0
+                }}>
                     <View style={styles.data}>
                         <Text style={[styles.label]}>First Name</Text>
                         <TextInput
                             style={[styles.input,]}
-                            onChange={(txt) => {
-                                guarantor.first_name = txt
-                            }}
+                            onChangeText={(text) => handleChange(text, "first_name")}
 
                         >
 
@@ -57,6 +71,7 @@ export default function FormItem({guarantor, index}) {
                         <Text style={[styles.label]}>Last Name</Text>
                         <TextInput
                             style={[styles.input,]}
+                            onChangeText={(event) => handleChange(event, "last_name")}
 
                         >
 
@@ -66,6 +81,7 @@ export default function FormItem({guarantor, index}) {
                         <Text style={[styles.label]}>Telephone</Text>
                         <TextInput
                             style={[styles.input,]}
+                            onChangeText={(event) => handleChange(event, "phone_number")}
 
                         >
 
@@ -75,12 +91,29 @@ export default function FormItem({guarantor, index}) {
                         <Text style={[styles.label]}>Address</Text>
                         <TextInput
                             style={[styles.input,]}
+                            onChangeText={(event) => handleChange(event, "home_address")}
 
                         >
-
                         </TextInput>
                     </View>
                 </View>
+                <View
+                    style={{
+                        backgroundColor: "transparent",
+                        width: "20%",
+                        alignSelf: "flex-end",
+                        marginBottom: 10
+                    }}>
+                    <Button
+                        color="#074A74"
+                        title={"Save"}
+                        onPress={saveGuarantor}
+                    ></Button>
+                </View>
+
+
+
+
 
             </CollapsableContainer>
         </View>
@@ -126,7 +159,7 @@ const styles = StyleSheet.create({
     },
     data: {
         backgroundColor: "transparent",
-        marginBottom: 20,
+        marginBottom: 10,
         width: Dimensions.get("window").width * 0.8,
         marginLeft: 40
     },

@@ -1,9 +1,9 @@
-import { Dimensions, Image, Pressable, StyleSheet, Switch, ToastAndroid } from "react-native";
+import { Dimensions, Image, Pressable, StyleSheet } from "react-native";
 
 import { Text, View } from "../components/Themed";
 import { RootStackParamList } from "../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Leaf from "../assets/svgs/leaf.svg";
 
 import axios from "axios";
@@ -21,7 +21,8 @@ type Props = NativeStackScreenProps<RootStackParamList, "UploadDocument">;
 export default function Guarantors({ navigation, route }: Props) {
     const [guarantorList, setGuarantorList] = useState([{}]);
     const [loading, setLoading] = useState(false);
-    const orderDetails: { down_payment: number; loan_amount: number; repayment: number; repayment_cycle_id } = route.params;
+    const [main, setMain] = useState([]);
+    let orderDetails: object = route.params;
 
     const goBack = () => {
         navigation.goBack();
@@ -30,8 +31,19 @@ export default function Guarantors({ navigation, route }: Props) {
         setGuarantorList([...guarantorList, {}])
     };
     const goToUploads = () => {
-        console.log("I got here")
+        orderDetails = { ...orderDetails, guarantors: main }
         navigation.navigate("UploadDocument", orderDetails);
+    }
+    const setGuarantor = (guarantor) => {
+        if (guarantorList.length < 2) {
+            setGuarantorList([...guarantorList, guarantor]);
+
+        }
+        setMain([...main, guarantor]);
+        console.log(main.length, guarantorList.length)
+        // if (guarantorList.length < 1){
+        //     addMore();
+        // }
     }
 
 
@@ -86,7 +98,7 @@ export default function Guarantors({ navigation, route }: Props) {
 
                     <View style={{ backgroundColor: "transparent", marginHorizontal: 0 }}>
                         {guarantorList.map((guarantor, index) => (
-                            <FormItem key={index} guarantor={guarantor} index={index}></FormItem>
+                            <FormItem key={index} setGuarantor={setGuarantor} index={index} ></FormItem>
                         ))}
 
                     </View>
@@ -97,19 +109,7 @@ export default function Guarantors({ navigation, route }: Props) {
                         flexDirection: "column"
                     }}>
 
-                    {guarantorList.length < 2 && (
-                        <Pressable style={{
-                            backgroundColor: "transparent",
-                            alignSelf: "flex-end",
-                            marginHorizontal: 20,
-                            marginVertical: 30
 
-
-                        }} onPress={addMore}>
-                            <AntDesign name="pluscircle" size={36} color="#074A74" />
-
-                        </Pressable>
-                    )}
                     <LinearGradient
                         colors={["#074A74", "#089CA4"]}
                         style={styles.buttonContainer}
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     },
     button: {
         flex: 1,
-        paddingVertical: 15,
+        paddingVertical: 10,
         marginHorizontal: 8,
         borderRadius: 24,
         alignItems: "center",
