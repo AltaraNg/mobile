@@ -23,6 +23,7 @@ export default function Guarantors({ navigation, route }: Props) {
     const [loading, setLoading] = useState(false);
     const [main, setMain] = useState([]);
     let orderDetails: object = route.params;
+    console.log(orderDetails);
 
     const goBack = () => {
         navigation.goBack();

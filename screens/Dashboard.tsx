@@ -78,6 +78,7 @@ export default function Dashboard({ navigation }: Props) {
             calculateDebt(order);
             setAmortization(filteredAmoritzation);
             await recentActivity();
+            console.log(cCheck);
             if (cCheck) {
                 let details = await previewOrder(cCheck?.id);
                 await fetchCalculator(details);
@@ -370,7 +371,7 @@ export default function Dashboard({ navigation }: Props) {
                                             display: "flex",
                                             alignItems: "center",
                                             height: 130,
-                                            paddingHorizontal: 19,
+                                            paddingHorizontal: 18,
                                         },
                                     ]}
                                 >
@@ -387,7 +388,7 @@ export default function Dashboard({ navigation }: Props) {
                                         onPress={() => navigation.navigate("VerificationPending", creditChecker)}
                                     >
                                         <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>
-                                            Loan Request {`₦${formatAsMoney(parseInt(prospectiveLoan?.loan_requested))}`}
+                                            Loan Request {creditChecker?.loan_amount ? `₦${formatAsMoney(parseInt(creditChecker?.loan_amount))}` :  `₦0.00`}
                                         </Text>
 
                                         <View
@@ -409,7 +410,7 @@ export default function Dashboard({ navigation }: Props) {
                                             <View style={{ backgroundColor: "transparent" }}>
                                                 <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Downpayment</Text>
                                                 <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
-                                                    {`₦${formatAsMoney(parseInt(prospectiveLoan?.down_payment))}`}
+                                                    {creditChecker.down_payment ? `₦${formatAsMoney(parseInt(creditChecker?.down_payment))}` : `₦0.00`}
                                                 </Text>
                                             </View>
                                         </View>

@@ -45,6 +45,7 @@ export default function UploadDocument({ navigation, route }: Props) {
             })
             .then(async (res) => {
                 // fetchUser();
+                console.log(res.data.data);
                 ToastAndroid.showWithGravity("Loan request sent successfully, Awaiting Verification", ToastAndroid.LONG, ToastAndroid.CENTER);
                 navigation.navigate("VerificationPending", res?.data?.data?.credit_check_verification);
             })

@@ -12,16 +12,6 @@ import Header from "../components/Header";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 const data = [
     {
-        title: "Altara Product",
-        text: "You can apply for a product with Altara App at your convenience",
-        img: hands,
-    },
-    {
-        title: "Altara Rent",
-        text: "You can apply for hassle-free renting on pay later plan",
-        img: illustration,
-    },
-    {
         title: "Altara E-Loan",
         text: "You can apply for quick-to-process loans on multiple payment plans.",
         img: image3,
