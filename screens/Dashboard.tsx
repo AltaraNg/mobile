@@ -78,11 +78,7 @@ export default function Dashboard({ navigation }: Props) {
             calculateDebt(order);
             setAmortization(filteredAmoritzation);
             await recentActivity();
-            console.log(cCheck);
-            if (cCheck) {
-                let details = await previewOrder(cCheck?.id);
-                await fetchCalculator(details);
-            }
+            
 
         } catch (error) {
             console.log(error)
