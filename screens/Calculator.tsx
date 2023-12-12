@@ -84,7 +84,6 @@ export default function Calculator({ navigation }: Props) {
             });
             if (params) {
                 const { actualDownpayment, rePayment, biMonthlyRepayment } = cashLoan(input, data, params, 0);
-                console.log(actualDownpayment, rePayment, biMonthlyRepayment);
                 setDownPayment(
                     "₦" +
                         actualDownpayment

@@ -23,7 +23,6 @@ export default function Guarantors({ navigation, route }: Props) {
     const [loading, setLoading] = useState(false);
     const [main, setMain] = useState([]);
     let orderDetails: object = route.params;
-    console.log(orderDetails);
 
     const goBack = () => {
         navigation.goBack();
@@ -41,7 +40,6 @@ export default function Guarantors({ navigation, route }: Props) {
 
         }
         setMain([...main, guarantor]);
-        console.log(main.length, guarantorList.length)
         // if (guarantorList.length < 1){
         //     addMore();
         // }

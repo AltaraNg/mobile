@@ -12,6 +12,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
 type Props = NativeStackScreenProps<RootTabParamList, "Dashboard">;
 import Upload from "../components/Upload";
+import UploadPDF from "../components/UploadPDF";
 const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 
@@ -19,7 +20,6 @@ export default function UploadDocument({ navigation, route }: Props) {
     const auth = useAuth();
 
     const order: object = route.params;
-    console.log(order);
     const { authData, setAuthData } = useContext(AuthContext);
     const [loading, setLoader] = useState(null);
     const [showMenu] = useState(false);
@@ -28,13 +28,13 @@ export default function UploadDocument({ navigation, route }: Props) {
         navigation.toggleDrawer();
     };
 
-    function handleRequest() {}
+    function handleRequest() { }
 
     const createOrderRequest = async () => {
         const data = {
             ...order,
             documents: authData.documents,
-           
+
         };
         const headers = {
             Authorization: `Bearer ${authData.token}`,
@@ -45,14 +45,13 @@ export default function UploadDocument({ navigation, route }: Props) {
             })
             .then(async (res) => {
                 // fetchUser();
-                console.log(res.data.data);
                 ToastAndroid.showWithGravity("Loan request sent successfully, Awaiting Verification", ToastAndroid.LONG, ToastAndroid.CENTER);
                 navigation.navigate("VerificationPending", res?.data?.data?.credit_check_verification);
             })
             .catch((err) => {
                 ToastAndroid.showWithGravity("Error creating order request", ToastAndroid.SHORT, ToastAndroid.CENTER);
             })
-            .finally(() => {});
+            .finally(() => { });
     };
 
     return (
@@ -98,6 +97,17 @@ export default function UploadDocument({ navigation, route }: Props) {
                             <Upload onRequest={handleRequest} document="Guarantor's ID" type="guarantor_id" />
                             <Upload onRequest={handleRequest} document="Proof of Income" type="proof_of_income" />
                         </View>
+
+                        <View
+                            style={{
+                                alignItems: "center",
+                                justifyContent: "space-evenly",
+                                backgroundColor: "white",
+                                flexDirection: "row",
+                            }}
+                        >
+                            <UploadPDF onRequest={handleRequest} document="Bank Statement" type="bank_statement" />
+                        </View>
                         <View
                             style={{
                                 flexDirection: "row",
@@ -117,7 +127,7 @@ export default function UploadDocument({ navigation, route }: Props) {
                                     {loading ? (
                                         <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
                                     ) : (
-                                        <Text style={styles.buttonText}> Continue </Text>
+                                        <Text style={styles.buttonText}> Submit </Text>
                                     )}
                                 </Pressable>
                             </LinearGradient>

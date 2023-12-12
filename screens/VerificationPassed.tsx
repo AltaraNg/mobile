@@ -46,7 +46,7 @@ export default function VerificationPassed({ navigation, route }: Props) {
                     product_price: parseInt(details.product.retail_price),
                     down_payment: (parseInt(details.product.retail_price) * details.down_payment_rate.percent) / 100,
                     repayment:
-                        parseInt(details.product.retail_price) - (parseInt(details.product.retail_price) * details.down_payment_rate.percent) / 100,
+                        parseInt(creditChecker.repayment),
                 },
             });
             setOrderDetails(details);

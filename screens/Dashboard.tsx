@@ -65,7 +65,6 @@ export default function Dashboard({ navigation }: Props) {
             setOrders(order);
             setUser(user);
             const cCheck = user?.included?.creditCheckerVerifications.splice(-1)[0];
-            console.log(cCheck)
             setCreditChecker(cCheck);
             setHasActiveOrder(order?.included?.orderStatus?.name === "Active");
             setHasCompletedOrder(order?.included?.orderStatus.name === "Completed");
