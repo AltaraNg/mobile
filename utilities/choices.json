@@ -1,0 +1,38 @@
+[
+    {
+        "key": 1,
+        "name": "Zenith Bank"
+    },
+    {
+        "key": 2,
+        "name": "UBA Bank"
+    },
+    {
+        "key": 3,
+        "name": "Access Bank"
+    },
+    {
+        "key": 4,
+        "name": "First Bank"
+    },
+    {
+        "key": 5,
+        "name": "GT Bank"
+    },
+    {
+        "key": 6,
+        "name": "FCMB Bank"
+    },
+    {
+        "key": 7,
+        "name": "Fidelity Bank"
+    },
+    {
+        "key": 8,
+        "name": "Sterling Bank"
+    },
+    {
+        "key": 9,
+        "name": "Opay Bank"
+    }
+]
