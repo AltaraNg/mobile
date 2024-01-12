@@ -1,6 +1,6 @@
 export default {
     // ...
-    owner: "ipixels",
+    owner: "darmhoo",
     extra: {},
     slug: "loan-app",
     version: "1.0.0",
