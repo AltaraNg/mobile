@@ -11,7 +11,7 @@ const calculate = (productPrice, data, params, percentage_discount) => {
     const initDownpayment = (data.payment_type_id.percent / 100) * total;
     const downpayment = initDownpayment + Math.floor((total - initDownpayment) / count) * data.payment_type_id.plus;
     const actualDownpayment = Math.floor(downpayment / 100) * 100;
-    const tempActualRepayment = +(total - downpayment).toFixed(2);
+    const tempActualRepayment = +(total - downpayment)?.toFixed(2);
     var biMonthlyRepayment = Math.round(tempActualRepayment / count / 100) * 100;
     const actualRepayment = biMonthlyRepayment * count;
     if (percentage_discount > 0) {

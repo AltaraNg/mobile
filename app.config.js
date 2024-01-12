@@ -1,7 +1,11 @@
 export default {
     // ...
-    owner: "ipixels",
-    extra: {},
+    owner: "darmhoo",
+    extra: {
+        eas: {
+            projectId: "1796bf23-4b18-4d86-83e3-1710f676bb19",
+        },
+    },
     slug: "loan-app",
     version: "1.0.0",
     orientation: "portrait",

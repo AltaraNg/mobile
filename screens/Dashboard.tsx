@@ -29,7 +29,7 @@ export default function Dashboard({ navigation }: Props) {
     const [recentActivities, setRecentActivities] = useState(null);
     const [prospectiveLoan, setProspectiveLoan] = useState(null);
 
-    const [totalDebt, setTotalDebt] = useState(0);
+    const [totalDebt, setTotalDebt] = useState(null);
     const [progressBar, setProgressBar] = useState(0);
     const [hasActiveOrder, setHasActiveOrder] = useState(null);
     const [hasCompletedOrder, setHasCompletedOrder] = useState(false);
@@ -53,31 +53,37 @@ export default function Dashboard({ navigation }: Props) {
 
     const fetchOrder = async () => {
         setShowLoader(true);
-        const response = await axios({
-            method: "GET",
-            url: `/customers/${authData.user.id}/orders`,
-            headers: { Authorization: `Bearer ${authData.token}` },
-        });
-        const order = response.data.data[0].included.orders[0];
-        const user = response.data.data[0];
-        auth.saveProfile(user);
-        setOrders(order);
-        setUser(user);
-        const cCheck = user?.included?.creditCheckerVerifications.splice(-1)[0];
-        setCreditChecker(cCheck);
-        setHasActiveOrder(order?.included?.orderStatus?.name === "Active");
-        setHasCompletedOrder(order?.included?.orderStatus.name === "Completed");
+        try {
+            const response = await axios({
+                method: "GET",
+                url: `/customers/${authData.user.id}/orders`,
+                headers: { Authorization: `Bearer ${authData.token}` },
+            });
+            const order = response.data.data[0].included.orders[0];
+            const user = response.data.data[0];
+            auth.saveProfile(user);
+            setOrders(order);
+            setUser(user);
+            const cCheck = user?.included?.creditCheckerVerifications.splice(-1)[0];
+            setCreditChecker(cCheck);
+            setHasActiveOrder(order?.included?.orderStatus?.name === "Active");
+            setHasCompletedOrder(order?.included?.orderStatus.name === "Completed");
 
-        const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
-        setNextRepayment(nextRepayment);
-        const filteredAmoritzation = order?.included?.amortizations.filter((item) => {
-            return item.actual_amount === 0;
-        });
-        calculateDebt(order);
-        setAmortization(filteredAmoritzation);
-        await recentActivity();
-        const details = await previewOrder(cCheck?.id);
-        await fetchCalculator(details);
+            const nextRepayment = order?.included?.amortizations?.find((payment: { actual_amount: number }) => payment.actual_amount == 0);
+            setNextRepayment(nextRepayment);
+            const filteredAmoritzation = order?.included?.amortizations.filter((item) => {
+                return item.actual_amount === 0;
+            });
+            calculateDebt(order);
+            setAmortization(filteredAmoritzation);
+            await recentActivity();
+            
+
+        } catch (error) {
+            console.log(error)
+        }
+
+
 
         setShowLoader(false);
     };
@@ -95,7 +101,14 @@ export default function Dashboard({ navigation }: Props) {
         const totalPaid = paid_repayment?.reduce((total, item) => {
             return total + item;
         });
-        setTotalDebt(total_expected_repayment - totalPaid);
+        if (!hasActiveOrder) {
+            setTotalDebt(null);
+        } else {
+
+            setTotalDebt(total_expected_repayment - totalPaid);
+
+        }
+
         setProgressBar((totalPaid + orders?.attributes?.down_payment / total_expected_repayment) * 100);
     };
 
@@ -283,7 +296,7 @@ export default function Dashboard({ navigation }: Props) {
                             haveActiveOrder={hasActiveOrder}
                             title="Loan Balance"
                             amount={
-                                !totalDebt || !creditChecker?.loan_id ? "₦0.00" : `₦${totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
+                                (totalDebt == null || !creditChecker?.loan_id) ? "₦0.00" : `₦${totalDebt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
                             }
                             progressBar={progressBar}
                             next_repayment={nextExpectedRepayment}
@@ -333,7 +346,7 @@ export default function Dashboard({ navigation }: Props) {
                                                             width: "50%",
                                                         }}
                                                     >
-                                                        {`₦${formatAsMoney(item.expected_amount)}`}
+                                                        {`₦${formatAsMoney(parseInt(item.expected_amount))}`}
                                                     </Text>
                                                 </View>
                                             </Pressable>
@@ -353,7 +366,7 @@ export default function Dashboard({ navigation }: Props) {
                                             display: "flex",
                                             alignItems: "center",
                                             height: 130,
-                                            paddingHorizontal: 19,
+                                            paddingHorizontal: 18,
                                         },
                                     ]}
                                 >
@@ -361,15 +374,16 @@ export default function Dashboard({ navigation }: Props) {
                                         source={require("../assets/images/cashloan.png")}
                                         style={{ width: Dimensions.get("window").width * 0.2 }}
                                     />
-                                    <View
+                                    <Pressable
                                         style={{
                                             backgroundColor: "transparent",
                                             paddingLeft: 5,
                                             width: Dimensions.get("window").width * 0.6,
                                         }}
+                                        onPress={() => navigation.navigate("VerificationPending", creditChecker)}
                                     >
                                         <Text style={[styles.name, { marginHorizontal: 0, marginBottom: 6 }]}>
-                                            Loan Request {`₦${formatAsMoney(prospectiveLoan?.loan_requested)}`}
+                                            Loan Request {creditChecker?.loan_amount ? `₦${formatAsMoney(parseInt(creditChecker?.loan_amount))}` :  `₦0.00`}
                                         </Text>
 
                                         <View
@@ -382,20 +396,20 @@ export default function Dashboard({ navigation }: Props) {
                                                 justifyContent: "flex-start",
                                             }}
                                         >
-                                            <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
+                                            {/* <View style={{ backgroundColor: "transparent", marginRight: 13 }}>
+                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Amount</Text>
+                                                <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
+                                                    {`₦${formatAsMoney(parseInt(prospectiveLoan?.actual_amount))}`}
+                                                </Text>
+                                            </View> */}
+                                            <View style={{ backgroundColor: "transparent" }}>
                                                 <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Downpayment</Text>
                                                 <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
-                                                    {`₦${formatAsMoney(prospectiveLoan?.down_payment)}`}
-                                                </Text>
-                                            </View>
-                                            <View style={{ backgroundColor: "transparent", alignSelf: "flex-end" }}>
-                                                <Text style={[styles.message, { paddingBottom: 3, marginHorizontal: 0 }]}>Repayment</Text>
-                                                <Text style={[styles.message, { fontFamily: "Montserrat_600SemiBold", marginHorizontal: 0 }]}>
-                                                    {`₦${formatAsMoney(prospectiveLoan?.repayment)}`}
+                                                    {creditChecker.down_payment ? `₦${formatAsMoney(parseInt(creditChecker?.down_payment))}` : `₦0.00`}
                                                 </Text>
                                             </View>
                                         </View>
-                                    </View>
+                                    </Pressable>
                                 </View>
                             </View>
                         )}
@@ -476,7 +490,7 @@ export default function Dashboard({ navigation }: Props) {
                         )}
                         {creditChecker?.status !== "pending" && creditChecker?.status !== "passed" && !hasActiveOrder && (
                             <View style={{ backgroundColor: "transparent", position: "relative" }}>
-                                {creditChecker?.id && (
+                                {creditChecker && creditChecker?.status !== "completed" && (
                                     <View
                                         style={{
                                             position: "absolute",
@@ -687,6 +701,16 @@ const styles = StyleSheet.create({
         color: "#074A74",
         fontFamily: "Montserrat_700Bold",
     },
+    messageText: {
+        marginHorizontal: 30,
+        marginVertical: 5,
+        paddingHorizontal: 5,
+        fontSize: 14,
+        color: "#074A74",
+        fontFamily: "Montserrat_400Regular",
+        textAlign: "left"
+
+    },
     message: {
         fontFamily: "Montserrat_400Regular",
         marginTop: 0,
@@ -770,7 +794,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         width: 120,
         height: 40,
-        alignSelf: "flex-end",
+        alignSelf: "center",
         marginRight: 10,
         marginVertical: 10,
     },

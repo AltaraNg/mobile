@@ -1,24 +1,20 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, ToastAndroid, TouchableOpacity } from "react-native";
 import { ArrowUp } from "../assets/svgs/svg";
-import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-export default function Upload(props) {
+export default function UploadPDF(props) {
     const url = process.env.EXPO_PUBLIC_API_URL;
     axios.defaults.baseURL = url;
     const { authData, setAuthData } = useContext(AuthContext);
     const [showLoader, setShowLoader] = useState(false);
     const [image, setImage] = useState(null);
+    const [imageName, setImageName] = useState(null);
 
     const pickImage = async () => {
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
+        const result = await DocumentPicker.getDocumentAsync({});
         if (!result.canceled) {
             setShowLoader(true);
             // ImagePicker saves the taken photo to disk and returns a local URI to it
@@ -26,7 +22,7 @@ export default function Upload(props) {
             const filename = localUri.split("/").pop();
             // Infer the type of the image
             const match = /\.(\w+)$/.exec(filename);
-            const type = match ? `image/${match[1]}` : `image`;
+            const type = match ? `pdf/${match[1]}` : `pdf`;
 
             // Upload the image using the fetch and FormData APIs
             const formData = new FormData();
@@ -53,6 +49,8 @@ export default function Upload(props) {
                 setShowLoader(false);
                 props.onRequest();
                 setImage(result.assets[0].uri);
+                setImageName(result.assets[0].name);
+
                 const res = responseJson.data.document;
                 setAuthData((prevState: object) => {
                     const updatedState = {
@@ -74,29 +72,38 @@ export default function Upload(props) {
     };
 
     return (
-        <TouchableOpacity onPress={pickImage}>
-            <View style={[styles.container, (image || showLoader) && { display: "none" }]}>
-                <View style={[styles.triangle, (image || showLoader) && { display: "none" }]}>
-                    <View style={[styles.triangleCorner, showLoader && { display: "none" }]}></View>
+        <View>
+            <TouchableOpacity onPress={pickImage}>
+                <View style={[styles.container, (image || showLoader) && { display: "none" }]}>
+                    <View style={[styles.triangle, (image || showLoader) && { display: "none" }]}>
+                        <View style={[styles.triangleCorner, showLoader && { display: "none" }]}></View>
+                    </View>
+                    <ArrowUp />
+                    <View
+                        style={{
+                            alignItems: "center",
+                            flexDirection: "column",
+                            marginTop: 10,
+                        }}
+                    >
+                        <Text style={{ fontFamily: "Montserrat_700Bold", fontSize: 11 }}>{props.document}</Text>
+                        <Text style={{ color: "#888", textAlign: "center", fontSize: 10 }}>Click here to upload file</Text>
+                    </View>
                 </View>
-                <ArrowUp />
-                <View
-                    style={{
-                        alignItems: "center",
-                        flexDirection: "column",
-                        marginTop: 10,
-                    }}
-                >
-                    <Text style={{ fontFamily: "Montserrat_700Bold", fontSize: 11 }}>{props.document}</Text>
-                    <Text style={{ color: "#888", textAlign: "center", fontSize: 10 }}>Click here to upload file</Text>
-                </View>
-            </View>
-            {showLoader ? (
-                <Image source={require("../assets/gifs/loader.gif")} style={{ width: 60, height: 60 }} />
-            ) : (
-                image && <Image source={{ uri: image }} style={{ width: 120, height: 150, zIndex: 10 }} />
-            )}
-        </TouchableOpacity>
+                {showLoader ? (
+                    <Image source={require("../assets/gifs/loader.gif")} style={{ width: 60, height: 60 }} />
+                ) : (
+                    image && <Image source={require("../assets/images/pdf_logo.png")} style={{ width: 120, height: 150, zIndex: 10 }} />
+                )}
+                {
+                    image &&
+                    <Text style={{ color: "#888", textAlign: "center", fontSize: 10 }}>{imageName}</Text>
+
+                }
+
+            </TouchableOpacity>
+
+        </View>
     );
 }
 const styles = StyleSheet.create({

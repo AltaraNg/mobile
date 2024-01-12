@@ -12,8 +12,9 @@ import businessTypes from "../lib/calculator.json";
 import repaymentDurations from "../lib/repaymentDuration.json";
 import { Ionicons } from "@expo/vector-icons";
 import { logActivity } from "../utilities/globalFunctions";
+import { cashLoan } from "../lib/calculator";
 
-// import {cashLoan, calculate} from '../lib/calculator';
+
 const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 
@@ -26,6 +27,7 @@ export default function Calculator({ navigation }: Props) {
     const [sliderValue, setSliderValue] = useState(6);
     const [calculator, setCalculator] = useState([]);
     const [downPayment, setDownPayment] = useState("");
+    const [downPaymentF, setDownPaymentF] = useState(0);
     const [repayment, setRepayment] = useState("");
 
     const [completeRepayment, setCompleteRepayment] = useState(0);
@@ -55,13 +57,13 @@ export default function Calculator({ navigation }: Props) {
     async function doSome() {
         await logActivity(authData.token, 8);
 
-        navigation.navigate("UploadDocument", {
-            down_payment: parseInt(downPayment.replace(/[^0-9]/g, ""), 10),
+        navigation.navigate("Guarantors", {
+            down_payment: downPaymentF,
             loan_amount: inputValue,
             repayment: completeRepayment,
             repayment_cycle_id: isBiMonthly ? 1 : 2,
         });
-        setLoader(true);
+        // setLoader(true);
     }
 
     const getCalc = (val = sliderValue, input = inputValue) => {
@@ -89,6 +91,7 @@ export default function Calculator({ navigation }: Props) {
                             .toString()
                             .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 );
+                setDownPaymentF(actualDownpayment);
                 setCompleteRepayment(rePayment);
                 if (isBiMonthly) {
                     setRepayment(
@@ -126,25 +129,25 @@ export default function Calculator({ navigation }: Props) {
         status: 1,
     };
 
-    const cashLoan = (productPrice, data, params, percentage_discount) => {
-        const count = repaymentCount(data.repayment_duration_id.value, 14);
-        const actualDownpayment = (data.payment_type_id.percent / 100) * productPrice;
-        const residual = productPrice - actualDownpayment;
-        const principal = residual / count;
-        const interest = (params.interest / 100) * residual;
-        const tempActualRepayment = (principal + interest) * count;
-        const biMonthlyRepayment = Math.round(tempActualRepayment / count / 100) * 100;
-        const actualRepayment = biMonthlyRepayment * count;
-        let total = Math.ceil((actualDownpayment + actualRepayment) / 100) * 100;
-        let rePayment = 0;
-        if (percentage_discount > 0) {
-            rePayment = actualRepayment - (actualRepayment * percentage_discount) / 100;
-        } else {
-            rePayment = actualRepayment;
-        }
-        total = actualRepayment + actualDownpayment;
-        return { total, actualDownpayment, rePayment, biMonthlyRepayment };
-    };
+    // const cashLoan = (productPrice, data, params, percentage_discount) => {
+    //     const count = repaymentCount(data.repayment_duration_id.value, 14);
+    //     const actualDownpayment = (data.payment_type_id.percent / 100) * productPrice;
+    //     const residual = productPrice - actualDownpayment;
+    //     const principal = residual / count;
+    //     const interest = (params.interest / 100) * residual;
+    //     const tempActualRepayment = (principal + interest) * count;
+    //     const biMonthlyRepayment = Math.round(tempActualRepayment / count / 100) * 100;
+    //     const actualRepayment = biMonthlyRepayment * count;
+    //     let total = Math.ceil((actualDownpayment + actualRepayment) / 100) * 100;
+    //     let rePayment = 0;
+    //     if (percentage_discount > 0) {
+    //         rePayment = actualRepayment - (actualRepayment * percentage_discount) / 100;
+    //     } else {
+    //         rePayment = actualRepayment;
+    //     }
+    //     total = actualRepayment + actualDownpayment;
+    //     return { total, actualDownpayment, rePayment, biMonthlyRepayment };
+    // };
 
     const repaymentCount = (days, cycle) => {
         const result = days / cycle;

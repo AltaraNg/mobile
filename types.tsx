@@ -25,7 +25,7 @@ export type RootStackParamList = {
     VerificationPassed: { order: object };
     VerificationPending: { order: object };
     ViewNotification: { notification: object };
-    UploadDocument: { down_payment: number; loan_amount: number; repayment: number; repayment_cycle_id };
+    UploadDocument: object;
     Main: undefined;
     OTP: { phone_number: string };
     Login: undefined;
@@ -34,6 +34,8 @@ export type RootStackParamList = {
     Cards: { order: string };
     OrderRequest: { order: string };
     Calculator: { order: object };
+    Guarantors: {};
+
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, Screen>;
@@ -54,6 +56,7 @@ export type RootTabParamList = {
     OrderConfirmation: { order: object };
     OrderSuccess: { order: object };
     Calculator: { order: object };
+    Guarantors: {};
 };
 
 export type DrawerParamList = {

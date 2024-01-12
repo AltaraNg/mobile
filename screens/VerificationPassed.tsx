@@ -46,7 +46,7 @@ export default function VerificationPassed({ navigation, route }: Props) {
                     product_price: parseInt(details.product.retail_price),
                     down_payment: (parseInt(details.product.retail_price) * details.down_payment_rate.percent) / 100,
                     repayment:
-                        parseInt(details.product.retail_price) - (parseInt(details.product.retail_price) * details.down_payment_rate.percent) / 100,
+                        parseInt(creditChecker.repayment),
                 },
             });
             setOrderDetails(details);
@@ -64,8 +64,7 @@ export default function VerificationPassed({ navigation, route }: Props) {
             product_price: parseInt(orderDetails?.product?.retail_price),
             down_payment: (parseInt(orderDetails?.product.retail_price) * orderDetails?.down_payment_rate.percent) / 100,
             repayment:
-                parseInt(orderDetails?.product.retail_price) -
-                (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100,
+                parseInt(creditChecker.repayment) / 100,
         };
         navigation.navigate("OrderConfirmation", data);
     };
@@ -135,9 +134,7 @@ export default function VerificationPassed({ navigation, route }: Props) {
                         <Text style={[styles.modalText, { textAlign: "right" }]}>
                             Total Repayment:{" "}
                             <Text style={{ fontFamily: "Montserrat_700Bold" }}>
-                                {`₦${formatAsMoney(
-                                    parseInt(orderDetails?.product?.retail_price) -
-                                        (parseInt(orderDetails?.product?.retail_price) * orderDetails?.down_payment_rate?.percent) / 100
+                                {`₦${formatAsMoney(parseInt(creditChecker.repayment)
                                 )}`}
                             </Text>{" "}
                         </Text>

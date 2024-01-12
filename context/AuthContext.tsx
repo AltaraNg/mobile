@@ -28,7 +28,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
     const [authData, setAuthData] = useState<AuthData>();
-    const [showLoader, setShowLoader] = useState(false);
+    const [showLoader, setShowLoader] = useState(true);
     const [totalUnread, setTotalUnread] = useState({
         unread: 0,
     });

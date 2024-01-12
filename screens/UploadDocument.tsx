@@ -7,12 +7,15 @@ import { Text, View } from "../components/Themed";
 import { RootTabParamList } from "../types";
 import SideMenu from "./SideMenu";
 import { AuthContext, useAuth } from "../context/AuthContext";
+import { Dropdown } from "react-native-element-dropdown";
+
+
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
 type Props = NativeStackScreenProps<RootTabParamList, "Dashboard">;
 import Upload from "../components/Upload";
-import { logActivity } from "../utilities/globalFunctions";
+import UploadPDF from "../components/UploadPDF";
 const url = process.env.EXPO_PUBLIC_API_URL;
 axios.defaults.baseURL = url;
 
@@ -23,37 +26,72 @@ export default function UploadDocument({ navigation, route }: Props) {
     const { authData, setAuthData } = useContext(AuthContext);
     const [loading, setLoader] = useState(null);
     const [showMenu] = useState(false);
+    const [bankChoice, setBankChoice] = useState("");
+    const [isFocus, setIsFocus] = useState(false);
+
 
     const toggleSideMenu = () => {
         navigation.toggleDrawer();
     };
 
-    function handleRequest() {}
+    const choices = [
+        {
+            "key": 1,
+            "name": "Zenith Bank"
+        },
+        {
+            "key": 2,
+            "name": "UBA Bank"
+        },
+        {
+            "key": 3,
+            "name": "Access Bank"
+        },
+        {
+            "key": 4,
+            "name": "First Bank"
+        },
+        {
+            "key": 5,
+            "name": "GT Bank"
+        },
+        {
+            "key": 6,
+            "name": "FCMB Bank"
+        },
+        {
+            "key": 7,
+            "name": "Fidelity Bank"
+        },
+        {
+            "key": 8,
+            "name": "Sterling Bank"
+        },
+        {
+            "key": 9,
+            "name": "Opay Bank"
+        }
+    ];
+
+    function handleRequest() { }
 
     const createOrderRequest = async () => {
         const data = {
             ...order,
             documents: authData.documents,
-            guarantors: [
-                {
-                    first_name: "Guarantor First Name",
-                    last_name: "Guarantor Last Name",
-                    phone_number: "090876661661",
-                    home_address: "23, Odogbolu, Altara Junction",
-                },
-                {
-                    first_name: "Second Guarantor Sed Name",
-                    last_name: "Second Guarantor Last Name",
-                    phone_number: "090876661662",
-                    home_address: "23, Odogbolu, Altara Junction",
-                },
-            ],
         };
+        let data0 = data;
+        if(bankChoice !== ""){
+            data0 = {
+                ...data0,
+                bank_statement_choice: bankChoice
+            }
+        }
         const headers = {
             Authorization: `Bearer ${authData.token}`,
         };
         axios
-            .post("submit/loan/request", data, {
+            .post("submit/loan/request", data0, {
                 headers: headers,
             })
             .then(async (res) => {
@@ -64,7 +102,7 @@ export default function UploadDocument({ navigation, route }: Props) {
             .catch((err) => {
                 ToastAndroid.showWithGravity("Error creating order request", ToastAndroid.SHORT, ToastAndroid.CENTER);
             })
-            .finally(() => {});
+            .finally(() => { });
     };
 
     return (
@@ -110,6 +148,43 @@ export default function UploadDocument({ navigation, route }: Props) {
                             <Upload onRequest={handleRequest} document="Guarantor's ID" type="guarantor_id" />
                             <Upload onRequest={handleRequest} document="Proof of Income" type="proof_of_income" />
                         </View>
+
+                        <View
+                            style={{
+                                alignItems: "center",
+                                justifyContent: "space-evenly",
+                                backgroundColor: "white",
+                                flexDirection: "column",
+                            }}
+                        >
+                            <UploadPDF onRequest={handleRequest} document="Bank Statement" type="bank_statement" />
+                            <Dropdown
+                                style={[
+                                    styles.input2,
+                                    { width: Dimensions.get("window").width * 0.5 },
+                                    isFocus && { borderColor: "blue" },
+                                ]}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                data={choices}
+                                search
+                                maxHeight={300}
+                                labelField="name"
+                                valueField="key"
+                                placeholder={!isFocus ? "Select Bank" : "..."}
+
+                                searchPlaceholder="Search..."
+                                value={bankChoice}
+                                onFocus={() => setIsFocus(true)}
+                                onBlur={() => setIsFocus(false)}
+                                onChange={(txt) => {
+                                    console.log(txt)
+                                    setBankChoice(txt.key);
+                                    setIsFocus(false);
+                                }}
+                            />
+                        </View>
                         <View
                             style={{
                                 flexDirection: "row",
@@ -129,7 +204,7 @@ export default function UploadDocument({ navigation, route }: Props) {
                                     {loading ? (
                                         <Image source={require("../assets/gifs/loader.gif")} style={styles.image} />
                                     ) : (
-                                        <Text style={styles.buttonText}> Continue </Text>
+                                        <Text style={styles.buttonText}> Submit </Text>
                                     )}
                                 </Pressable>
                             </LinearGradient>
@@ -259,5 +334,18 @@ const styles = StyleSheet.create({
         marginHorizontal: 30,
         fontSize: 14,
         color: "#72788D",
+    },
+    input2: {
+        backgroundColor: "#E8EBF7",
+        color: "#72788D",
+        marginRight: 25,
+        paddingVertical: 5,
+        borderWidth: 0.5,
+        borderRadius: 2,
+        borderColor: "#aaa",
+        paddingHorizontal: 10,
+        width: 140,
+        fontSize: 15,
+        fontFamily: "Montserrat_600SemiBold",
     },
 });
